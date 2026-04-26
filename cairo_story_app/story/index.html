@@ -1,0 +1,3772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
+<title>Cairo · Layla · Masari — Interactive Data Story</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Noto+Sans+Arabic:wght@400;600;700&display=swap">
+
+<!-- MapLibre GL JS -->
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+<!-- Turf.js for along-line interpolation (animated route traversal) -->
+<script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
+
+<!-- Three.js — bound into MapLibre's WebGL context via CustomLayerInterface -->
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+<!-- React 18 + Babel for JSX in-browser -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+
+<style>
+  :root {
+    --bg:         #07090C;
+    --bg-alt:     #0D1117;
+    --panel:      #161B22;
+    --panel-deep: #111820;
+    --fg:         #E6EDF3;
+    --fg-body:    #C9D1D9;
+    --fg-muted:   #8B949E;
+    --fg-dim:     #6E7681;
+    --grid:       #21262D;
+    --accent:     #58A6FF;
+    --ok:         #2A9D8F;
+    --gold:       #E9C46A;
+    --warn:       #E86F51;
+    --orange:     #F4A261;
+    --purple:     #7B2D8E;
+    --pink:       #FF6B6B;
+    --teal2:      #4ECDC4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body, #root {
+    margin: 0; padding: 0;
+    width: 100%; height: 100vh;
+    background: var(--bg);
+    color: var(--fg-body);
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    overflow: hidden;
+  }
+
+  /* ── Map container ─────────────────────────────────────────── */
+  .map-stage {
+    position: absolute; inset: 0;
+    background: var(--bg);
+  }
+  .maplibregl-ctrl-attrib {
+    background: rgba(13,17,23,0.5) !important;
+    color: var(--fg-dim) !important;
+    font-family: 'Share Tech Mono', monospace !important;
+    font-size: 9px !important;
+  }
+  .maplibregl-ctrl-attrib a { color: var(--fg-muted) !important; }
+
+  /* ── Animations ────────────────────────────────────────────── */
+  @keyframes shimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes pulse-ring {
+    0%   { transform: scale(1);   opacity: 0.9; }
+    80%  { transform: scale(2.4); opacity: 0;   }
+    100% { transform: scale(2.4); opacity: 0;   }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes pulse-border {
+    0%, 100% { opacity: 0.6; }
+    50%      { opacity: 1.0; }
+  }
+  @keyframes scan {
+    0%   { transform: translateY(-100%); }
+    100% { transform: translateY(100%);  }
+  }
+  @keyframes chart-rise {
+    from { opacity: 0; transform: translateY(30px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  }
+
+  /* ── Frosted glass card ────────────────────────────────────── */
+  .card {
+    position: relative;
+    background: linear-gradient(160deg,
+                rgba(13,17,23,0.82) 0%,
+                rgba(17,24,32,0.82) 50%,
+                rgba(13,17,23,0.82) 100%);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid rgba(88,166,255,0.16);
+    border-radius: 14px;
+    box-shadow: 0 0 40px rgba(88,166,255,0.08),
+                inset 0 0 30px rgba(88,166,255,0.02);
+    overflow: hidden;
+  }
+  .card::before, .card::after, .card .bl, .card .br {
+    content: ''; position: absolute; width: 32px; height: 32px;
+    opacity: 0.72; pointer-events: none;
+  }
+  .card::before {
+    top: 0; left: 0;
+    border-top: 2px solid var(--accent); border-left: 2px solid var(--accent);
+    border-radius: 14px 0 0 0;
+  }
+  .card::after {
+    top: 0; right: 0;
+    border-top: 2px solid var(--ok); border-right: 2px solid var(--ok);
+    border-radius: 0 14px 0 0;
+  }
+  .card .bl {
+    bottom: 0; left: 0;
+    border-bottom: 2px solid var(--ok); border-left: 2px solid var(--ok);
+    border-radius: 0 0 0 14px;
+  }
+  .card .br {
+    bottom: 0; right: 0;
+    border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent);
+    border-radius: 0 0 14px 0;
+  }
+
+  /* ── TOP BAR (brand + chapter + progress) ──────────────────── */
+  .topbar {
+    position: fixed; top: 14px; left: 14px; right: 14px;
+    display: flex; align-items: center; gap: 16px;
+    z-index: 30; pointer-events: none;
+  }
+  .brand {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 12px; letter-spacing: 3px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--ok) 40%, var(--gold) 65%, var(--accent) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shimmer 6s linear infinite;
+    filter: drop-shadow(0 0 16px rgba(88,166,255,0.45));
+    text-transform: uppercase;
+    padding: 10px 18px; border-radius: 100px;
+    background-color: rgba(13,17,23,0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(88,166,255,0.16);
+    pointer-events: auto;
+  }
+  .chapter-pill {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px; letter-spacing: 3px; color: var(--fg-muted);
+    padding: 10px 18px; border-radius: 100px;
+    background: rgba(13,17,23,0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.06);
+    text-transform: uppercase;
+    pointer-events: auto;
+  }
+  .progress-wrap {
+    flex: 1; display: flex; align-items: center; gap: 14px;
+    padding: 10px 20px; border-radius: 100px;
+    background: rgba(13,17,23,0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(88,166,255,0.08);
+    pointer-events: auto;
+  }
+  .progress-track {
+    flex: 1; height: 2px; background: rgba(88,166,255,0.12); border-radius: 1px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; transition: width 1400ms cubic-bezier(0.22,0.61,0.36,1);
+    background: linear-gradient(90deg, var(--accent) 0%, var(--ok) 40%, var(--gold) 75%, var(--warn) 100%);
+    box-shadow: 0 0 14px rgba(88,166,255,0.6);
+  }
+  .progress-counter {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 0.2em; color: var(--fg-muted);
+    white-space: nowrap;
+  }
+  .mode-btns { display: flex; gap: 8px; pointer-events: auto; }
+  .mode-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 0.25em;
+    padding: 8px 14px; border-radius: 100px;
+    background: rgba(13,17,23,0.72);
+    color: var(--fg-muted);
+    border: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(14px);
+    cursor: pointer;
+    transition: all 180ms;
+    text-transform: uppercase;
+  }
+  .mode-btn:hover {
+    color: var(--accent);
+    border-color: rgba(88,166,255,0.35);
+    background: rgba(88,166,255,0.08);
+  }
+  .mode-btn.active {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: rgba(88,166,255,0.14);
+    box-shadow: 0 0 18px rgba(88,166,255,0.35);
+  }
+
+  /* ── NARRATIVE PANEL (floating, left side) ─────────────────── */
+  .panel {
+    position: fixed; left: 28px; top: 92px; bottom: 92px;
+    width: 420px; max-width: 32vw;
+    z-index: 20;
+    padding: 32px 34px; overflow-y: auto; overflow-x: hidden;
+  }
+  .panel::-webkit-scrollbar { width: 4px; }
+  .panel::-webkit-scrollbar-thumb { background: rgba(88,166,255,0.25); border-radius: 2px; }
+
+  .kicker {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9.5px; letter-spacing: 0.5em; color: var(--accent);
+    opacity: 0.9; text-transform: uppercase;
+    margin-bottom: 14px;
+    animation: fade-up 600ms 200ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .arabic {
+    font-family: 'Noto Sans Arabic', sans-serif;
+    font-size: 15px; color: var(--ok); font-weight: 600;
+    direction: rtl; letter-spacing: 0.02em;
+    margin-bottom: 10px;
+    text-shadow: 0 0 14px rgba(42,157,143,0.3);
+    animation: fade-up 600ms 320ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .headline {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 2.05rem; line-height: 1.08;
+    margin: 4px 0 20px 0; letter-spacing: 0.3px;
+    background: linear-gradient(120deg, var(--gold) 0%, var(--accent) 50%, var(--ok) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    filter: drop-shadow(0 0 22px rgba(88,166,255,0.28));
+    animation: fade-up 700ms 440ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .body {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13.5px; line-height: 1.78; color: rgba(201,209,217,0.9);
+    animation: fade-up 700ms 600ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .metric {
+    margin-top: 28px; padding-top: 22px;
+    border-top: 1px solid rgba(88,166,255,0.16);
+    animation: fade-up 700ms 760ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .metric-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 0.4em; color: var(--fg-muted);
+    margin-bottom: 8px; text-transform: uppercase;
+  }
+  .metric-val {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 2.6rem; color: var(--gold); line-height: 1;
+    filter: drop-shadow(0 0 18px rgba(233,196,106,0.5));
+  }
+  .metric-unit {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 0.3em;
+    color: rgba(233,196,106,0.88); margin-top: 6px;
+  }
+
+  .trip-plan {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(88,166,255,0.12);
+    animation: fade-up 700ms 860ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .trip-plan-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 0.34em; color: var(--fg-muted);
+    margin-bottom: 12px; text-transform: uppercase;
+  }
+  .trip-leg {
+    display: grid;
+    grid-template-columns: 74px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .trip-leg:first-of-type { border-top: 0; }
+  .trip-leg-mode {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px; letter-spacing: 0.24em; color: var(--fg-muted);
+  }
+  .trip-leg-route {
+    font-size: 11px; color: var(--fg-body); line-height: 1.45;
+  }
+  .trip-leg-time {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem; color: var(--accent);
+    white-space: nowrap;
+  }
+  .trip-leg-note {
+    margin-top: 3px;
+    font-size: 9px;
+    color: var(--fg-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .panel .hr {
+    height: 1px; margin: 24px 0; opacity: 0.55;
+    background: linear-gradient(90deg, transparent, var(--accent) 30%, var(--ok) 70%, transparent);
+    box-shadow: 0 0 10px rgba(88,166,255,0.3);
+    border: none;
+  }
+
+  /* ── BOTTOM BAR (controls) ─────────────────────────────────── */
+  .bottombar {
+    position: fixed; left: 28px; right: 28px; bottom: 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; z-index: 25; pointer-events: none;
+  }
+  .hint {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 0.25em; color: var(--fg-dim);
+    padding: 10px 18px; border-radius: 100px;
+    background: rgba(13,17,23,0.72);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.06);
+    pointer-events: auto;
+    text-transform: uppercase;
+  }
+  .controls { display: flex; gap: 10px; pointer-events: auto; }
+  .ctrl {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 10px; letter-spacing: 0.3em;
+    padding: 10px 20px; border-radius: 100px;
+    background: rgba(13,17,23,0.72);
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,0.28);
+    backdrop-filter: blur(14px);
+    cursor: pointer;
+    transition: all 180ms;
+    text-transform: uppercase;
+  }
+  .ctrl:hover {
+    background: rgba(88,166,255,0.16);
+    border-color: rgba(88,166,255,0.5);
+    box-shadow: 0 0 20px rgba(88,166,255,0.4);
+  }
+  .ctrl:disabled { opacity: 0.35; cursor: not-allowed; }
+  .ctrl.primary {
+    background: linear-gradient(135deg, rgba(88,166,255,0.25), rgba(42,157,143,0.2));
+    border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(88,166,255,0.35);
+  }
+  .ctrl.primary:hover {
+    box-shadow: 0 0 28px rgba(88,166,255,0.55);
+    background: linear-gradient(135deg, rgba(88,166,255,0.4), rgba(42,157,143,0.3));
+  }
+
+  /* ── CHAPTER MARKERS (bottom progress dots) ────────────────── */
+  .chapters-strip {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .chap-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(88,166,255,0.15);
+    border: 1px solid rgba(88,166,255,0.3);
+    transition: all 300ms;
+    cursor: pointer;
+  }
+  .chap-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 12px rgba(88,166,255,0.7);
+    transform: scale(1.35);
+  }
+  .chap-dot.past { background: rgba(88,166,255,0.45); }
+  .chap-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 0.35em;
+    color: var(--fg-muted); margin-right: 8px;
+    text-transform: uppercase;
+  }
+
+  /* ── METRIC CHART CARD (H1 / H2 / H3 / Q18b inset) ─────────── */
+  .chart-card {
+    position: fixed; right: 28px; bottom: 86px;
+    width: 420px; max-width: 34vw;
+    padding: 20px 22px;
+    z-index: 18;
+    animation: chart-rise 700ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .chart-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px; letter-spacing: 0.3em; color: var(--accent);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  /* ── BAR CHARTS (inline SVG) ───────────────────────────────── */
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; color: var(--fg-muted);
+    width: 120px; text-align: right; letter-spacing: 0.1em;
+  }
+  .bar-track {
+    flex: 1; height: 16px; background: rgba(88,166,255,0.05);
+    border-radius: 2px; overflow: hidden; position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    transition: width 1400ms cubic-bezier(0.22,0.61,0.36,1);
+  }
+  .bar-val {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 11px; color: var(--gold);
+    width: 70px; letter-spacing: 0.05em;
+  }
+
+  /* ── Q18b MATRIX ──────────────────────────────────────────── */
+  .matrix {
+    display: grid; grid-template-columns: 110px repeat(4, 1fr);
+    gap: 3px; font-family: 'Share Tech Mono', monospace;
+  }
+  .matrix-cell {
+    padding: 10px 6px; text-align: center;
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 11px; border-radius: 3px;
+    animation: fade-in 700ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .matrix-head {
+    color: var(--accent); font-size: 9px;
+    letter-spacing: 0.18em; padding: 8px 4px;
+    text-align: center; text-transform: uppercase;
+  }
+  .matrix-rowlbl {
+    color: var(--fg-muted); font-size: 10px;
+    letter-spacing: 0.12em; padding: 10px 8px;
+    text-align: right; text-transform: uppercase;
+  }
+
+  /* ── CTA BUTTONS (final scene) ─────────────────────────────── */
+  .cta-row {
+    display: flex; gap: 10px; margin-top: 26px;
+    flex-wrap: wrap;
+    animation: fade-up 800ms 1000ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .cta {
+    flex: 1; min-width: 150px;
+    padding: 14px 18px; border-radius: 10px;
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 10px; letter-spacing: 0.28em;
+    background: linear-gradient(135deg, rgba(88,166,255,0.22), rgba(42,157,143,0.15));
+    color: var(--accent);
+    border: 1px solid rgba(88,166,255,0.35);
+    cursor: pointer;
+    transition: all 220ms;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .cta:hover {
+    background: linear-gradient(135deg, rgba(88,166,255,0.4), rgba(42,157,143,0.25));
+    border-color: var(--accent);
+    box-shadow: 0 0 28px rgba(88,166,255,0.5);
+    transform: translateY(-2px);
+  }
+
+  /* ── VIGNETTE OVERLAY ───────────────────────────────────────── */
+  .vignette {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center,
+                transparent 55%,
+                rgba(7,9,12,0.22) 85%,
+                rgba(7,9,12,0.5) 100%);
+    pointer-events: none; z-index: 5;
+  }
+
+  /* ── loading screen ────────────────────────────────────────── */
+  .splash {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--bg); z-index: 50;
+    transition: opacity 500ms;
+  }
+  .splash.hidden { opacity: 0; pointer-events: none; }
+  .splash-logo {
+    font-family: 'Orbitron', sans-serif; font-weight: 900;
+    font-size: 2rem; letter-spacing: 0.3em;
+    background: linear-gradient(90deg, var(--accent), var(--ok), var(--gold), var(--accent));
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shimmer 3s linear infinite;
+    filter: drop-shadow(0 0 32px rgba(88,166,255,0.5));
+  }
+  .splash-sub {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--fg-muted); letter-spacing: 0.4em;
+    font-size: 10px; margin-top: 18px; text-transform: uppercase;
+  }
+  .splash-bar {
+    width: 220px; height: 1px; margin-top: 26px;
+    background: rgba(88,166,255,0.15); overflow: hidden;
+  }
+  .splash-bar::after {
+    content: ''; display: block; width: 30%; height: 100%;
+    background: var(--accent);
+    animation: scan 1.4s linear infinite;
+    box-shadow: 0 0 14px var(--accent);
+  }
+  .version-tag {
+    position: fixed; top: 14px; right: 14px;
+    z-index: 40; pointer-events: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 0.25em; color: var(--fg-dim);
+    padding: 4px 10px; border-radius: 100px;
+    background: rgba(13,17,23,0.6);
+    border: 1px solid rgba(88,166,255,0.12);
+    text-transform: uppercase;
+  }
+  /* ─── Top-right colour legend (replaces the dev debug HUD) ────────────── */
+  .legend-card {
+    position: fixed; top: 44px; right: 14px;
+    z-index: 40; pointer-events: auto;
+    font-family: 'Share Tech Mono', monospace;
+    color: #E6EDF3;
+    padding: 14px 16px 12px; border-radius: 12px;
+    background: rgba(13,17,23,0.82);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid rgba(88,166,255,0.2);
+    box-shadow: 0 0 30px rgba(88,166,255,0.10), inset 0 0 20px rgba(88,166,255,0.03);
+    min-width: 210px;
+  }
+  .legend-card .legend-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 0.32em; color: #58A6FF;
+    text-transform: uppercase; margin-bottom: 8px;
+    border-bottom: 1px solid rgba(88,166,255,0.18);
+    padding-bottom: 6px;
+  }
+  .legend-row {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px; line-height: 1.55; padding: 3px 0;
+  }
+  .legend-swatch {
+    width: 14px; height: 14px; border-radius: 50%;
+    flex: none;
+    box-shadow: 0 0 10px currentColor, inset 0 0 0 1.5px rgba(13,17,23,0.6);
+  }
+  .legend-row .legend-label {
+    flex: 1; letter-spacing: 0.05em; color: #C9D1D9;
+  }
+  .legend-row .legend-glyph {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 11px;
+    width: 18px; text-align: center;
+  }
+
+  /* ── MapLibre marker customization ─────────────────────────── */
+  .maplibregl-canvas:focus { outline: none; }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .panel { width: 88vw; left: 6vw; right: 6vw; max-width: none; }
+    .chart-card { width: 88vw; right: 6vw; left: 6vw; max-width: none; bottom: 120px; }
+    .headline { font-size: 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<!--  ╔════════════════════════════════════════════════════════════╗
+      ║  MAIN APP                                                  ║
+      ╚════════════════════════════════════════════════════════════╝  -->
+<script type="text/babel" data-type="module">
+(() => {
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
+
+// ═══════════════════════════════════════════════════════════════════════
+//  DATA · stations, routes, districts
+// ═══════════════════════════════════════════════════════════════════════
+const LOCATIONS = {
+  imbaba: [31.2083, 30.0866],
+  maadi: [31.2581, 29.9601],
+  adlyMansour: [31.4213, 30.1460],
+  tahrir: [31.2357, 30.0444],
+};
+
+// METRO_POST_2014 — auto-extracted from Phase2/CleanedData/metro_stations.csv
+// Filter: opening_year >= 2014. 27 stations across Phases 3A/3B/3C/3D of Line 3.
+const METRO_POST_2014 = [
+  { name: 'Fair Zone',             coords: [31.3011, 30.0733], year: 2014, line: 'Line 3', phase: 'Phase 3A', interchange: false },
+  { name: 'Stadium',               coords: [31.3175, 30.0731], year: 2014, line: 'Line 3', phase: 'Phase 3A', interchange: false },
+  { name: 'Al-Ahram',              coords: [31.3264, 30.0914], year: 2014, line: 'Line 3', phase: 'Phase 3A', interchange: false },
+  { name: 'Koleyet El-Banat',      coords: [31.3289, 30.0836], year: 2014, line: 'Line 3', phase: 'Phase 3A', interchange: false },
+  { name: 'Haroun',                coords: [31.3328, 30.1011], year: 2019, line: 'Line 3', phase: 'Phase 3B', interchange: false },
+  { name: 'Heliopolis Square',     coords: [31.3381, 30.1081], year: 2019, line: 'Line 3', phase: 'Phase 3B', interchange: false },
+  { name: 'Alf Maskan',            coords: [31.3397, 30.1181], year: 2019, line: 'Line 3', phase: 'Phase 3B', interchange: false },
+  { name: 'Nadi El-Shams',         coords: [31.3439, 30.1222], year: 2019, line: 'Line 3', phase: 'Phase 3B', interchange: false },
+  { name: 'El-Nozha',              coords: [31.3600, 30.1283], year: 2020, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'Hesham Barakat',        coords: [31.3728, 30.1311], year: 2020, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'Qobaa',                 coords: [31.3839, 30.1347], year: 2020, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'Omar Ibn El-Khattab',   coords: [31.3942, 30.1406], year: 2020, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'El Haykestep',          coords: [31.4047, 30.1439], year: 2020, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'Adly Mansour',          coords: [31.4214, 30.1469], year: 2020, line: 'Line 3', phase: 'Phase 3C', interchange: true  },
+  { name: 'Kit Kat',               coords: [31.2131, 30.0667], year: 2022, line: 'Line 3', phase: 'Phase 3C', interchange: true  },
+  { name: 'Safaa Hegazy',          coords: [31.2225, 30.0625], year: 2022, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'Maspero',               coords: [31.2322, 30.0556], year: 2022, line: 'Line 3', phase: 'Phase 3C', interchange: false },
+  { name: 'Rod al-Farag Corridor', coords: [31.1842, 30.1019], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Boulak El Dakrour',     coords: [31.1964, 30.0361], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Ring Road',             coords: [31.1997, 30.0964], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Gamat El Dowal',        coords: [31.1997, 30.0508], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Wadi El Nile',          coords: [31.2011, 30.0583], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Tawfikia',              coords: [31.2025, 30.0653], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Sudan',                 coords: [31.2053, 30.0697], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'Imbaba',                coords: [31.2075, 30.0758], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'El-Qawmia',             coords: [31.2089, 30.0933], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+  { name: 'El-Bohy',               coords: [31.2106, 30.0822], year: 2024, line: 'Line 3', phase: 'Phase 3D', interchange: false },
+];
+
+// METRO_PRE_2014 — Lines 1 & 2 stations + Line-3 Phase-3A interchanges
+// (everything that was open BEFORE the post-2014 expansion programme).
+// Sourced from Phase2/CleanedData/metro_stations.csv (opening_year < 2014).
+// Used in Scene 5 (THE GAP) so the viewer sees the FULL existing network the
+// ghost terminals could be reaching, not just the post-2014 additions.
+const METRO_PRE_2014 = [
+  { name: 'Al-Sayeda Zeinab',              coords: [31.2353, 30.0292], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Sadat',                         coords: [31.2356, 30.0444], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: true  },
+  { name: 'Saad Zaghloul',                 coords: [31.2381, 30.0367], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Nasser',                        coords: [31.2389, 30.0536], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: true  },
+  { name: 'Orabi',                         coords: [31.2425, 30.0575], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Al-Shohadaa',                   coords: [31.2461, 30.0619], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: true  },
+  { name: 'Tora El-Balad',                 coords: [31.2736, 29.9464], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Tora El-Asmant',                coords: [31.2878, 29.9258], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'El-Maasara',                    coords: [31.2997, 29.9061], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Ain Helwan',                    coords: [31.3250, 29.8628], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Helwan',                        coords: [31.3342, 29.8489], year: 1987, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Dar El-Salam',                  coords: [31.2422, 29.9819], year: 1988, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Ghamra',                        coords: [31.2647, 30.0689], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'El-Demerdash',                  coords: [31.2778, 30.0772], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Manshiet El-Sadr',              coords: [31.2878, 30.0822], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Kobri El-Qobba',                coords: [31.2939, 30.0869], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Hammamat El-Qobba',             coords: [31.2981, 30.0903], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Saray El-Qobba',                coords: [31.3047, 30.0981], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Hadayeq El-Zaitoun',            coords: [31.3100, 30.1053], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Helmeyet El-Zaitoun',           coords: [31.3139, 30.1144], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'El-Matareyya',                  coords: [31.3139, 30.1214], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Ain Shams',                     coords: [31.3192, 30.1311], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Ezbet El-Nakhl',                coords: [31.3244, 30.1392], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'El-Marg',                       coords: [31.3356, 30.1522], year: 1989, line: 'Line 1', phase: 'Phase 1 (orig)', interchange: false },
+  { name: 'Mar Girgis',                    coords: [31.2294, 30.0058], year: 1992, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Hadayek El-Maadi',              coords: [31.2506, 29.9700], year: 1992, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Sakanat El-Maadi',              coords: [31.2633, 29.9528], year: 1992, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Kozzika',                       coords: [31.2817, 29.9361], year: 1993, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'El-Malek El-Saleh',             coords: [31.2308, 30.0169], year: 1995, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Maadi',                         coords: [31.2581, 29.9597], year: 1995, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Wadi Hof',                      coords: [31.3133, 29.8794], year: 1995, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: "El-Zahraa'",                    coords: [31.2317, 29.9953], year: 1997, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Hadayek Helwan',                coords: [31.3042, 29.8972], year: 1997, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'New El-Marg',                   coords: [31.3383, 30.1633], year: 1999, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Helwan University',             coords: [31.3203, 29.8689], year: 2002, line: 'Line 1', phase: 'Phase 1 (ext)',  interchange: false },
+  { name: 'Shubra El-Kheima',              coords: [31.2447, 30.1225], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Masarra',                       coords: [31.2450, 30.0711], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Khalafawy',                     coords: [31.2453, 30.0981], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Road El-Farag',                 coords: [31.2456, 30.0806], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'St. Teresa',                    coords: [31.2456, 30.0883], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Mezallat',                      coords: [31.2467, 30.1050], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Kolleyyet El-Zeraa',            coords: [31.2486, 30.1139], year: 1996, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Mohamed Naguib',                coords: [31.2442, 30.0453], year: 1998, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Attaba',                        coords: [31.2469, 30.0525], year: 1998, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: true  },
+  { name: 'El Bohoth',                     coords: [31.2003, 30.0358], year: 1999, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Cairo University',              coords: [31.2011, 30.0261], year: 1999, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: true  },
+  { name: 'Dokki',                         coords: [31.2119, 30.0383], year: 1999, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Opera',                         coords: [31.2253, 30.0419], year: 1999, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Faisal',                        coords: [31.2039, 30.0172], year: 2000, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'El Giza',                       coords: [31.2069, 30.0106], year: 2000, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Omm El-Masryeen',               coords: [31.2081, 30.0053], year: 2000, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Sakiat Mekky',                  coords: [31.2086, 29.9956], year: 2005, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'El-Mounib',                     coords: [31.2119, 29.9814], year: 2005, line: 'Line 2', phase: 'Phase 2 (orig)', interchange: false },
+  { name: 'Bab El Shaaria',                coords: [31.2561, 30.0539], year: 2012, line: 'Line 3', phase: 'Phase 3A',       interchange: false },
+  { name: 'El Geish',                      coords: [31.2669, 30.0619], year: 2012, line: 'Line 3', phase: 'Phase 3A',       interchange: false },
+  { name: 'Abdou Pasha',                   coords: [31.2747, 30.0647], year: 2012, line: 'Line 3', phase: 'Phase 3A',       interchange: false },
+  { name: 'Abbassia',                      coords: [31.2808, 30.0697], year: 2012, line: 'Line 3', phase: 'Phase 3A',       interchange: false },
+];
+
+// LRT_STATIONS — auto-extracted from Phase2/CleanedData/lrt_stations.csv
+// Filter: is_operational=True and lat is not null. 11 operational on the 3-July line.
+const LRT_STATIONS = [
+  { name: 'Badr',              coords: [31.2744, 29.8513], line: 'LRT' },
+  { name: 'Adly Mansour',      coords: [31.4215, 30.1470], line: 'LRT' },
+  { name: 'El-Obour',          coords: [31.4816, 30.1629], line: 'LRT' },
+  { name: 'Future',            coords: [31.5628, 30.1605], line: 'LRT' },
+  { name: 'El-Shorouk',        coords: [31.6058, 30.1796], line: 'LRT' },
+  { name: 'New Heliopolis',    coords: [31.6527, 30.1837], line: 'LRT' },
+  { name: 'Knowledge City',    coords: [31.6916, 30.2307], line: 'LRT' },
+  { name: 'Industrial Park',   coords: [31.7156, 30.2040], line: 'LRT' },
+  { name: 'El-Robaiky',        coords: [31.7525, 30.1665], line: 'LRT' },
+  { name: 'Capital Airport',   coords: [31.7825, 30.0759], line: 'LRT' },
+  { name: 'Hadayek al-Assema', coords: [31.8068, 30.1367], line: 'LRT' },
+];
+
+// BRT_STATIONS — coords sourced directly from Phase2/CleanedData/brt_stations.csv
+// (Google-Maps scraped, deduped to 21 unique Cairo BRT stops). English names are
+// manual translations of the raw Arabic. Demand: top-10 from Phase 1 boarding
+// research; remaining stops default to 500 (median order-of-magnitude).
+const BRT_STATIONS = [
+  { name: 'Bahtim',              coords: [31.2793, 30.1566], demand:  2032 },
+  { name: 'Adly Mansour BRT',    coords: [31.4200, 30.1481], demand:  7483 },
+  { name: 'El-Zakah Foundation', coords: [31.3827, 30.1659], demand:   236 },
+  { name: 'Shubra El-Kheima',    coords: [31.2290, 30.1491], demand:  5521 },
+  { name: 'Mostorod',            coords: [31.3019, 30.1640], demand:   453 },
+  { name: 'As-Salam',            coords: [31.4187, 30.1489], demand:  9559 },
+  { name: 'Carrefour Maadi',     coords: [31.3219, 29.9843], demand:   500 },
+  { name: 'Al-Khusus',           coords: [31.3235, 30.1633], demand:  7979 },
+  { name: 'Shaheed',             coords: [31.3598, 29.9787], demand:   500 },
+  { name: 'Sharqawia',           coords: [31.2403, 30.1497], demand:   500 },
+  { name: 'Suez Road',           coords: [31.4355, 30.0796], demand:   500 },
+  { name: 'Autostrad',           coords: [31.2903, 29.9927], demand:   500 },
+  { name: 'Fayoum Junction',     coords: [31.0996, 29.9469], demand:   500 },
+  { name: 'Al-Hadaba al-Wusta',  coords: [31.3094, 29.9866], demand:   500 },
+  { name: 'Algeria Street',      coords: [31.2717, 29.9904], demand:   500 },
+  { name: 'Al-Marg',             coords: [31.3414, 30.1635], demand: 14726 },
+  { name: 'Al-Qaleg',            coords: [31.3581, 30.1656], demand:   340 },
+  { name: 'Gardenia',            coords: [31.4124, 30.0555], demand:  1120 },
+  { name: 'Eastern Weavers',     coords: [31.3387, 29.9820], demand:   500 },
+  { name: 'Shubra-Banha Highway',coords: [31.2528, 30.1497], demand:   500 },
+  { name: 'Ibrahim Orabi',       coords: [31.4051, 30.1583], demand:   500 },
+];
+
+// INFORMAL_TERMINALS — Phase 1 ghost terminals (the exact 115 the analysis
+// notebook's Q14 uses). Each row is [lng, lat, dist_to_nearest_post2014_metro_m, category]
+// where category ∈ {'reached' (<1 km), 'marginal' (1–2 km), 'stranded' (>2 km)}.
+// Source: CleanedData/merged_G_underused_terminals.csv (Underused==True) ∩
+//         CleanedData/cleaned_terminals.csv → centroids reprojected to WGS84 →
+//         haversine distance to Phase2/CleanedData/metro_stations.csv (year≥2014).
+const INFORMAL_TERMINALS = [
+  [31.6226, 29.9306, 30887, 'stranded'], [31.3898, 29.9735, 13074, 'stranded'],
+  [31.2569, 30.0248,  4160, 'stranded'], [31.0243, 30.0641, 15945, 'stranded'],
+  [30.9144, 29.9639, 28319, 'stranded'], [30.9464, 29.9709, 25144, 'stranded'],
+  [31.6540, 30.1389, 22389, 'stranded'], [31.4818, 30.2419, 12044, 'stranded'],
+  [31.1329, 29.9909,  7917, 'stranded'], [30.8769, 29.9323, 32862, 'stranded'],
+  [31.2701, 30.0475,  3757, 'stranded'], [31.2330, 30.0497,   656, 'reached' ],
+  [31.4753, 30.0648, 10501, 'stranded'], [31.1916, 30.0594,   927, 'reached' ],
+  [31.4713, 30.2357, 10973, 'stranded'], [31.4253, 30.0166, 11898, 'stranded'],
+  [31.3804, 30.0472,  6397, 'stranded'], [30.9195, 29.9428, 28616, 'stranded'],
+  [31.2652, 30.0967,  4326, 'stranded'], [31.2459, 30.0644,  1644, 'marginal'],
+  [30.9160, 29.9310, 29429, 'stranded'], [31.0065, 30.0194, 18371, 'stranded'],
+  [30.9788, 29.9822, 21791, 'stranded'], [30.9183, 30.0781, 25720, 'stranded'],
+  [31.2096, 30.1109,  1868, 'marginal'], [30.9393, 29.9835, 25439, 'stranded'],
+  [31.3465, 30.1106,   860, 'reached' ], [30.8923, 29.9298, 31580, 'stranded'],
+  [31.3780, 29.8111, 29710, 'stranded'], [30.8944, 29.9093, 32324, 'stranded'],
+  [31.2470, 29.9740,  8451, 'stranded'], [31.1998, 30.1811,  8924, 'stranded'],
+  [30.8898, 29.9196, 32246, 'stranded'], [31.0219, 30.0291, 16818, 'stranded'],
+  [31.4257, 30.0045, 12814, 'stranded'], [30.9408, 29.9224, 27678, 'stranded'],
+  [31.4097, 30.0534,  8470, 'stranded'], [31.2697, 29.9701, 10162, 'stranded'],
+  [31.6044, 30.1190, 17875, 'stranded'], [31.1284, 29.9891,  8376, 'stranded'],
+  [31.3389, 30.0103,  7278, 'stranded'], [31.5239, 30.0098, 18167, 'stranded'],
+  [31.3592, 30.0391,  5515, 'stranded'], [31.3327, 29.8473, 24763, 'stranded'],
+  [31.3204, 30.1309,  2347, 'stranded'], [31.3346, 29.8502, 24587, 'stranded'],
+  [31.2260, 30.0099,  4082, 'stranded'], [31.2404, 30.0737,  2125, 'stranded'],
+  [31.1937, 30.0419,   690, 'reached' ], [31.2910, 30.1287,  4831, 'stranded'],
+  [31.1108, 29.9809, 10274, 'stranded'], [31.3273, 30.1178,  1195, 'marginal'],
+  [31.0949, 30.0454,  9820, 'stranded'], [31.2633, 30.1370,  7141, 'stranded'],
+  [31.2137, 30.0878,   687, 'reached' ], [31.2502, 30.0516,  1786, 'marginal'],
+  [31.2318, 30.1496,  6632, 'stranded'], [31.4403, 30.1706,  3195, 'stranded'],
+  [31.2611, 30.0790,  3809, 'stranded'], [31.3297, 29.9692, 11612, 'stranded'],
+  [31.2988, 29.8929, 18736, 'stranded'], [31.2772, 29.8486, 22253, 'stranded'],
+  [31.2314, 29.8502, 20948, 'stranded'], [31.2511, 30.1462,  7150, 'stranded'],
+  [31.3219, 30.1605,  4756, 'stranded'], [31.2025, 30.0952,   296, 'reached' ],
+  [31.4205, 30.1882,  4586, 'stranded'], [31.1338, 30.1255,  5512, 'stranded'],
+  [31.2347, 29.9888,  6427, 'stranded'], [31.2967, 29.7888, 29152, 'stranded'],
+  [31.2709, 29.8902, 17744, 'stranded'], [31.4629, 30.1681,  4636, 'stranded'],
+  [31.3657, 30.2216,  9421, 'stranded'], [31.2728, 30.0390,  4315, 'stranded'],
+  [31.3790, 29.8325, 27400, 'stranded'], [31.3635, 29.8185, 28652, 'stranded'],
+  [31.3554, 30.0820,  2554, 'stranded'], [31.2087, 30.0295,  1393, 'marginal'],
+  [31.3279, 30.1413,  2621, 'stranded'], [31.1305, 30.0463,  6446, 'stranded'],
+  [31.2297, 30.0292,  2944, 'stranded'], [31.2173, 30.0785,   764, 'reached' ],
+  [31.4088, 30.1534,  1129, 'marginal'], [31.3273, 30.0809,   339, 'reached' ],
+  [31.4992, 30.0266, 15328, 'stranded'], [31.2514, 29.9653,  9490, 'stranded'],
+  [31.3555, 30.1600,  3550, 'stranded'], [31.3164, 30.1268,  2448, 'stranded'],
+  [31.3143, 30.1131,  2221, 'stranded'], [31.3247, 30.0937,   305, 'reached' ],
+  [31.3253, 30.0541,  2239, 'stranded'], [31.2489, 30.1139,  4476, 'stranded'],
+  [31.3324, 30.1468,  2951, 'stranded'], [31.1996, 30.0140,  2474, 'stranded'],
+  [31.3095, 29.7816, 30328, 'stranded'], [31.2613, 29.7449, 32984, 'stranded'],
+  [31.1375, 30.0095,  6397, 'stranded'], [31.3162, 30.0948,  1051, 'marginal'],
+  [31.1968, 29.9940,  4685, 'stranded'], [31.2417, 30.0330,  2665, 'stranded'],
+  [31.1893, 30.0565,  1153, 'marginal'], [31.2122, 29.9828,  6116, 'stranded'],
+  [31.3545, 30.2497, 12716, 'stranded'], [31.2401, 29.9843,  7136, 'stranded'],
+  [31.3054, 30.0987,  2179, 'stranded'], [31.6769, 30.0243, 28111, 'stranded'],
+  [31.2376, 30.0835,  2606, 'stranded'], [31.1315, 30.1974, 11764, 'stranded'],
+  [31.0647, 29.8916, 20472, 'stranded'], [31.7328, 30.0212, 33063, 'stranded'],
+  [31.3164, 29.9838,  9930, 'stranded'], [31.1084, 29.9647, 11609, 'stranded'],
+  [30.9660, 29.9658, 23522, 'stranded'], [31.3417, 30.0725,  1745, 'marginal'],
+  [31.1525, 29.9860,  6997, 'stranded'],
+];
+
+// Pre-bucketed counts — the headline numbers for Scene 5
+const GHOST_STATS = {
+  total: 115,
+  reached_under_1km: 9,
+  marginal_1_2km: 9,
+  stranded_over_2km: 97,
+  stranded_pct: 84,
+};
+
+// DISTRICTS — Phase2/CleanedData/districts_wide.csv, centroid_source=='nominatim'
+// only (drops gov-fallback rows that all collapse to Cairo center). Admin
+// sub-areas with the same display name are merged. Pop tertile = pop_2017
+// quantile; coverage = under for dense Cairo/Giza Kism districts, over for new
+// desert cities (New Cairo, 6th October, Sheikh Zayed, Shorouk, etc.).
+const DISTRICTS = [
+  { name: 'Imbaba',              center: [31.2076, 30.0759], pop: 'high', coverage: 'under' },
+  { name: 'El Marg',             center: [31.3419, 30.1415], pop: 'high', coverage: 'under' },
+  { name: 'Al-Warraq',           center: [31.2287, 30.1130], pop: 'high', coverage: 'under' },
+  { name: 'Nasr City',           center: [31.3422, 30.0521], pop: 'high', coverage: 'under' },
+  { name: 'Al-Ahram',            center: [31.1345, 29.9843], pop: 'high', coverage: 'under' },
+  { name: 'Giza',                center: [31.2118, 29.9871], pop: 'high', coverage: 'under' },
+  { name: 'Helwan',              center: [31.3333, 29.8500], pop: 'high', coverage: 'under' },
+  { name: 'Al-Basatin',          center: [31.3102, 29.9631], pop: 'high', coverage: 'under' },
+  { name: 'Al-Ayyat',            center: [31.2581, 29.6196], pop: 'high', coverage: 'over'  },
+  { name: 'As-Salam 1',          center: [31.5363, 30.0596], pop: 'high', coverage: 'under' },
+  { name: 'Kirdasah',            center: [31.1119, 30.0316], pop: 'high', coverage: 'over'  },
+  { name: 'As-Saff',             center: [31.2811, 29.5647], pop: 'high', coverage: 'over'  },
+  { name: '6th of October City', center: [30.9409, 29.9723], pop: 'med',  coverage: 'over'  },
+  { name: 'Hadayek al-Qubbah',   center: [31.2825, 30.0822], pop: 'med',  coverage: 'under' },
+  { name: 'New Cairo',           center: [31.4757, 30.0278], pop: 'med',  coverage: 'over'  },
+  { name: 'Al-Agouza',           center: [31.2127, 30.0549], pop: 'med',  coverage: 'under' },
+  { name: 'Old Cairo',           center: [31.2332, 30.0174], pop: 'med',  coverage: 'under' },
+  { name: 'An-Nuzhah',           center: [31.3384, 30.1035], pop: 'med',  coverage: 'under' },
+  { name: 'Tura',                center: [31.2807, 29.9346], pop: 'med',  coverage: 'under' },
+  { name: 'Al-Muqattam',         center: [31.2833, 30.0333], pop: 'med',  coverage: 'under' },
+  { name: 'Al-Hawamidiyah',      center: [31.2651, 29.8959], pop: 'med',  coverage: 'under' },
+  { name: 'Zeitoun',             center: [31.3058, 30.1085], pop: 'med',  coverage: 'under' },
+  { name: 'As-Salam 2',          center: [31.5363, 30.0596], pop: 'med',  coverage: 'under' },
+  { name: 'Rod El Farag',        center: [31.2454, 30.0806], pop: 'med',  coverage: 'under' },
+  { name: 'Heliopolis',          center: [31.3329, 30.1006], pop: 'low',  coverage: 'under' },
+  { name: '15th of May City',    center: [31.3857, 29.8541], pop: 'low',  coverage: 'over'  },
+  { name: 'Sheikh Zayed City',   center: [30.9832, 30.0483], pop: 'low',  coverage: 'over'  },
+  { name: 'Maadi',               center: [31.2581, 29.9597], pop: 'low',  coverage: 'under' },
+  { name: 'Ash-Shorouk',         center: [31.6058, 30.1795], pop: 'low',  coverage: 'over'  },
+  { name: 'Shubra',              center: [31.2456, 30.0482], pop: 'low',  coverage: 'under' },
+  { name: 'Az-Zahir',            center: [31.2460, 30.0708], pop: 'low',  coverage: 'under' },
+  { name: 'Ad-Duqqi',            center: [31.2126, 30.0389], pop: 'low',  coverage: 'under' },
+  { name: 'Ad-Darb al-Ahmar',    center: [31.2788, 30.0501], pop: 'low',  coverage: 'under' },
+  { name: 'Bulaq',               center: [31.1910, 30.0339], pop: 'low',  coverage: 'under' },
+  { name: 'Azbakeya',            center: [31.2455, 30.0539], pop: 'low',  coverage: 'under' },
+  { name: 'Zamalek',             center: [31.2254, 30.0205], pop: 'low',  coverage: 'under' },
+];
+
+// Masari route: Imbaba → (microbus) → Kit Kat → (metro) → Sadat → (return) → Maadi
+const MASARI_LEGS = [
+  {
+    id: 'leg-1',
+    mode: 'MICROBUS',
+    icon: 'icon-microbus-trip',
+    color: '#E86F51',
+    durationMs: 3000,
+    pauseMs: 900,
+    label: 'Imbaba to Kit Kat',
+    note: 'Walk + microbus boarding',
+    timeText: '17 min',
+    route: [
+      [31.2083, 30.0866], [31.2095, 30.0855], [31.2108, 30.0840], [31.2125, 30.0800],
+      [31.2115, 30.0760], [31.2105, 30.0710],
+    ],
+  },
+  {
+    id: 'leg-2',
+    mode: 'METRO',
+    icon: 'icon-metro-trip',
+    color: '#58A6FF',
+    durationMs: 3600,
+    pauseMs: 1100,
+    label: 'Kit Kat to Sadat',
+    note: 'Line 3 into the core',
+    timeText: '14 min',
+    route: [
+      [31.2105, 30.0710], [31.2160, 30.0660], [31.2218, 30.0588],
+      [31.2338, 30.0530], [31.2388, 30.0549],
+    ],
+  },
+  {
+    id: 'leg-3',
+    mode: 'METRO',
+    icon: 'icon-metro-trip',
+    color: '#58A6FF',          // METRO is always blue (was gold — clashed with BRT)
+    durationMs: 2200,
+    pauseMs: 700,
+    label: 'Sadat to Maadi Metro',
+    note: 'Switch southbound',
+    timeText: '12 min',
+    route: [
+      [31.2388, 30.0549], [31.2468, 30.0527], [31.2388, 30.0470],
+      [31.2368, 30.0400], [31.2375, 30.0320], [31.2395, 30.0200],
+    ],
+  },
+  {
+    id: 'leg-4',
+    mode: 'MICROBUS',
+    icon: 'icon-microbus-trip',
+    color: '#E86F51',          // MICROBUS is always coral (was orange — inconsistent with leg-1)
+    durationMs: 1900,
+    pauseMs: 0,
+    label: 'Last mile to office',
+    note: 'Final connection to Maadi',
+    timeText: '2 min',
+    route: [
+      [31.2395, 30.0200], [31.2450, 30.0100], [31.2500, 29.9920],
+      [31.2540, 29.9780], [31.2565, 29.9680], [31.2581, 29.9601],
+    ],
+  },
+];
+
+const MASARI_ROUTE = MASARI_LEGS.flatMap((leg, idx) =>
+  idx === 0 ? leg.route : leg.route.slice(1)
+);
+
+const MASARI_TRANSFERS = [
+  { name: 'Kit Kat transfer', coords: MASARI_LEGS[0].route[MASARI_LEGS[0].route.length - 1] },
+  { name: 'Sadat transfer', coords: MASARI_LEGS[1].route[MASARI_LEGS[1].route.length - 1] },
+  { name: 'Maadi arrival', coords: MASARI_LEGS[3].route[MASARI_LEGS[3].route.length - 1] },
+];
+
+const LAYLA_TRIP_LEGS = [
+  {
+    id: 'layla-leg-1',
+    mode: 'MICROBUS',
+    icon: 'icon-microbus-trip',
+    color: '#E86F51',
+    durationMs: 3600,
+    pauseMs: 1400,
+    label: 'Imbaba to Kit Kat',
+    note: 'Wait, ask, board, and hope the route is right',
+    timeText: '26 min',
+    route: MASARI_LEGS[0].route,
+  },
+  {
+    id: 'layla-leg-2',
+    mode: 'METRO',
+    icon: 'icon-metro-trip',
+    color: '#58A6FF',
+    durationMs: 3000,
+    pauseMs: 1200,
+    label: 'Kit Kat to Sadat',
+    note: 'Enter the formal network',
+    timeText: '18 min',
+    route: MASARI_LEGS[1].route,
+  },
+  {
+    id: 'layla-leg-3',
+    mode: 'METRO',
+    icon: 'icon-metro-trip',
+    color: '#58A6FF',          // METRO blue
+    durationMs: 2600,
+    pauseMs: 1100,
+    label: 'Sadat transfer southbound',
+    note: 'Crowded interchange and platform wait',
+    timeText: '22 min',
+    route: MASARI_LEGS[2].route,
+  },
+  {
+    id: 'layla-leg-4',
+    mode: 'MICROBUS',
+    icon: 'icon-microbus-trip',
+    color: '#E86F51',          // MICROBUS coral
+    durationMs: 2200,
+    pauseMs: 0,
+    label: 'Last mile to the office',
+    note: 'Final uncertain connection into Maadi',
+    timeText: '17 min',
+    route: MASARI_LEGS[3].route,
+  },
+];
+
+const LAYLA_TRIP_ROUTE = LAYLA_TRIP_LEGS.flatMap((leg, idx) =>
+  idx === 0 ? leg.route : leg.route.slice(1)
+);
+
+const LAYLA_TRIP_STOPS = [
+  { name: 'Imbaba', coords: LOCATIONS.imbaba, kind: 'origin' },
+  { name: 'Kit Kat', coords: LAYLA_TRIP_LEGS[0].route[LAYLA_TRIP_LEGS[0].route.length - 1], kind: 'transfer' },
+  { name: 'Sadat', coords: LAYLA_TRIP_LEGS[1].route[LAYLA_TRIP_LEGS[1].route.length - 1], kind: 'transfer' },
+  { name: 'Maadi', coords: LOCATIONS.maadi, kind: 'destination' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+//  LAYER REGISTRY
+// ═══════════════════════════════════════════════════════════════════════
+const LAYERS = {
+  crowLine:    ['crow-line-layer'],
+  metro:       ['metro-line-layer', 'metro-dot-halo', 'metro-dots'],
+  lrt:         ['lrt-line-layer', 'lrt-dot-halo', 'lrt-dots'],
+  brt:         ['brt-demand-halo', 'brt-dots'],
+  // informal-layer / informal-halo are now 3D Three.js markers (no MapLibre
+  // layers); their semantic keys still appear in scene.visible arrays so
+  // syncScene can flip the 3D ghost swarm on/off.
+  gapLines:    ['gap-lines-layer'],
+  districts:   ['districts-choropleth', 'districts-outline'],
+  lrtCatch:    ['lrt-catchment-fill', 'lrt-catchment-line'],
+  brtCatch:    ['brt-catchment-fill'],
+  laylaTrip:   ['layla-trip-glow', 'layla-trip-inner', 'layla-trip-progress', 'layla-trip-stops', 'layla-trip-transfer-pulse'],
+  masariRoute: ['masari-glow', 'masari-inner', 'masari-progress', 'masari-transfer-pulse'],
+};
+
+const ALL_LAYER_IDS = Object.values(LAYERS).flat();
+
+// Per-layer opacity property name (differs by layer type)
+function opacityProp(layerId, map) {
+  const l = map.getLayer(layerId);
+  if (!l) return null;
+  if (l.type === 'circle')  return 'circle-opacity';
+  if (l.type === 'line')    return 'line-opacity';
+  if (l.type === 'fill')    return 'fill-opacity';
+  if (l.type === 'symbol')  return 'icon-opacity';
+  if (l.type === 'raster')  return 'raster-opacity';
+  return null;
+}
+function opacityPropStroke(layerId, map) {
+  const l = map.getLayer(layerId);
+  if (!l) return null;
+  if (l.type === 'circle') return 'circle-stroke-opacity';
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  THREE.JS 3D LAYER · senior-level CustomLayerInterface integration
+//  ---------------------------------------------------------------------
+//  Binds a Three.js scene to MapLibre's own WebGL context so 3D geometry
+//  lives *inside* the map (depth-sorted, pitch-aware, bearing-aware).
+//  No second canvas, no DOM overlay. Objects sit in a "meters-from-origin"
+//  local frame; we compose that frame with MapLibre's mainMatrix every
+//  render call to project it through the map camera.
+// ═══════════════════════════════════════════════════════════════════════
+const THREE_ORIGIN_LNGLAT = [31.24, 30.05]; // downtown-ish; close to all scenes
+let ORIGIN_MERC = null;
+let METER_TO_MERC = 1;
+
+function initThreeMercator() {
+  ORIGIN_MERC = maplibregl.MercatorCoordinate.fromLngLat(THREE_ORIGIN_LNGLAT, 0);
+  METER_TO_MERC = ORIGIN_MERC.meterInMercatorCoordinateUnits();
+}
+
+function lngLatToWorld([lng, lat], altitudeMeters = 0) {
+  const m = maplibregl.MercatorCoordinate.fromLngLat([lng, lat], 0);
+  return new THREE.Vector3(
+    (m.x - ORIGIN_MERC.x) / METER_TO_MERC,
+    altitudeMeters,
+    (m.y - ORIGIN_MERC.y) / METER_TO_MERC,
+  );
+}
+
+// Procedural PBR environment map — three-stop gradient sky rendered into a
+// cube target and passed through PMREMGenerator for roughness-prefiltered
+// reflections. Every MeshPhysicalMaterial (orbs, vehicle chassis) picks
+// this up as `scene.environment`, so glossy surfaces reflect a warm Cairo
+// sky without any external HDR file.
+function buildProceduralEnvMap(renderer) {
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const tmpScene = new THREE.Scene();
+  const skyGeo = new THREE.SphereGeometry(300, 32, 24);
+  const skyMat = new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    uniforms: {
+      uTop: { value: new THREE.Color(0x243A5C) }, // deep indigo top
+      uMid: { value: new THREE.Color(0x6A4A62) }, // warm horizon
+      uBot: { value: new THREE.Color(0x1A1F28) }, // dark ground wash
+      uAccent: { value: new THREE.Color(0xE9C46A) }, // gold rim for sun direction
+    },
+    vertexShader: `
+      varying vec3 vDir;
+      void main() {
+        vDir = normalize(position);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vDir;
+      uniform vec3 uTop, uMid, uBot, uAccent;
+      void main() {
+        float h = clamp(vDir.y * 0.5 + 0.5, 0.0, 1.0);
+        vec3 sky = mix(uBot, uMid, smoothstep(0.35, 0.6, h));
+        sky = mix(sky, uTop, smoothstep(0.6, 0.9, h));
+        // Gold sun-rim in the −x/+y hemisphere (matches our DirectionalLight)
+        float sunDot = max(0.0, dot(vDir, normalize(vec3(-0.45, 0.65, -0.6))));
+        sky += uAccent * pow(sunDot, 24.0) * 0.7;
+        gl_FragColor = vec4(sky, 1.0);
+      }
+    `,
+  });
+  tmpScene.add(new THREE.Mesh(skyGeo, skyMat));
+  const envTexture = pmrem.fromScene(tmpScene, 0.04).texture;
+  pmrem.dispose();
+  skyGeo.dispose();
+  skyMat.dispose();
+  return envTexture;
+}
+
+// Inject a rim-fresnel emissive boost into any MeshStandardMaterial /
+// MeshPhysicalMaterial. Edge-on pixels get a stronger emissive pop, giving
+// the orb + Layla avatar a rim-lit "holographic" look without a second pass.
+function applyFresnelRim(material, { power = 2.4, strength = 1.8 } = {}) {
+  material.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>',
+        `#include <common>
+         varying vec3 vFresnelViewDir;
+         varying vec3 vFresnelNormal;`)
+      .replace('#include <worldpos_vertex>',
+        `#include <worldpos_vertex>
+         vFresnelNormal  = normalize(mat3(modelMatrix) * normal);
+         vFresnelViewDir = normalize(cameraPosition - worldPosition.xyz);`);
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>',
+        `#include <common>
+         varying vec3 vFresnelViewDir;
+         varying vec3 vFresnelNormal;`)
+      .replace('#include <emissivemap_fragment>',
+        `#include <emissivemap_fragment>
+         float fres = pow(1.0 - clamp(dot(vFresnelNormal, vFresnelViewDir), 0.0, 1.0), ${power.toFixed(2)});
+         totalEmissiveRadiance += emissive * fres * ${strength.toFixed(2)};`);
+  };
+  material.needsUpdate = true;
+}
+
+function makeGlyphTexture(letter, glyphColor, ringColor) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const ctx = c.getContext('2d');
+  const grd = ctx.createRadialGradient(128, 128, 20, 128, 128, 130);
+  grd.addColorStop(0, '#0D1117');
+  grd.addColorStop(1, '#161B22');
+  ctx.fillStyle = grd;
+  ctx.beginPath(); ctx.arc(128, 128, 124, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = ringColor;
+  ctx.lineWidth = 10; ctx.stroke();
+  ctx.shadowColor = glyphColor; ctx.shadowBlur = 36;
+  ctx.fillStyle = glyphColor;
+  ctx.font = 'bold 150px "Orbitron", "Arial Black", sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(letter, 128, 142);
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 4; tex.needsUpdate = true;
+  return tex;
+}
+
+// Floating station name — a sprite-billboard with a rounded pill drawn to a
+// canvas. Attached as a child of each pin so it inherits spawn/LOD scaling.
+// Opacity is modulated per-frame by zoom so labels fade out at wide shots.
+function makeStationLabel(name, color = '#E6EDF3') {
+  const c = document.createElement('canvas');
+  c.width = 768; c.height = 160;
+  const ctx = c.getContext('2d');
+  // Rounded rect background
+  const r = 40, pad = 8;
+  ctx.fillStyle = 'rgba(13, 17, 23, 0.78)';
+  ctx.beginPath();
+  ctx.moveTo(pad + r, pad);
+  ctx.arcTo(c.width - pad, pad,             c.width - pad, c.height - pad, r);
+  ctx.arcTo(c.width - pad, c.height - pad,  pad,           c.height - pad, r);
+  ctx.arcTo(pad,           c.height - pad,  pad,           pad,            r);
+  ctx.arcTo(pad,           pad,             c.width - pad, pad,            r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  // Text
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 18;
+  ctx.fillStyle = color;
+  ctx.font = 'bold 76px Orbitron, "Arial Black", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(name.toUpperCase(), c.width / 2, c.height / 2 + 4);
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.anisotropy = 4;
+  tex.minFilter = THREE.LinearFilter;
+  tex.needsUpdate = true;
+
+  const mat = new THREE.SpriteMaterial({
+    map: tex, transparent: true, opacity: 0, depthWrite: false, depthTest: false,
+  });
+  const sprite = new THREE.Sprite(mat);
+  // World units: ~480 m wide, ~100 m tall — legible at zoom 11–16
+  sprite.scale.set(480, 100, 1);
+  sprite.position.y = 460; // floats above the orb, in the pin's local frame
+  sprite.center.set(0.5, 0);
+  sprite.userData = { isStationLabel: true };
+  return sprite;
+}
+
+function makeStationPin({ color, ringColor, letter, letterHex, scale = 1 }) {
+  const group = new THREE.Group();
+  // XL dimensions — pins read as major landmarks, not dots on the map.
+  // Zoom-adaptive LOD in render() further modulates size per frame.
+  const shaftH = 320 * scale;
+
+  // Base plinth — metallic disc anchoring the pin
+  const plinthGeo = new THREE.CylinderGeometry(52 * scale, 64 * scale, 12 * scale, 40);
+  const plinthMat = new THREE.MeshPhysicalMaterial({
+    color, emissive: color, emissiveIntensity: 0.28,
+    metalness: 0.85, roughness: 0.25,
+    clearcoat: 0.6, clearcoatRoughness: 0.3,
+  });
+  const plinth = new THREE.Mesh(plinthGeo, plinthMat);
+  plinth.position.y = 6 * scale;
+
+  // Tapered shaft
+  const shaftGeo = new THREE.CylinderGeometry(10 * scale, 40 * scale, shaftH, 32);
+  shaftGeo.translate(0, shaftH / 2 + 12 * scale, 0);
+  const shaftMat = new THREE.MeshPhysicalMaterial({
+    color, emissive: color, emissiveIntensity: 0.35,
+    metalness: 0.68, roughness: 0.28,
+    clearcoat: 0.55, clearcoatRoughness: 0.25,
+  });
+  const shaft = new THREE.Mesh(shaftGeo, shaftMat);
+
+  // Collar — bright emissive ring just below the orb
+  const collarGeo = new THREE.TorusGeometry(20 * scale, 4 * scale, 12, 48);
+  const collarMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.98 });
+  const collar = new THREE.Mesh(collarGeo, collarMat);
+  collar.position.y = shaftH + 10 * scale;
+  collar.rotation.x = Math.PI / 2;
+
+  // Glyph orb — oversized so the M/L/B letter reads from any zoom
+  const orbTex = makeGlyphTexture(letter, letterHex, ringColor);
+  const orbGeo = new THREE.SphereGeometry(76 * scale, 40, 32);
+  const orbMat = new THREE.MeshPhysicalMaterial({
+    map: orbTex,
+    emissive: color, emissiveIntensity: 1.3,
+    metalness: 0.08, roughness: 0.22,
+    clearcoat: 0.9, clearcoatRoughness: 0.12,
+  });
+  applyFresnelRim(orbMat, { power: 2.0, strength: 3.0 });
+  const orb = new THREE.Mesh(orbGeo, orbMat);
+  orb.position.y = shaftH + 54 * scale;
+
+  // Volumetric halo — big additive glow, distinctly visible
+  const haloGeo = new THREE.SphereGeometry(144 * scale, 28, 20);
+  const haloMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.28, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.position.y = shaftH + 54 * scale;
+
+  // Orbit ring — thick, bright, unmistakable
+  const orbitGeo = new THREE.TorusGeometry(96 * scale, 3.6 * scale, 12, 96);
+  const orbitMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.98,
+  });
+  const orbit = new THREE.Mesh(orbitGeo, orbitMat);
+  orbit.position.y = shaftH + 54 * scale;
+  orbit.rotation.x = Math.PI / 2.4;
+
+  // Sky beam — long and bright, catches attention from across the city
+  const beamGeo = new THREE.CylinderGeometry(4.5 * scale, 9 * scale, 380 * scale, 22, 1, true);
+  beamGeo.translate(0, 190 * scale, 0);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.22, depthWrite: false,
+    side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+  });
+  const beam = new THREE.Mesh(beamGeo, beamMat);
+  beam.position.y = shaftH + 114 * scale;
+
+  // Ground ring — bigger footprint
+  const groundRingGeo = new THREE.RingGeometry(72 * scale, 144 * scale, 64);
+  const groundRingMat = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.55,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  const groundRing = new THREE.Mesh(groundRingGeo, groundRingMat);
+  groundRing.rotation.x = -Math.PI / 2;
+  groundRing.position.y = 1;
+
+  group.add(plinth, shaft, collar, orb, halo, orbit, beam, groundRing);
+  group.userData = {
+    shaft, orb, halo, ring: groundRing, orbit, beam, color,
+    baseScale: scale, // for zoom-adaptive LOD in render()
+  };
+  return group;
+}
+
+function makeLaylaAvatar() {
+  const group = new THREE.Group();
+  // Layla character colour — distinct from any transit mode. Microbus (the
+  // mode she rides) is coral #E86F51; she is a warmer ORANGE so the avatar
+  // never blends with the vehicle she's about to board.
+  const PRIMARY = 0xF4A261; // warm orange — her colour
+  const DRESS   = 0x8A3D27; // darker tunic
+  const SKIN    = 0xFFD8BA;
+  const HIJAB   = 0x4A1F14; // dark burgundy scarf
+
+  // ── Legs (two capsules, subtly offset)
+  const legGeo = new THREE.CapsuleGeometry(7, 52, 6, 12);
+  const legMat = new THREE.MeshStandardMaterial({
+    color: 0x1A2735, emissive: 0x1A2735, emissiveIntensity: 0.05,
+    metalness: 0.1, roughness: 0.6,
+  });
+  const legL = new THREE.Mesh(legGeo, legMat);
+  legL.position.set(-9, 30, 0);
+  const legR = new THREE.Mesh(legGeo, legMat);
+  legR.position.set(9, 30, 0);
+
+  // ── Torso — long tapered cylinder (tunic shape)
+  const torsoGeo = new THREE.CylinderGeometry(18, 28, 72, 20);
+  torsoGeo.translate(0, 36, 0);
+  const torsoMat = new THREE.MeshPhysicalMaterial({
+    color: PRIMARY, emissive: PRIMARY, emissiveIntensity: 0.22,
+    metalness: 0.18, roughness: 0.45,
+    clearcoat: 0.4, clearcoatRoughness: 0.45,
+  });
+  applyFresnelRim(torsoMat, { power: 2.6, strength: 1.5 });
+  const torso = new THREE.Mesh(torsoGeo, torsoMat);
+  torso.position.y = 60;
+
+  // Accent belt at the waist
+  const beltGeo = new THREE.TorusGeometry(20, 3, 8, 32);
+  const beltMat = new THREE.MeshBasicMaterial({ color: DRESS });
+  const belt = new THREE.Mesh(beltGeo, beltMat);
+  belt.rotation.x = Math.PI / 2;
+  belt.position.y = 82;
+
+  // ── Arms — two capsules with a slight outward angle (mounted on a pivot)
+  const armMat = new THREE.MeshStandardMaterial({
+    color: PRIMARY, emissive: PRIMARY, emissiveIntensity: 0.18,
+    metalness: 0.15, roughness: 0.5,
+  });
+  applyFresnelRim(armMat, { power: 2.8, strength: 1.3 });
+  const armGeo = new THREE.CapsuleGeometry(5.5, 52, 6, 12);
+  const armPivotL = new THREE.Group();
+  armPivotL.position.set(-22, 120, 0);
+  const armL = new THREE.Mesh(armGeo, armMat);
+  armL.position.y = -28;
+  armPivotL.add(armL);
+  armPivotL.rotation.z = 0.12;
+
+  const armPivotR = new THREE.Group();
+  armPivotR.position.set(22, 120, 0);
+  const armR = new THREE.Mesh(armGeo, armMat);
+  armR.position.y = -28;
+  armPivotR.add(armR);
+  armPivotR.rotation.z = -0.12;
+
+  // ── Neck + head
+  const neckGeo = new THREE.CylinderGeometry(7, 9, 12, 12);
+  const neckMat = new THREE.MeshStandardMaterial({ color: SKIN, roughness: 0.5 });
+  const neck = new THREE.Mesh(neckGeo, neckMat);
+  neck.position.y = 130;
+
+  const headGeo = new THREE.SphereGeometry(19, 28, 22);
+  const headMat = new THREE.MeshPhysicalMaterial({
+    color: SKIN, emissive: PRIMARY, emissiveIntensity: 0.15,
+    metalness: 0.0, roughness: 0.48,
+    clearcoat: 0.2, clearcoatRoughness: 0.5,
+  });
+  applyFresnelRim(headMat, { power: 2.4, strength: 1.4 });
+  const head = new THREE.Mesh(headGeo, headMat);
+  head.position.y = 150;
+
+  // ── Hijab — elongated sphere covering crown + neck, with trailing flap
+  const hijabGeo = new THREE.SphereGeometry(22, 28, 22, 0, Math.PI * 2, 0, Math.PI * 0.72);
+  const hijabMat = new THREE.MeshPhysicalMaterial({
+    color: HIJAB, emissive: PRIMARY, emissiveIntensity: 0.08,
+    metalness: 0.18, roughness: 0.55,
+    clearcoat: 0.35, clearcoatRoughness: 0.5,
+    side: THREE.DoubleSide,
+  });
+  applyFresnelRim(hijabMat, { power: 2.6, strength: 1.2 });
+  const hijab = new THREE.Mesh(hijabGeo, hijabMat);
+  hijab.position.y = 152;
+
+  // Trailing scarf flap behind the head
+  const scarfGeo = new THREE.PlaneGeometry(18, 34, 1, 4);
+  const scarfMat = new THREE.MeshStandardMaterial({
+    color: HIJAB, emissive: HIJAB, emissiveIntensity: 0.1,
+    side: THREE.DoubleSide, roughness: 0.55,
+  });
+  const scarf = new THREE.Mesh(scarfGeo, scarfMat);
+  scarf.position.set(0, 136, -16);
+  scarf.rotation.x = -0.35;
+
+  // ── Halo ring on the ground
+  const ringGeo = new THREE.RingGeometry(60, 130, 56);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: PRIMARY, transparent: true, opacity: 0.22,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 1;
+
+  // ── Ambient glow sphere
+  const glowGeo = new THREE.SphereGeometry(110, 20, 14);
+  const glowMat = new THREE.MeshBasicMaterial({
+    color: PRIMARY, transparent: true, opacity: 0.06, depthWrite: false,
+  });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  glow.position.y = 80;
+
+  // Pivot so we can rotate the whole figure on Y without altering limbs
+  const figure = new THREE.Group();
+  figure.add(legL, legR, torso, belt, armPivotL, armPivotR, neck, head, hijab, scarf);
+
+  group.add(glow, figure, ring);
+  group.userData = { figure, torso, head, hijab, ring, glow, armPivotL, armPivotR, legL, legR, scarf };
+  return group;
+}
+
+function makeVehicle(kind) {
+  const group = new THREE.Group();
+  const P = kind === 'metro'
+    ? { body: 0x1F3A5F, accent: 0x58A6FF, window: 0xBFE0FF, roof: 0x2A4A75, glow: 0x8FC6FF, len: 140 }
+    : { body: 0x8A3D27, accent: 0xE86F51, window: 0xFFE0D2, roof: 0xA54E36, glow: 0xFFAC8E, len: 84  };
+
+  const H = 44, W = 46;
+  const wheelR = 8, wheelAxleY = 10;
+
+  // Build one vehicle "car" — chassis + roof + windows + 4 wheels
+  const mkCar = (L, offsetX, isLead = true) => {
+    const car = new THREE.Group();
+
+    // Chassis — car-paint physical material (metallic + clearcoat)
+    const chassisGeo = new THREE.BoxGeometry(L, H, W);
+    const chassisMat = new THREE.MeshPhysicalMaterial({
+      color: P.body, emissive: P.accent, emissiveIntensity: 0.15,
+      metalness: 0.75, roughness: 0.26,
+      clearcoat: 0.92, clearcoatRoughness: 0.12,
+    });
+    const chassis = new THREE.Mesh(chassisGeo, chassisMat);
+    chassis.position.y = H / 2 + wheelAxleY + 4;
+
+    // Roof — slightly inset, more emissive
+    const roofGeo = new THREE.BoxGeometry(L * 0.92, 5, W * 0.94);
+    const roofMat = new THREE.MeshPhysicalMaterial({
+      color: P.roof, emissive: P.accent, emissiveIntensity: 0.4,
+      metalness: 0.7, roughness: 0.3,
+      clearcoat: 0.7, clearcoatRoughness: 0.22,
+    });
+    const roof = new THREE.Mesh(roofGeo, roofMat);
+    roof.position.y = H + wheelAxleY + 8;
+
+    // Window strip — emissive plane (both sides + front windscreen)
+    const winGeo = new THREE.PlaneGeometry(L * 0.82, H * 0.42);
+    const winMat = new THREE.MeshBasicMaterial({
+      color: P.window, transparent: true, opacity: 0.95,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    const winL = new THREE.Mesh(winGeo, winMat);
+    winL.position.set(0, H / 2 + wheelAxleY + 8, W / 2 + 0.25);
+    const winR = winL.clone();
+    winR.rotation.y = Math.PI;
+    winR.position.set(0, H / 2 + wheelAxleY + 8, -W / 2 - 0.25);
+
+    // Front windscreen (only for lead car)
+    let winF = null;
+    if (isLead) {
+      const winFGeo = new THREE.PlaneGeometry(W * 0.75, H * 0.42);
+      winF = new THREE.Mesh(winFGeo, winMat);
+      winF.rotation.y = Math.PI / 2;
+      winF.position.set(L / 2 + 0.25, H / 2 + wheelAxleY + 8, 0);
+    }
+
+    // Wheels — four tori with rubber material
+    const wheelGeo = new THREE.TorusGeometry(wheelR, 3.4, 12, 22);
+    wheelGeo.rotateY(Math.PI / 2); // axles along Z
+    const wheelMat = new THREE.MeshStandardMaterial({
+      color: 0x0A0D12, metalness: 0.4, roughness: 0.75,
+    });
+    const hubMat = new THREE.MeshStandardMaterial({
+      color: 0xC0C8D0, metalness: 0.85, roughness: 0.3,
+    });
+    const hubGeo = new THREE.CircleGeometry(wheelR * 0.55, 16);
+    const makeWheel = (x, z) => {
+      const w = new THREE.Group();
+      const tyre = new THREE.Mesh(wheelGeo, wheelMat);
+      const hub  = new THREE.Mesh(hubGeo, hubMat);
+      hub.position.z = 3.6; hub.rotation.y = Math.PI / 2;
+      const hub2 = hub.clone(); hub2.position.z = -3.6;
+      w.add(tyre, hub, hub2);
+      w.position.set(x, wheelAxleY, z);
+      return w;
+    };
+    const wheels = [
+      makeWheel(L / 2 - 14,  W / 2 - 3),
+      makeWheel(L / 2 - 14, -W / 2 + 3),
+      makeWheel(-L / 2 + 14,  W / 2 - 3),
+      makeWheel(-L / 2 + 14, -W / 2 + 3),
+    ];
+
+    car.add(chassis, roof, winL, winR, ...wheels);
+    if (winF) car.add(winF);
+    car.position.x = offsetX;
+    car.userData = { wheels };
+    return car;
+  };
+
+  // Assemble — one microbus OR two linked metro cars
+  const cars = [];
+  if (kind === 'metro') {
+    const gap = P.len * 0.04;
+    const sectionLen = (P.len - gap) / 2;
+    const c1 = mkCar(sectionLen, (sectionLen + gap) / 2, true);
+    const c2 = mkCar(sectionLen, -(sectionLen + gap) / 2, false);
+    // Accordion connector between the two cars
+    const connGeo = new THREE.BoxGeometry(gap * 2.2, H * 0.7, W * 0.55);
+    const connMat = new THREE.MeshStandardMaterial({
+      color: 0x0A0D12, metalness: 0.65, roughness: 0.6,
+    });
+    const conn = new THREE.Mesh(connGeo, connMat);
+    conn.position.set(0, H / 2 + wheelAxleY + 4, 0);
+    group.add(c1, c2, conn);
+    cars.push(c1, c2);
+
+    // Pantograph antenna on top of metro
+    const poleGeo = new THREE.CylinderGeometry(0.8, 0.8, 28, 8);
+    const poleMat = new THREE.MeshStandardMaterial({
+      color: 0x888C94, metalness: 0.9, roughness: 0.25,
+    });
+    const pole = new THREE.Mesh(poleGeo, poleMat);
+    pole.position.y = H + wheelAxleY + 22;
+    const capGeo = new THREE.BoxGeometry(20, 2, 8);
+    const cap = new THREE.Mesh(capGeo, poleMat);
+    cap.position.y = H + wheelAxleY + 36;
+    group.add(pole, cap);
+  } else {
+    const c = mkCar(P.len, 0, true);
+    group.add(c);
+    cars.push(c);
+  }
+
+  // Headlights (front = +X direction of travel)
+  const hlGeo = new THREE.SphereGeometry(5, 14, 12);
+  const hlMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+  const hlL = new THREE.Mesh(hlGeo, hlMat);
+  hlL.position.set(P.len / 2 + 2, H / 2 + wheelAxleY + 4, W / 4);
+  const hlR = hlL.clone();
+  hlR.position.set(P.len / 2 + 2, H / 2 + wheelAxleY + 4, -W / 4);
+
+  // Headlight beams — translucent cones projecting forward
+  const beamGeo = new THREE.ConeGeometry(14, 68, 20, 1, true);
+  beamGeo.translate(0, 34, 0); // tip at origin so rotation puts tip at the bulb
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: 0xFFF5D0, transparent: true, opacity: 0.22,
+    side: THREE.DoubleSide, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const beamL = new THREE.Mesh(beamGeo, beamMat);
+  beamL.rotation.z = -Math.PI / 2;
+  beamL.position.set(P.len / 2 + 4, H / 2 + wheelAxleY + 4, W / 4);
+  const beamR = beamL.clone();
+  beamR.position.set(P.len / 2 + 4, H / 2 + wheelAxleY + 4, -W / 4);
+
+  // Rear lights
+  const rearMat = new THREE.MeshBasicMaterial({ color: 0xFF4133 });
+  const rearL = new THREE.Mesh(hlGeo, rearMat);
+  rearL.position.set(-P.len / 2 - 2, H / 2 + wheelAxleY + 4, W / 4);
+  const rearR = rearL.clone();
+  rearR.position.set(-P.len / 2 - 2, H / 2 + wheelAxleY + 4, -W / 4);
+
+  // Ground glow disc under the vehicle
+  const groundGeo = new THREE.CircleGeometry(P.len * 0.85, 40);
+  const groundMat = new THREE.MeshBasicMaterial({
+    color: P.glow, transparent: true, opacity: 0.3, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const ground = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = 0.5;
+
+  group.add(hlL, hlR, beamL, beamR, rearL, rearR, ground);
+  group.userData = { kind, ground, cars, beams: [beamL, beamR] };
+  return group;
+}
+
+// Phase-1 GHOST TERMINAL marker — a small 3D pin distinct from station pins.
+// Compact downward-pointing cone (the "stake in the ground") + glowing orb
+// floating just above + ground halo. Category drives color + opacity:
+//   stranded (>2 km from new metro) → coral, translucent ghost
+//   marginal (1–2 km)               → gold, more solid
+//   reached  (<1 km)                → teal, fully present (a "win")
+// Sizes are intentionally smaller than station pins so they read as a
+// secondary swarm — but still legible at zoom 9–13 thanks to the LOD scaler.
+function makeGhostMarker(category) {
+  const isStranded = category === 'stranded';
+  const isReached  = category === 'reached';
+  const colorHex = isReached ? 0x2A9D8F : isStranded ? 0xE86F51 : 0xE9C46A;
+  const baseAlpha = isReached ? 1.0 : isStranded ? 0.85 : 0.95;
+  // Reached ghosts (the 9 "wins") render fully opaque + brightest emissive.
+  // Stranded ghosts (the 97 majority) render as semi-transparent "ghosts"
+  // with a softer alpha and slower pulse — visible everywhere, not blocking.
+
+  const group = new THREE.Group();
+  const SHAFT_H = 90;   // tall stake — was 38
+  const ORB_R   = 22;   // big orb — was 11
+  const HALO_R  = 50;   // big halo — was 22
+  const ORB_Y   = SHAFT_H + ORB_R + 8;
+
+  // Tapered shaft pointing downward (stake-in-the-ground silhouette)
+  const stakeGeo = new THREE.CylinderGeometry(8, 22, SHAFT_H, 22);
+  stakeGeo.translate(0, SHAFT_H / 2, 0);
+  const stakeMat = new THREE.MeshPhysicalMaterial({
+    color: colorHex,
+    emissive: colorHex, emissiveIntensity: isReached ? 0.55 : 0.42,
+    metalness: 0.55, roughness: 0.3,
+    clearcoat: 0.65, clearcoatRoughness: 0.22,
+    transparent: !isReached, opacity: baseAlpha,
+  });
+  applyFresnelRim(stakeMat, { power: 2.2, strength: 1.6 });
+  const stake = new THREE.Mesh(stakeGeo, stakeMat);
+
+  // Bright collar where the orb meets the stake
+  const collarGeo = new THREE.TorusGeometry(10, 2.4, 10, 36);
+  const collarMat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.92,
+  });
+  const collar = new THREE.Mesh(collarGeo, collarMat);
+  collar.position.y = SHAFT_H + 4;
+  collar.rotation.x = Math.PI / 2;
+
+  // Floating orb on top — the "ghost head"
+  const orbGeo = new THREE.SphereGeometry(ORB_R, 28, 22);
+  const orbMat = new THREE.MeshPhysicalMaterial({
+    color: colorHex,
+    emissive: colorHex, emissiveIntensity: isReached ? 1.6 : 1.05,
+    metalness: 0.06, roughness: 0.18,
+    clearcoat: 0.9, clearcoatRoughness: 0.12,
+    transparent: !isReached, opacity: baseAlpha,
+  });
+  applyFresnelRim(orbMat, { power: 2.0, strength: 2.6 });
+  const orb = new THREE.Mesh(orbGeo, orbMat);
+  orb.position.y = ORB_Y;
+
+  // Volumetric halo (additive, big and soft)
+  const haloGeo = new THREE.SphereGeometry(HALO_R, 22, 16);
+  const haloMat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.22,
+    depthWrite: false, blending: THREE.AdditiveBlending,
+  });
+  const halo = new THREE.Mesh(haloGeo, haloMat);
+  halo.position.y = ORB_Y;
+
+  // Sky beam — thin additive cone reaching up so the ghosts can be spotted
+  // from a wide overview (zoom 9–10) without crowding close-up shots
+  const beamGeo = new THREE.CylinderGeometry(2.0, 4.5, 140, 16, 1, true);
+  beamGeo.translate(0, 70, 0);
+  const beamMat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.16,
+    side: THREE.DoubleSide, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const beam = new THREE.Mesh(beamGeo, beamMat);
+  beam.position.y = ORB_Y + 30;
+
+  // Ground ring
+  const ringGeo = new THREE.RingGeometry(36, 60, 40);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color: colorHex, transparent: true, opacity: 0.55,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.5;
+
+  group.add(ring, stake, collar, orb, halo, beam);
+  group.userData = {
+    stake, collar, orb, halo, ring, beam, color: colorHex, category,
+    baseScale: 1.0, baseAlpha, orbY: ORB_Y,
+  };
+  return group;
+}
+
+// 3D route tube — extrudes a lng/lat path into a glowing raised ribbon
+// with a time-scrolling emissive dash pattern (GPU-side, no per-frame
+// geometry rebuilds). `coords` is an array of [lng, lat] pairs.
+function makeRouteTube(coords, { color, altitude = 14, radius = 9, segments = 240 }) {
+  const pts = coords.map(ll => lngLatToWorld(ll, altitude));
+  const curve = new THREE.CatmullRomCurve3(pts, false, 'catmullrom', 0.25);
+  const geo = new THREE.TubeGeometry(curve, segments, radius, 10, false);
+
+  const mat = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uColor:   { value: new THREE.Color(color) },
+      uTime:    { value: 0 },
+      uSpeed:   { value: 0.55 },
+      uDashGap: { value: 0.055 },
+      uGlow:    { value: 1.6 },
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      varying vec3 vWorldNormal;
+      varying vec3 vViewDir;
+      void main() {
+        vUv = uv;
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vWorldNormal = normalize(mat3(modelMatrix) * normal);
+        vViewDir = normalize(cameraPosition - worldPos.xyz);
+        gl_Position = projectionMatrix * viewMatrix * worldPos;
+      }
+    `,
+    fragmentShader: `
+      varying vec2 vUv;
+      varying vec3 vWorldNormal;
+      varying vec3 vViewDir;
+      uniform vec3  uColor;
+      uniform float uTime;
+      uniform float uSpeed;
+      uniform float uDashGap;
+      uniform float uGlow;
+      void main() {
+        // UV.x runs along the tube — scrolling dash pattern for direction of travel
+        float u = vUv.x * 24.0 - uTime * uSpeed;
+        float dash = smoothstep(0.45, 0.55, fract(u));
+        float fres = pow(1.0 - clamp(dot(vWorldNormal, vViewDir), 0.0, 1.0), 2.0);
+        float intensity = 0.35 + dash * 0.75 + fres * uGlow;
+        gl_FragColor = vec4(uColor * intensity, 0.82 * (0.6 + 0.4 * dash));
+      }
+    `,
+  });
+
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.userData = { material: mat };
+  return mesh;
+}
+
+function buildCairoThreeLayer() {
+  return {
+    id: 'three-cairo',
+    type: 'custom',
+    renderingMode: '3d',
+
+    onAdd(map, gl) {
+      initThreeMercator();
+      this.map = map;
+      this.scene = new THREE.Scene();
+      // Atmospheric fog — fades only very distant 3D content so the pins at
+      // the edge of wide shots stay readable. Start far out, end off-screen.
+      this.scene.fog = new THREE.Fog(0x07090C, 9000, 55000);
+      this.camera = new THREE.Camera();
+      this.clock = new THREE.Clock();
+
+      // Lighting rig — warm sun + cool rim + hemisphere + neon accent
+      const sun = new THREE.DirectionalLight(0xFFE5C0, 1.15);
+      sun.position.set(-800, 1400, -600);
+      this.scene.add(sun);
+      const rim = new THREE.DirectionalLight(0x88BBFF, 0.55);
+      rim.position.set(600, 900, 700);
+      this.scene.add(rim);
+      this.scene.add(new THREE.HemisphereLight(0xA0C4FF, 0x1A1F28, 0.75));
+      const neon = new THREE.PointLight(0x58A6FF, 2.2, 4500, 2);
+      neon.position.set(0, 900, 0);
+      this.scene.add(neon);
+
+      // Station pins — metro post-2014 1.2×, metro pre-2014 1.0× (slightly
+      // smaller and a slate-blue colour so they read as "the existing
+      // network", letting the bright cyan post-2014 pins still pop). LRT 1.55×
+      // (sparse desert network → bigger so the "L" reads at wide zooms),
+      // BRT scales 1.1–2.0× by demand.
+      this.pins = { metro: [], metroPre: [], lrt: [], brt: [] };
+      METRO_POST_2014.forEach(s => {
+        const p = makeStationPin({
+          color: 0x58A6FF, ringColor: '#8FC6FF', letter: 'M', letterHex: '#C9E2FF',
+          scale: 1.2,
+        });
+        p.position.copy(lngLatToWorld(s.coords));
+        p.add(makeStationLabel(s.name, '#C9E2FF'));
+        p.visible = false; this.scene.add(p); this.pins.metro.push(p);
+      });
+      METRO_PRE_2014.forEach(s => {
+        // Slate / steel blue — visually distinct from post-2014 cyan so the
+        // viewer can tell at a glance which stations were already there
+        // versus what the $10 B programme actually built.
+        const p = makeStationPin({
+          color: 0x4A6FA5, ringColor: '#7C9BC4', letter: 'M', letterHex: '#B7CDE6',
+          scale: 1.0,
+        });
+        p.position.copy(lngLatToWorld(s.coords));
+        p.add(makeStationLabel(s.name, '#B7CDE6'));
+        p.visible = false; this.scene.add(p); this.pins.metroPre.push(p);
+      });
+      LRT_STATIONS.forEach(s => {
+        const p = makeStationPin({
+          color: 0xB877C9, ringColor: '#D29EE0', letter: 'L', letterHex: '#EDC6F6',
+          scale: 1.55,
+        });
+        p.position.copy(lngLatToWorld(s.coords));
+        p.add(makeStationLabel(s.name, '#EDC6F6'));
+        p.visible = false; this.scene.add(p); this.pins.lrt.push(p);
+      });
+      BRT_STATIONS.forEach(s => {
+        const factor = 1.1 + Math.min(1, (s.demand || 0) / 12000) * 0.9;
+        const p = makeStationPin({
+          color: 0xE9C46A, ringColor: '#F4D58E', letter: 'B', letterHex: '#FBE9B5',
+          scale: factor,
+        });
+        p.position.copy(lngLatToWorld(s.coords));
+        p.add(makeStationLabel(s.name, '#FBE9B5'));
+        p.visible = false; this.scene.add(p); this.pins.brt.push(p);
+      });
+
+      // Layla home (Imbaba) + Layla mobile (Maadi arrival)
+      this.layla = makeLaylaAvatar();
+      this.layla.position.copy(lngLatToWorld(LOCATIONS.imbaba));
+      this.layla.visible = false;
+      this.scene.add(this.layla);
+
+      this.laylaMobile = makeLaylaAvatar();
+      this.laylaMobile.position.copy(lngLatToWorld(LOCATIONS.maadi));
+      this.laylaMobile.visible = false;
+      this.scene.add(this.laylaMobile);
+
+      // Office (Maadi) — oversized, reads as her destination anchor
+      this.office = makeStationPin({
+        color: 0x2A9D8F, ringColor: '#5AD4C4', letter: 'O', letterHex: '#CDEFE9', scale: 1.7,
+      });
+      this.office.position.copy(lngLatToWorld(LOCATIONS.maadi));
+      this.office.add(makeStationLabel('MAADI OFFICE', '#CDEFE9'));
+      this.office.visible = false;
+      this.scene.add(this.office);
+
+      // Vehicles — microbus + metro train, swapped per leg
+      this.microbus = makeVehicle('microbus');
+      this.microbus.visible = false; this.scene.add(this.microbus);
+      this.metroTrain = makeVehicle('metro');
+      this.metroTrain.visible = false; this.scene.add(this.metroTrain);
+      this.activeVehicle = null;
+
+      // Particle trail — circular buffer of the last N vehicle positions,
+      // drawn as additive points whose size+alpha fade by per-vertex age.
+      const TRAIL_N = 90;
+      const trailPos   = new Float32Array(TRAIL_N * 3);
+      const trailAge   = new Float32Array(TRAIL_N);
+      // Park the buffer far below the ground so it's invisible until real
+      // positions start streaming in (first frame after vehicle activates).
+      for (let i = 0; i < TRAIL_N; i++) {
+        trailPos[i * 3 + 1] = -1e6;
+        trailAge[i] = 1.0;
+      }
+      const trailGeo = new THREE.BufferGeometry();
+      trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPos, 3));
+      trailGeo.setAttribute('aAge',     new THREE.BufferAttribute(trailAge, 1));
+      const trailMat = new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: { uColor: { value: new THREE.Color(0xFFD89C) } },
+        vertexShader: `
+          attribute float aAge;
+          varying float vAge;
+          void main() {
+            vAge = aAge;
+            vec4 mv = modelViewMatrix * vec4(position, 1.0);
+            // Size attenuates with distance AND fades with age.
+            gl_PointSize = 22.0 * (1.0 - aAge) * (300.0 / -mv.z);
+            gl_Position = projectionMatrix * mv;
+          }
+        `,
+        fragmentShader: `
+          varying float vAge;
+          uniform vec3 uColor;
+          void main() {
+            vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+            float r = dot(cxy, cxy);
+            if (r > 1.0) discard;
+            float alpha = (1.0 - vAge) * (1.0 - r) * 0.75;
+            gl_FragColor = vec4(uColor, alpha);
+          }
+        `,
+      });
+      this.trailPoints = new THREE.Points(trailGeo, trailMat);
+      this.trailPoints.frustumCulled = false;
+      this.scene.add(this.trailPoints);
+      this._trail = {
+        n: TRAIL_N, head: 0, positions: trailPos, ages: trailAge,
+        geo: trailGeo, mat: trailMat,
+      };
+
+      // Phase-1 ghost terminals — 115 small 3D markers in {stranded, marginal,
+      // reached} categories. They live in a single group so we can toggle the
+      // whole swarm with one visibility flip and apply LOD scaling per-frame.
+      this.ghosts = [];
+      this.ghostsGroup = new THREE.Group();
+      this.ghostsGroup.visible = false;
+      INFORMAL_TERMINALS.forEach(([lng, lat, dist_m, cat]) => {
+        const m = makeGhostMarker(cat);
+        m.position.copy(lngLatToWorld([lng, lat]));
+        m.userData.dist_m = dist_m;
+        this.ghostsGroup.add(m);
+        this.ghosts.push(m);
+      });
+      this.scene.add(this.ghostsGroup);
+
+      // 3D extruded route ribbons — raised tubes with GPU-scrolling dash
+      this.masariTube = makeRouteTube(MASARI_ROUTE, {
+        color: 0x58A6FF, altitude: 16, radius: 10, segments: 280,
+      });
+      this.masariTube.visible = false;
+      this.scene.add(this.masariTube);
+
+      this.laylaTripTube = makeRouteTube(LAYLA_TRIP_ROUTE, {
+        color: 0xE86F51, altitude: 14, radius: 9, segments: 260,
+      });
+      this.laylaTripTube.visible = false;
+      this.scene.add(this.laylaTripTube);
+
+      // Renderer — reuses MapLibre's existing gl context
+      this.renderer = new THREE.WebGLRenderer({
+        canvas: map.getCanvas(),
+        context: gl,
+        antialias: true,
+        alpha: true,
+      });
+      this.renderer.autoClear = false;
+      this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+      this.renderer.toneMapping = THREE.NoToneMapping;
+
+      // Procedural PBR environment → all MeshPhysicalMaterials (orbs, vehicle
+      // chassis, shafts) pick this up as a reflection source. PMREM handles
+      // the roughness-prefiltering so smooth surfaces get crisp reflections
+      // and rough ones get diffuse IBL.
+      this.envMap = buildProceduralEnvMap(this.renderer);
+      this.scene.environment = this.envMap;
+    },
+
+    setPinGroupVisible(group, v) {
+      const now = performance.now();
+      this.pins[group]?.forEach((p, i) => {
+        const was = p.visible;
+        p.visible = v;
+        // Stagger spawn-in per index so large groups animate as a cascade,
+        // not a single pop. i*35 ms = 24 pins span ~840 ms which looks alive
+        // but doesn't delay the last pin long enough to be noticed.
+        if (v && !was) p.userData.spawnAt = now + i * 35;
+      });
+      this.map?.triggerRepaint();
+    },
+    setLaylaHomeVisible(v) {
+      if (v && !this.layla.visible) this.layla.userData.spawnAt = performance.now();
+      this.layla.visible = v; this.map?.triggerRepaint();
+    },
+    setLaylaMobileVisible(v) {
+      if (v && !this.laylaMobile.visible) this.laylaMobile.userData.spawnAt = performance.now();
+      this.laylaMobile.visible = v; this.map?.triggerRepaint();
+    },
+    setOfficeVisible(v) {
+      if (v && !this.office.visible) this.office.userData.spawnAt = performance.now();
+      this.office.visible = v; this.map?.triggerRepaint();
+    },
+
+    setVehicle(kind, pose) {
+      const target = kind === 'metro' ? this.metroTrain : this.microbus;
+      const other  = kind === 'metro' ? this.microbus   : this.metroTrain;
+      if (pose) {
+        const targetPos = lngLatToWorld(pose.lngLat, 8);
+        // MapLibre bearing = 0°N, CW. Three.js Y rotation is right-handed
+        // (CCW, +X→+Z). Heading of +X (front of model) toward compass bearing:
+        //   rot_y = -(bearing - 90) · π/180   (so bearing=0 → rot_y=+π/2 = north)
+        const targetRot = -(pose.bearing - 90) * Math.PI / 180;
+
+        // First placement after a model swap → snap (no inertia across swaps).
+        if (this.activeVehicle !== target) {
+          target.position.copy(targetPos);
+          target.rotation.y = targetRot;
+        } else {
+          // Micro-inertia: a tight LERP on position and wrap-safe on rotation.
+          // The source bearing is already smoothed; this kills residual frame
+          // jitter when the map redraws at irregular intervals.
+          target.position.lerp(targetPos, 0.55);
+          const cur = target.rotation.y;
+          const diff = ((targetRot - cur + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+          target.rotation.y = cur + diff * 0.35;
+        }
+      }
+      target.visible = true;
+      other.visible = false;
+      this.activeVehicle = target;
+      this.map?.triggerRepaint();
+    },
+    hideVehicles() {
+      this.microbus.visible = false;
+      this.metroTrain.visible = false;
+      this.activeVehicle = null;
+      this.map?.triggerRepaint();
+    },
+
+    syncScene(scene) {
+      const v = new Set(scene.visible || []);
+      this.setPinGroupVisible('metro',    v.has('metro-icons'));
+      this.setPinGroupVisible('metroPre', v.has('metro-pre-icons'));
+      this.setPinGroupVisible('lrt',      v.has('lrt-icons'));
+      this.setPinGroupVisible('brt',      v.has('brt-icons'));
+      this.setLaylaHomeVisible(v.has('layla-home-icon'));
+      this.setLaylaMobileVisible(v.has('layla-mobile-icon'));
+      this.setOfficeVisible(v.has('office-icon'));
+      this.masariTube.visible     = v.has('masari-glow')     || v.has('masari-inner');
+      this.laylaTripTube.visible  = v.has('layla-trip-glow') || v.has('layla-trip-inner');
+      // Ghost terminals are an analytical overlay — only show them when a
+      // scene EXPLICITLY needs them (key 'informal-layer' in scene.visible).
+      // The looser 'informal-halo' key was only ambient glow and shouldn't
+      // pull the full 115-marker swarm onto intimate scenes (e.g. Scene 1).
+      // Scenes that show ghosts: Prologue (0), Real Journey (3), The Gap (5),
+      //   The Mawfaq (7), BRT × Demand (10), Q18b Verdict (11).
+      const showGhosts = v.has('informal-layer');
+      if (showGhosts && !this.ghostsGroup.visible) this._ghostSpawnAt = performance.now();
+      this.ghostsGroup.visible = showGhosts;
+      if (!v.has('masari-car') && !v.has('layla-trip-car')) this.hideVehicles();
+    },
+
+    render(gl, args) {
+      const t = this.clock.getElapsedTime();
+
+      // Scroll the route tube dashes (GPU-side uniform update only)
+      if (this.masariTube.visible)    this.masariTube.userData.material.uniforms.uTime.value = t;
+      if (this.laylaTripTube.visible) this.laylaTripTube.userData.material.uniforms.uTime.value = t;
+
+      // Zoom-adaptive LOD for pins and avatars
+      const zoom = this.map ? this.map.getZoom() : 13;
+      const zoomK = Math.max(0.7, Math.min(3.0, Math.pow(2, (13 - zoom) * 0.3)));
+
+      // Labels fade in only at closer zooms so wide shots stay uncluttered.
+      // zoom 11 → 0 opacity; zoom 13.5+ → 1 opacity.
+      const labelOpacity = Math.max(0, Math.min(1, (zoom - 11) * 0.4));
+
+      const nowMs = performance.now();
+      // Spawn-in easing: per-pin 0→1 over 750 ms, ease-out-cubic
+      const spawn = (obj) => {
+        const at = obj.userData.spawnAt;
+        if (at === undefined) return 1;
+        const p = Math.min(1, Math.max(0, (nowMs - at) / 750));
+        const e = 1 - Math.pow(1 - p, 3);
+        if (p >= 1) delete obj.userData.spawnAt; // stop tracking
+        return e;
+      };
+
+      // Pin pulse — emissive breathe + orbit spin + beam flicker + LOD + spawn
+      const pulse = (arr) => arr.forEach((p, i) => {
+        if (!p.visible) return;
+        const phase = t * 2.2 + i * 0.35;
+        p.userData.orb.material.emissiveIntensity = 1.1 + 0.5 * (0.5 + 0.5 * Math.sin(phase));
+        p.userData.halo.material.opacity         = 0.24 + 0.18 * (0.5 + 0.5 * Math.sin(phase * 0.7));
+        p.userData.ring.material.opacity         = 0.42 + 0.22 * (0.5 + 0.5 * Math.sin(phase * 1.1));
+        if (p.userData.orbit) {
+          p.userData.orbit.rotation.z = t * 0.55 + i * 0.2;
+          p.userData.orbit.rotation.x = Math.PI / 2.4 + Math.sin(t * 0.35 + i) * 0.25;
+        }
+        if (p.userData.beam) {
+          p.userData.beam.material.opacity = 0.16 + 0.12 * (0.5 + 0.5 * Math.sin(phase * 0.6));
+        }
+        // Find the label sprite child (if any) and fade it with zoom
+        for (const child of p.children) {
+          if (child.userData?.isStationLabel) {
+            child.material.opacity = labelOpacity * spawn(p);
+            break;
+          }
+        }
+        const b = p.userData.baseScale || 1;
+        p.scale.setScalar(b * zoomK * spawn(p));
+      });
+      pulse(this.pins.metro); pulse(this.pins.metroPre);
+      pulse(this.pins.lrt); pulse(this.pins.brt);
+      if (this.office.visible) pulse([this.office]);
+
+      // Layla — slow turn + body bob + arm sway + scarf ripple + LOD + spawn
+      [this.layla, this.laylaMobile].forEach(ly => {
+        if (!ly.visible) return;
+        ly.userData.figure.rotation.y = t * 0.35;
+        const bob = Math.sin(t * 1.6) * 3;
+        ly.userData.figure.position.y = bob;
+        ly.userData.armPivotL.rotation.x = Math.sin(t * 1.4) * 0.18;
+        ly.userData.armPivotR.rotation.x = -Math.sin(t * 1.4) * 0.18;
+        ly.userData.scarf.rotation.z = Math.sin(t * 0.9) * 0.12;
+        ly.userData.ring.material.opacity = 0.22 + 0.16 * (0.5 + 0.5 * Math.sin(t * 1.4));
+        ly.userData.glow.material.opacity = 0.08 + 0.10 * (0.5 + 0.5 * Math.sin(t * 1.9));
+        ly.scale.setScalar(1.9 * zoomK * spawn(ly));
+      });
+
+      // Vehicle wheels — roll proportional to distance moved, so they STOP
+      // when the vehicle pauses at a transfer (real wheels don't keep spinning).
+      if (this.activeVehicle) {
+        const pos = this.activeVehicle.position;
+        const prev = this._lastVehiclePos;
+        let metersMoved = 0;
+        if (prev && this._lastVehicleRef === this.activeVehicle) {
+          const dx = pos.x - prev.x, dz = pos.z - prev.z;
+          metersMoved = Math.sqrt(dx * dx + dz * dz);
+        }
+        // Circumference of wheel (radius 8m in scene units) → radians per meter
+        const wheelR = 8;
+        const deltaRot = metersMoved / wheelR;
+        this._wheelAngle = (this._wheelAngle || 0) + deltaRot;
+        this.activeVehicle.userData.cars.forEach(car => {
+          car.userData.wheels.forEach(w => { w.rotation.x = this._wheelAngle; });
+        });
+        this.activeVehicle.userData.beams.forEach(b => {
+          b.material.opacity = 0.18 + 0.08 * (0.5 + 0.5 * Math.sin(t * 8));
+        });
+
+        // ── Particle trail ─────────────────────────────────────────────
+        // Each frame we (a) age every existing point, (b) if the vehicle
+        // actually moved, drop a fresh point at its current position.
+        const tr = this._trail;
+        for (let i = 0; i < tr.n; i++) tr.ages[i] = Math.min(1, tr.ages[i] + 0.015);
+        if (metersMoved > 0.3) {
+          const head = tr.head;
+          tr.positions[head * 3]     = pos.x;
+          tr.positions[head * 3 + 1] = pos.y + 6;   // hover just above ground
+          tr.positions[head * 3 + 2] = pos.z;
+          tr.ages[head] = 0;
+          tr.head = (head + 1) % tr.n;
+        }
+        tr.geo.attributes.position.needsUpdate = true;
+        tr.geo.attributes.aAge.needsUpdate = true;
+        // Tint the trail by the current leg — microbus = coral, metro = blue.
+        tr.mat.uniforms.uColor.value.set(
+          this.activeVehicle === this.metroTrain ? 0x9FCFFF : 0xFFB992
+        );
+        this.trailPoints.visible = true;
+
+        this._lastVehiclePos = pos.clone();
+        this._lastVehicleRef = this.activeVehicle;
+      } else {
+        this._lastVehiclePos = null;
+        this._lastVehicleRef = null;
+        // Fade the trail out quickly when the vehicle is gone
+        if (this._trail) {
+          const tr = this._trail;
+          for (let i = 0; i < tr.n; i++) tr.ages[i] = Math.min(1, tr.ages[i] + 0.05);
+          tr.geo.attributes.aAge.needsUpdate = true;
+          this.trailPoints.visible = tr.ages.some(a => a < 1);
+        }
+      }
+
+      // ── Ghost-terminal swarm animation: per-marker bob + LOD scaling +
+      // staggered spawn-in when the swarm becomes visible. Reached ghosts
+      // (the 9 "wins" within 1 km of new metro) pulse brighter and bigger.
+      // Stranded ghosts pulse slower with a softer "dying signal" emissive.
+      if (this.ghostsGroup.visible) {
+        const spawnedAt = this._ghostSpawnAt || 0;
+        const sinceSpawn = nowMs - spawnedAt;
+        // Ghost markers themselves are smaller-scale than station pins, so
+        // they get their own baseline multiplier (1.6×) on top of the global
+        // zoom LOD — visible from zoom 9, never overpowering the bigger pins.
+        const ghostBase = 1.6;
+        for (let i = 0; i < this.ghosts.length; i++) {
+          const g = this.ghosts[i];
+          const ud = g.userData;
+          const isReached = ud.category === 'reached';
+          // Stagger spawn — reached ghosts pop up first (i*14 ms), then the
+          // stranded swarm cascades across the city (200 + i*14 ms).
+          const delay = isReached ? i * 14 : 200 + i * 14;
+          const sp = Math.min(1, Math.max(0, (sinceSpawn - delay) / 800));
+          const ease = 1 - Math.pow(1 - sp, 3);
+          const phase = t * (isReached ? 2.4 : 1.5) + i * 0.27;
+          const bob = Math.sin(phase) * (isReached ? 4 : 2.2);
+          ud.orb.position.y  = ud.orbY + bob;
+          ud.halo.position.y = ud.orbY + bob;
+          // Emissive breath — reached ghosts breathe stronger
+          const breath = 0.5 + 0.5 * Math.sin(phase);
+          ud.orb.material.emissiveIntensity =
+            (isReached ? 1.6 : 1.0) + (isReached ? 0.7 : 0.5) * breath;
+          ud.halo.material.opacity = 0.18 + 0.16 * breath;
+          ud.ring.material.opacity = 0.40 + 0.20 * (0.5 + 0.5 * Math.sin(phase * 0.6));
+          ud.beam.material.opacity = 0.12 + 0.10 * (0.5 + 0.5 * Math.sin(phase * 0.55));
+          // LOD scaling × ghost-baseline × spawn-in ease
+          g.scale.setScalar(ghostBase * zoomK * ease);
+        }
+      }
+
+      // Compose camera: mapMatrix * (T · S · rotX)
+      const matrix = Array.isArray(args)
+        ? args
+        : (args?.defaultProjectionData?.mainMatrix || args?.matrix);
+      if (!matrix) return;
+      const rotX = new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+      const mapMat = new THREE.Matrix4().fromArray(matrix);
+      const localMat = new THREE.Matrix4()
+        .makeTranslation(ORIGIN_MERC.x, ORIGIN_MERC.y, ORIGIN_MERC.z)
+        .multiply(new THREE.Matrix4().makeScale(METER_TO_MERC, -METER_TO_MERC, METER_TO_MERC))
+        .multiply(rotX);
+      this.camera.projectionMatrix = mapMat.multiply(localMat);
+
+      this.renderer.resetState();
+      this.renderer.render(this.scene, this.camera);
+
+      // Keep the frame loop alive while any dynamic object is on screen
+      if (this.hasLiveObjects()) this.map.triggerRepaint();
+    },
+
+    hasLiveObjects() {
+      return this.activeVehicle !== null
+          || (this.trailPoints && this.trailPoints.visible)
+          || this.layla.visible || this.laylaMobile.visible
+          || this.office.visible
+          || this.masariTube.visible || this.laylaTripTube.visible
+          || this.ghostsGroup.visible
+          || this.pins.metro.some(p => p.visible)
+          || this.pins.metroPre.some(p => p.visible)
+          || this.pins.lrt.some(p => p.visible)
+          || this.pins.brt.some(p => p.visible);
+    },
+
+    onRemove() {
+      this.scene?.traverse(obj => {
+        if (obj.isMesh) {
+          obj.geometry?.dispose();
+          const disposeMat = (m) => { m.map?.dispose?.(); m.dispose?.(); };
+          if (Array.isArray(obj.material)) obj.material.forEach(disposeMat);
+          else if (obj.material) disposeMat(obj.material);
+        }
+      });
+      this.scene = null;
+      this.renderer = null;
+    },
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  14 SCENES · the full narrative
+// ═══════════════════════════════════════════════════════════════════════
+const SCENES = [
+  {
+    id: 0, chapter: 'Prologue', chapterIdx: 0,
+    kicker: 'PHASE 02 · THE ARGUMENT',
+    headline: 'A story about what Cairo built and who was left out',
+    arabic: 'القاهرة · نظامان',
+    body: 'Every morning 1.4 million Cairenes commute by bus or microbus. Most make trips the state\'s $10 billion post-2014 transport programme was never designed to serve. This is one of those stories.',
+    metric: { label: 'COMMUTERS LIKE LAYLA', value: 1400000, unit: 'DAILY', format: 'k' },
+    hint: 'Click next · or press →',
+    center: [31.30, 30.05], zoom: 10.1, pitch: 20, bearing: 0,
+    // Prologue is a clean opening — no ghost-terminal swarm yet. The 115
+    // ghosts come on stage in Scene 5 where they're explicitly named.
+    visible: [], dim: [],
+    transition: { speed: 0.9, curve: 1.2 },
+  },
+  {
+    id: 1, chapter: 'Layla', chapterIdx: 1,
+    kicker: 'STAGE 01 · HOME',
+    headline: 'Layla lives in Imbaba',
+    arabic: 'ليلى · إمبابة · ٦:١٥ صباحاً',
+    body: 'One of the densest neighborhoods on Earth — 63,000 people per square kilometer. No metro ran through Imbaba until 2024. None run at a useful walking distance from her apartment today.',
+    metric: { label: 'DENSITY · IMBABA', value: 63000, unit: 'PEOPLE / KM²' },
+    center: LOCATIONS.imbaba, zoom: 13.6, pitch: 55, bearing: -18,
+    visible: ['layla-home-glow', 'layla-home-dot', 'layla-home-icon', 'informal-halo'], dim: [],
+    transition: { speed: 0.7, curve: 1.4 },
+  },
+  {
+    id: 2, chapter: 'Layla', chapterIdx: 1,
+    kicker: 'STAGE 02 · THE OFFICE',
+    headline: 'Her office is in Maadi · 11 km away',
+    arabic: 'المعادي · ١١ كيلومتر',
+    body: 'Across the city. South of the Nile. On paper, a short trip. In reality, Layla must cross two transport systems that were never designed to connect.',
+    metric: { label: 'AS THE CROW FLIES', value: 11, unit: 'KM' },
+    center: [31.23, 30.03], zoom: 12.0, pitch: 50, bearing: -18,
+    visible: ['layla-home-glow', 'layla-home-dot', 'layla-home-icon', 'office-glow', 'office-icon', 'crow-line-layer'],
+    dim: [],
+    transition: { speed: 0.55, curve: 1.5 },
+  },
+  {
+    id: 3, chapter: 'Layla', chapterIdx: 1,
+    kicker: 'STAGE 03 · THE REAL JOURNEY',
+    headline: 'The real route is 83 minutes each way',
+    arabic: 'الرحلة الحقيقية · ٨٣ دقيقة',
+    body: 'Three vehicles. Two transfers. No single app that can plan the trip end to end. Layla does this twice a day — over 720 hours a year sitting in transit.',
+    metric: { label: 'TYPICAL TRIP', value: 83, unit: 'MIN · EACH WAY' },
+    tripPlan: LAYLA_TRIP_LEGS,
+    // Open on Imbaba so the microbus leaving the mawfaq is visible immediately.
+    center: [31.215, 30.082], zoom: 12.6, pitch: 50, bearing: -5,
+    visible: ['layla-home-icon', 'office-icon', 'informal-layer', 'informal-halo', 'layla-trip-glow', 'layla-trip-inner', 'layla-trip-progress', 'layla-trip-car', 'layla-trip-stops', 'layla-trip-transfer-pulse'], dim: ['metro-line-layer', 'metro-icons'],
+    animate: 'layla-trip',
+    transition: { speed: 0.55, curve: 1.4 },
+  },
+  {
+    id: 4, chapter: 'The State Built', chapterIdx: 2,
+    kicker: 'STAGE 04 · THE $10B SYSTEM',
+    headline: 'What Cairo built since 2014',
+    arabic: '١٠ مليار دولار · البنية الجديدة',
+    body: 'Metro Line 3 extensions — Ataba to Adly Mansour, then Kit Kat westward. The Cairo LRT to the New Administrative Capital. The Ring Road BRT. Ten billion dollars of rail, bus-rapid, and light-rail infrastructure.',
+    metric: { label: 'INVESTMENT · 2014–2026', value: 10, unit: 'BILLION USD', format: 'billion' },
+    center: [31.32, 30.09], zoom: 10.9, pitch: 52, bearing: -8,
+    visible: ['metro-line-layer', 'metro-dot-halo', 'metro-dots', 'metro-icons',
+              'lrt-line-layer', 'lrt-dot-halo', 'lrt-dots', 'lrt-icons',
+              'brt-dots', 'brt-icons', 'brt-demand-halo'],
+    dim: ['layla-home-icon'],
+    transition: { speed: 0.6, curve: 1.6 },
+  },
+  {
+    id: 5, chapter: 'The State Built', chapterIdx: 2,
+    kicker: 'STAGE 05 · Q14 · THE GAP',
+    headline: '84% of ghost terminals are stranded beyond 2 km of any new station',
+    arabic: 'المحطات المنسيّة · ٨٤٪ بعيدة',
+    body: 'In Phase 1 we identified 115 ghost terminals — bus terminals with no boarding activity within walking distance. Of those 115, only 9 sit within a kilometer of any post-2014 metro station. Ninety-seven sit beyond two kilometers.',
+    metric: { label: 'STRANDED', value: 84, unit: '% · GHOSTS OVER 2 KM' },
+    // Pulled the camera back so both the city core (Lines 1+2) AND the
+    // post-2014 corridor extensions (3A/3B/3C/3D) are simultaneously in
+    // frame — that's the only way the gap between ghosts and ANY metro
+    // station reads visually.
+    center: [31.27, 30.06], zoom: 11.0, pitch: 50, bearing: -8,
+    visible: [
+      // Full metro network — bright cyan = post-2014, slate = pre-2014
+      'metro-icons', 'metro-pre-icons', 'metro-dot-halo', 'metro-dots', 'metro-line-layer',
+      // Phase-1 ghost-terminal swarm (3D) and the long gap-line annotations
+      'informal-layer', 'informal-halo', 'gap-lines-layer',
+      // Layla anchor for orientation
+      'layla-home-icon',
+    ],
+    dim: ['lrt-line-layer', 'lrt-dots', 'brt-icons', 'brt-dots'],
+    transition: { speed: 0.6, curve: 1.5 },
+  },
+  {
+    id: 6, chapter: 'Evidence', chapterIdx: 3,
+    kicker: 'STAGE 06 · TWO DENSITIES',
+    headline: 'Cairo is a city of two densities',
+    arabic: 'القاهرة · مدينتان مختلفتان',
+    body: 'Imbaba: 63,000 people per square kilometer. New Cairo: fewer than 3,000. The state\'s new stations favour the empty outer suburbs over the already-dense inner core where people already live.',
+    metric: { label: 'DENSITY RATIO', value: 21, unit: '× · IMBABA vs NEW CAIRO' },
+    center: [31.28, 30.05], zoom: 10.6, pitch: 24, bearing: 0,
+    visible: ['districts-choropleth', 'districts-outline'],
+    dim: ['metro-icons', 'lrt-icons', 'brt-icons'],
+    transition: { speed: 0.7, curve: 1.3 },
+  },
+  {
+    id: 7, chapter: 'Layla', chapterIdx: 1,
+    kicker: 'STAGE 07 · THE MAWFAQ',
+    headline: 'At 6:15 AM she stands at the mawfaq',
+    arabic: 'الموقف · الساعة ٦:١٥',
+    body: 'Five microbuses. Five destinations written in Arabic on taped cardboard. Drivers shouting competing routes. No schedule. No app. No driver who knows her specific trip. She picks one by guessing which direction it starts in.',
+    metric: { label: 'DEPARTURES / HOUR', value: 60, unit: 'MICROBUSES · NO SCHEDULE', suffix: '+' },
+    center: LOCATIONS.imbaba, zoom: 15.4, pitch: 58, bearing: 12,
+    visible: ['layla-home-glow', 'layla-home-icon', 'informal-layer', 'informal-halo'], dim: [],
+    transition: { speed: 0.5, curve: 1.5 },
+  },
+  {
+    id: 8, chapter: 'Evidence', chapterIdx: 3,
+    kicker: 'STAGE 08 · HYPOTHESIS H1',
+    headline: 'Dense districts get 12× fewer stations per capita',
+    arabic: 'عدم التوافق · ح١',
+    body: 'We divided Cairo\'s 68 districts into three density tertiles and counted stations per 100,000 residents. Low-density districts get a median of 19.6 stations per 100k. High-density districts get 1.47. Kruskal-Wallis H = 12.5, p < 0.01, ε² = 0.16.',
+    metric: { label: 'EFFECT SIZE · ε²', value: 0.162, unit: 'KW H = 12.5 · p = 0.002', decimals: 3 },
+    center: [31.27, 30.05], zoom: 11.4, pitch: 44, bearing: 0,
+    visible: ['districts-choropleth', 'districts-outline',
+              'metro-icons', 'metro-dots', 'metro-dot-halo',
+              'lrt-icons', 'lrt-dots', 'lrt-dot-halo',
+              'brt-icons', 'brt-dots'],
+    dim: [],
+    chart: 'h1',
+    transition: { speed: 0.65, curve: 1.3 },
+  },
+  {
+    id: 9, chapter: 'Evidence', chapterIdx: 3,
+    kicker: 'STAGE 09 · HYPOTHESIS H2',
+    headline: 'LRT median 2-km catchment is zero residents',
+    arabic: 'قطار خفيف في الصحراء · ح٢',
+    body: 'We drew 2-kilometer circles around each LRT station and asked: how many people live inside? The median answer is zero. Cliff\'s δ = −0.993 — within a hair of the theoretical maximum. Planning built for a city that does not yet exist.',
+    metric: { label: "CLIFF'S δ", value: -0.993, unit: 'NEAR-MAX NEGATIVE', decimals: 3 },
+    center: [31.60, 30.11], zoom: 10.3, pitch: 58, bearing: 22,
+    visible: ['lrt-line-layer', 'lrt-dot-halo', 'lrt-dots', 'lrt-icons',
+              'lrt-catchment-fill', 'lrt-catchment-line'],
+    dim: ['metro-icons', 'metro-dots', 'districts-choropleth'],
+    chart: 'h2',
+    transition: { speed: 0.55, curve: 1.6 },
+  },
+  {
+    id: 10, chapter: 'Evidence', chapterIdx: 3,
+    kicker: 'STAGE 10 · HYPOTHESIS H3',
+    headline: 'The BRT is the one thing they got right',
+    arabic: 'النقل السريع · ح٣',
+    body: 'Not all of the $10B missed. Median daily informal boardings inside a 500-metre BRT corridor buffer: 1,576. Matched control: zero. Cliff\'s δ = +0.826. The BRT was built on top of real demand.',
+    metric: { label: "CLIFF'S δ", value: 0.826, unit: 'THE ONE PLANNING WIN', decimals: 3 },
+    center: [31.33, 30.14], zoom: 11.5, pitch: 54, bearing: -12,
+    visible: ['brt-icons', 'brt-dots', 'brt-demand-halo', 'brt-catchment-fill',
+              'informal-layer', 'informal-halo'],
+    dim: ['metro-icons', 'metro-dots', 'lrt-icons', 'lrt-dots'],
+    chart: 'h3',
+    transition: { speed: 0.6, curve: 1.4 },
+  },
+  {
+    id: 11, chapter: 'Evidence', chapterIdx: 3,
+    kicker: 'STAGE 11 · Q18b · VERDICT',
+    headline: 'No cell in the gap-closure matrix is above 25%',
+    arabic: 'الحُكم · ١٨ب',
+    body: 'Four Phase-1 gap categories × three new modes. Twelve cells. The single best cell is 25%. Most are below 16%. Ten billion dollars closed almost none of the Phase-1 gaps.',
+    metric: { label: 'BEST CELL', value: 25, unit: '% · BRT × VEHICLE MISMATCH' },
+    center: [31.25, 30.05], zoom: 10.8, pitch: 38, bearing: 0,
+    visible: ['metro-icons', 'metro-dots', 'lrt-icons', 'lrt-dots',
+              'brt-icons', 'brt-dots', 'informal-layer'],
+    dim: ['districts-choropleth'],
+    chart: 'q18b',
+    transition: { speed: 0.7, curve: 1.2 },
+  },
+  {
+    id: 12, chapter: 'Masari', chapterIdx: 4,
+    kicker: 'STAGE 12 · THE SOFTWARE ANSWER',
+    headline: 'Masari · one route planner for both systems',
+    arabic: 'مَسَارِي · تطبيق واحد',
+    body: 'Masari does not invent a new railway. It stitches the commute into one readable chain: microbus out of Imbaba, Metro Line 3 into the core, a transfer at Sadat, then the final connection into Maadi. The route becomes one journey instead of three guesses.',
+    metric: { label: 'ADDRESSABLE MARKET', value: 18, unit: 'MILLION · EST. CORE + PERIPHERAL GROWTH' },
+    tripPlan: MASARI_LEGS,
+    // Open on Imbaba then chase the microbus south. The full transit network
+    // (metro + BRT pins) is visible as Masari's "guide" — the formal stops it
+    // stitches together. The cinematic chase camera tightens on the vehicle
+    // (warmup=0, target zoom 13.8) so the microbus stays the focal point even
+    // with the network pins around it.
+    center: [31.215, 30.082], zoom: 12.6, pitch: 56, bearing: -5,
+    visible: ['masari-glow', 'masari-inner', 'masari-progress', 'masari-car', 'masari-transfer-pulse',
+              'metro-icons', 'metro-dots', 'metro-line-layer',
+              'brt-icons', 'brt-dots', 'brt-demand-halo',
+              'layla-home-icon', 'office-icon'],
+    dim: ['lrt-icons', 'lrt-dots'],
+    animate: 'masari-route',
+    transition: { speed: 0.6, curve: 1.5 },
+  },
+  {
+    id: 13, chapter: 'Masari', chapterIdx: 4,
+    kicker: 'STAGE 13 · ARRIVAL',
+    headline: '08:55 — she arrives on time',
+    arabic: 'وصلت في الموعد',
+    body: 'The commute now has named legs, known transfers, and one route Layla can trust. Forty-five minutes instead of eighty-three. The infrastructure did not reach her as one system. The software can make it behave like one.',
+    metric: { label: 'LAYLA · MORNING', value: '08:55', unit: 'ARRIVED ON TIME', isText: true },
+    center: LOCATIONS.maadi, zoom: 14.0, pitch: 58, bearing: 24,
+    visible: ['office-glow', 'office-icon', 'layla-mobile-icon', 'layla-mobile-pulse'],
+    dim: ['lrt-icons', 'lrt-dots', 'brt-icons', 'brt-dots', 'informal-layer'],
+    hint: 'Press R to replay · or click a chapter',
+    cta: true,
+    transition: { speed: 0.55, curve: 1.5 },
+  },
+];
+
+const CHAPTERS = ['Prologue', 'Layla', 'The State Built', 'Evidence', 'Masari'];
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CIRCLE POLYGON (for LRT / BRT catchment overlays)
+// ═══════════════════════════════════════════════════════════════════════
+function circlePolygon([lng, lat], km) {
+  const points = 64;
+  const coords = [];
+  const latR = km / 111;
+  const lngR = km / (111 * Math.cos(lat * Math.PI / 180));
+  for (let i = 0; i <= points; i++) {
+    const angle = (i / points) * 2 * Math.PI;
+    coords.push([lng + lngR * Math.cos(angle), lat + latR * Math.sin(angle)]);
+  }
+  return coords;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  ANIMATED NUMBER HOOK
+// ═══════════════════════════════════════════════════════════════════════
+function useAnimatedNumber(target, { duration = 1200, decimals = 0, format = null } = {}) {
+  const [value, setValue] = useState(typeof target === 'number' ? 0 : target);
+  useEffect(() => {
+    if (typeof target !== 'number') { setValue(target); return; }
+    const start = typeof value === 'number' ? value : 0;
+    const diff = target - start;
+    const t0 = performance.now();
+    let raf;
+    const tick = (t) => {
+      const p = Math.min((t - t0) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setValue(start + diff * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  if (typeof value !== 'number') return value;
+  if (format === 'k' && Math.abs(value) >= 1000) {
+    return (value / 1000).toFixed(0) + 'K';
+  }
+  if (format === 'billion') return value.toFixed(0);
+  return decimals > 0 ? value.toFixed(decimals) : Math.round(value).toLocaleString();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  CHARTS (pure SVG — H1 / H2 / H3 bars + Q18b matrix)
+// ═══════════════════════════════════════════════════════════════════════
+function BarRow({ label, value, max, color, valueText }) {
+  const pct = Math.max(2, Math.min(100, (value / max) * 100));
+  return (
+    <div className="bar-row">
+      <div className="bar-label">{label}</div>
+      <div className="bar-track">
+        <div className="bar-fill" style={{ width: pct + '%', background: color, boxShadow: `0 0 14px ${color}` }} />
+      </div>
+      <div className="bar-val" style={{ color }}>{valueText}</div>
+    </div>
+  );
+}
+
+function ChartH1() {
+  return (
+    <div className="card chart-card" key="h1">
+      <div className="bl"></div><div className="br"></div>
+      <div className="chart-title">H1 · STATIONS PER 100K BY DENSITY TERTILE</div>
+      <BarRow label="LOW DENSITY"   value={19.6} max={22} color="#2A9D8F" valueText="19.60" />
+      <BarRow label="MEDIUM"        value={4.08} max={22} color="#E9C46A" valueText="4.08"  />
+      <BarRow label="HIGH DENSITY"  value={1.47} max={22} color="#E86F51" valueText="1.47"  />
+      <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
+                    letterSpacing: '0.06em', marginTop: 14 }}>
+        KRUSKAL-WALLIS H = 12.506 · p = 0.002 · ε² = 0.162 · MORAN'S I = 0.087
+      </div>
+    </div>
+  );
+}
+
+function ChartH2() {
+  return (
+    <div className="card chart-card" key="h2">
+      <div className="bl"></div><div className="br"></div>
+      <div className="chart-title">H2 · MEDIAN 2-KM CATCHMENT · LRT vs METRO</div>
+      <BarRow label="LRT · n=16"                 value={1}      max={700000} color="#7B2D8E" valueText="0"       />
+      <BarRow label="METRO L3 POST-2012 · n=27"  value={634333} max={700000} color="#58A6FF" valueText="634,333" />
+      <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
+                    letterSpacing: '0.06em', marginTop: 14 }}>
+        MANN-WHITNEY U = 2 · p &lt; 0.0001 · CLIFF'S δ = −0.993
+      </div>
+    </div>
+  );
+}
+
+function ChartH3() {
+  return (
+    <div className="card chart-card" key="h3">
+      <div className="bl"></div><div className="br"></div>
+      <div className="chart-title">H3 · INFORMAL DEMAND · BRT vs MATCHED CONTROL</div>
+      <BarRow label="BRT CORRIDOR · n=12"  value={1576} max={2000} color="#E9C46A" valueText="1,576" />
+      <BarRow label="CONTROL · n=12"       value={1}    max={2000} color="#8B949E" valueText="0"     />
+      <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#2A9D8F',
+                    letterSpacing: '0.06em', marginTop: 14 }}>
+        WILCOXON · p = 0.0001 · CLIFF'S δ = +0.826 · THE ONE POSITIVE
+      </div>
+    </div>
+  );
+}
+
+function ChartQ18b() {
+  const gaps = ['GHOSTS', 'EMPTY-RET', 'VEH MISM', 'UNDERSRV'];
+  const rows = [
+    { mode: 'METRO L3', vals: [15.7, 5.3, 0.0, 9.7] },
+    { mode: 'LRT',      vals: [3.5,  5.3, 25.0, 2.6] },
+    { mode: 'BRT',      vals: [4.3,  10.5, 25.0, 13.6] },
+  ];
+  const cellColor = (v) => {
+    if (v >= 20) return 'rgba(42,157,143,0.35)';
+    if (v >= 10) return 'rgba(233,196,106,0.35)';
+    if (v >= 5)  return 'rgba(232,111,81,0.35)';
+    return 'rgba(123,45,142,0.3)';
+  };
+  const textColor = (v) => {
+    if (v >= 20) return '#5AD4C4';
+    if (v >= 10) return '#F4D58E';
+    if (v >= 5)  return '#FFA887';
+    return '#B877C9';
+  };
+  return (
+    <div className="card chart-card" key="q18b" style={{ width: 460, maxWidth: '36vw' }}>
+      <div className="bl"></div><div className="br"></div>
+      <div className="chart-title">Q18b · GAP-CLOSURE MATRIX · % WITHIN 2 KM</div>
+      <div className="matrix">
+        <div className="matrix-head"></div>
+        {gaps.map((g, i) => <div key={g} className="matrix-head" style={{ animationDelay: (i * 60) + 'ms' }}>{g}</div>)}
+        {rows.map((r, ri) => (
+          <React.Fragment key={r.mode}>
+            <div className="matrix-rowlbl">{r.mode}</div>
+            {r.vals.map((v, ci) => (
+              <div key={ci} className="matrix-cell"
+                   style={{
+                     background: cellColor(v), color: textColor(v),
+                     animationDelay: ((ri * 4 + ci) * 80 + 240) + 'ms',
+                   }}>
+                {v.toFixed(1)}%
+              </div>
+            ))}
+          </React.Fragment>
+        ))}
+      </div>
+      <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
+                    letterSpacing: '0.06em', marginTop: 14, textAlign: 'center' }}>
+        NO CELL ABOVE 25% · MOST BELOW 16%
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  PANEL (narrative left-side card)
+// ═══════════════════════════════════════════════════════════════════════
+function NarrativePanel({ scene, onGoPhase1, onGoPhase2, onGoHypotheses, onReplay }) {
+  const metric = scene.metric || {};
+  const val = useAnimatedNumber(metric.value, {
+    duration: 1400, decimals: metric.decimals || 0, format: metric.format,
+  });
+  return (
+    <div key={scene.id} className="card panel">
+      <div className="bl"></div><div className="br"></div>
+      <div className="kicker">{scene.kicker}</div>
+      {scene.arabic && <div className="arabic">{scene.arabic}</div>}
+      <div className="headline">{scene.headline}</div>
+      <div className="body">{scene.body}</div>
+
+      {metric.label && (
+        <div className="metric">
+          <div className="metric-label">{metric.label}</div>
+          <div className="metric-val">
+            {metric.isText ? metric.value : val}
+            {metric.suffix || ''}
+          </div>
+          {metric.unit && <div className="metric-unit">{metric.unit}</div>}
+        </div>
+      )}
+
+      {scene.tripPlan && (
+        <div className="trip-plan">
+          <div className="trip-plan-title">LAYLA · MODED TRIP PLAN</div>
+          {scene.tripPlan.map((leg) => (
+            <div className="trip-leg" key={leg.id}>
+              <div className="trip-leg-mode">{leg.mode}</div>
+              <div className="trip-leg-route">
+                <div>{leg.label}</div>
+                {leg.note && <div className="trip-leg-note">{leg.note}</div>}
+              </div>
+              <div className="trip-leg-time">{leg.timeText}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {scene.cta && (
+        <div className="cta-row">
+          <button className="cta" onClick={onReplay}>REPLAY STORY</button>
+          <button className="cta" onClick={onGoPhase1}>EVIDENCE · PHASE 1</button>
+          <button className="cta" onClick={onGoPhase2}>EVIDENCE · PHASE 2</button>
+          <button className="cta" onClick={onGoHypotheses}>HYPOTHESES</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  TOP BAR
+// ═══════════════════════════════════════════════════════════════════════
+function TopBar({ scene, sceneIdx, total }) {
+  const pct = ((sceneIdx + 1) / total) * 100;
+  return (
+    <div className="topbar">
+      <div className="brand">CAIRO · LAYLA · MASARI</div>
+      <div className="chapter-pill">ACT · {scene.chapter.toUpperCase()}</div>
+      <div className="progress-wrap">
+        <div className="progress-counter">{String(sceneIdx + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}</div>
+        <div className="progress-track">
+          <div className="progress-fill" style={{ width: pct + '%' }}></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  BOTTOM BAR (controls + chapter dots + autoplay)
+// ═══════════════════════════════════════════════════════════════════════
+function BottomBar({ sceneIdx, total, onPrev, onNext, autoPlay, setAutoPlay, onJump, scene }) {
+  return (
+    <div className="bottombar">
+      <div className="chapters-strip" style={{ pointerEvents: 'auto' }}>
+        <span className="chap-label">Scenes</span>
+        {Array.from({ length: total }).map((_, i) => (
+          <div key={i}
+               className={'chap-dot ' + (i === sceneIdx ? 'active' : (i < sceneIdx ? 'past' : ''))}
+               onClick={() => onJump(i)}
+               title={`Scene ${i + 1}`} />
+        ))}
+      </div>
+      <div className="hint">{scene.hint || 'Press → · ← · SPACE · R'}</div>
+      <div className="controls">
+        <button className="ctrl" onClick={onPrev} disabled={sceneIdx === 0}>← PREV</button>
+        <button className={'ctrl ' + (autoPlay ? 'primary' : '')}
+                onClick={() => setAutoPlay(!autoPlay)}>
+          {autoPlay ? 'PAUSE' : 'AUTOPLAY'}
+        </button>
+        <button className="ctrl primary" onClick={onNext}
+                disabled={sceneIdx === total - 1}>NEXT →</button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  SCENE CONTROLLER · applies a scene to the map
+// ═══════════════════════════════════════════════════════════════════════
+function applyScene(map, scene) {
+  const isMobile = window.innerWidth <= 900;
+  const padding = isMobile
+    ? { top: 92, right: 24, bottom: 112, left: 24 }
+    : {
+        top: 96,
+        right: 42,
+        bottom: 108,
+        left: scene.panelFocus === 'centered' ? 72 : Math.min(Math.max(window.innerWidth * 0.30, 320), 430),
+      };
+  // Camera fly
+  map.flyTo({
+    center: scene.center,
+    zoom: scene.zoom,
+    pitch: scene.pitch,
+    bearing: scene.bearing,
+    padding,
+    speed: scene.transition?.speed || 0.7,
+    curve: scene.transition?.curve || 1.3,
+    easing: (t) => 1 - Math.pow(1 - t, 3),
+    essential: true,
+  });
+  // Layer opacity toggles
+  const visible = new Set(scene.visible || []);
+  const dim = new Set(scene.dim || []);
+  ALL_LAYER_IDS.forEach(id => {
+    if (!map.getLayer(id)) return;
+    const op = opacityProp(id, map);
+    const opStroke = opacityPropStroke(id, map);
+    let target = 0;
+    if (visible.has(id)) target = 1;
+    else if (dim.has(id)) target = 0.28;
+    if (op)       map.setPaintProperty(id, op, target);
+    if (opStroke) map.setPaintProperty(id, opStroke, target);
+  });
+
+  // scene.visible still carries the old 2D icon IDs as semantic keys; we use
+  // them to drive the Three.js scene graph (pins, avatars, vehicles).
+  if (map._threeLayer) map._threeLayer.syncScene(scene);
+
+  // Force a repaint so opacity changes appear immediately even when the map
+  // is not moving (otherwise MapLibre can skip a frame and the fade looks stuck).
+  map.triggerRepaint();
+}
+
+function segmentBearing(route, index) {
+  const current = route[index];
+  const next = route[Math.min(index + 1, route.length - 1)];
+  const prev = route[Math.max(index - 1, 0)];
+  const from = index < route.length - 1 ? current : prev;
+  const to = index < route.length - 1 ? next : current;
+  return turf.bearing(turf.point(from), turf.point(to));
+}
+
+// ── Cinematic follow-camera ─────────────────────────────────────────────
+// Called once per animation frame. Chases the vehicle smoothly: centers
+// slightly ahead of it, rotates the map so direction-of-travel is "up",
+// and eases zoom/pitch toward cinematic values. Everything is a per-axis
+// LERP so panning/tilting never snaps — the camera feels like a drone.
+function cinematicFollow(map, lngLat, bearingDeg, elapsed, opts = {}) {
+  const {
+    warmup      = 350,   // ms — short opening then chase. Was 650; reduced so
+                         // the user doesn't sit on a wide static shot waiting.
+    leadKm      = 0.14,  // look-ahead distance along bearing
+    targetZoom  = 14.3,
+    targetPitch = 60,
+    centerBlend = 0.10,
+    bearingBlend= 0.055,
+    zoomBlend   = 0.045,
+    pitchBlend  = 0.04,
+  } = opts;
+
+  if (elapsed < warmup) return;
+
+  // Point ahead of the vehicle — camera "looks forward"
+  const ahead = turf.destination(turf.point(lngLat), leadKm, bearingDeg, { units: 'kilometers' });
+  const [lng, lat] = ahead.geometry.coordinates;
+
+  const c = map.getCenter();
+  map.setCenter([
+    c.lng + (lng - c.lng) * centerBlend,
+    c.lat + (lat - c.lat) * centerBlend,
+  ]);
+
+  // Wrap-safe bearing LERP (shortest angular path)
+  const curB = map.getBearing();
+  const delta = ((bearingDeg - curB + 540) % 360) - 180;
+  map.setBearing(curB + delta * bearingBlend);
+
+  // Zoom + pitch ease toward cinematic targets
+  const curZ = map.getZoom();
+  map.setZoom(curZ + (targetZoom - curZ) * zoomBlend);
+  const curP = map.getPitch();
+  map.setPitch(curP + (targetPitch - curP) * pitchBlend);
+}
+
+// ── Look-ahead bearing + temporal LERP ──────────────────────────────────
+// The raw per-segment bearing snaps at every route vertex (and jumps at
+// leg transitions). Real vehicles take corners with a turning radius.
+// We emulate that with two tricks stacked:
+//   1. LOOK-AHEAD: the target bearing is the compass direction from the
+//      current position to a point ~40 m further along the FULL route
+//      (`overallLine` — all legs concatenated). Near a corner this vector
+//      naturally rotates through the arc rather than snapping at the apex.
+//   2. TEMPORAL SMOOTHING: wrap-safe LERP from last frame's bearing to the
+//      target. This kills micro-jitter and models the yaw inertia of a bus.
+//
+// Returns the smoothed bearing in degrees; caller persists state via
+// `bearingStateRef` (so hot re-renders don't reset the filter).
+function smoothedLookAheadBearing({
+  overallLine, totalRouteKm, point, traveledKm,
+  bearingStateRef, lookAheadKm = 0.04, lerp = 0.18,
+}) {
+  const clampedAhead = Math.min(traveledKm + lookAheadKm, totalRouteKm - 0.0005);
+  const aheadPt = turf.along(overallLine, Math.max(0, clampedAhead), { units: 'kilometers' });
+  let raw = turf.bearing(point, aheadPt);
+  if (!Number.isFinite(raw)) raw = bearingStateRef.current ?? 0;
+
+  const cur = bearingStateRef.current;
+  if (cur === null || cur === undefined) {
+    bearingStateRef.current = raw;
+    return raw;
+  }
+  const diff = ((raw - cur + 540) % 360) - 180;
+  const next = cur + diff * lerp;
+  bearingStateRef.current = next;
+  return next;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MULTI-LEG MASARI ANIMATION (scene 12)
+// ═══════════════════════════════════════════════════════════════════════
+function useMasariAnimation(map, active) {
+  const rafRef = useRef(null);
+  const startedAtRef = useRef(0);
+  const bearingRef = useRef(null);
+
+  useEffect(() => {
+    if (!map || !active) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      const transferSource = map?.getSource?.('masari-transfer-src');
+      if (transferSource) {
+        transferSource.setData({ type: 'FeatureCollection', features: [] });
+      }
+      return;
+    }
+    // FRESH-START RESET — see comments in useLaylaTripAnimation. Re-entering
+    // the scene (next → prev) leaves stale state in the 3D layer that can
+    // suppress the vehicle on the second activation; reset before scheduling.
+    if (map._threeLayer) {
+      map._threeLayer.hideVehicles();
+      const tr = map._threeLayer._trail;
+      if (tr) {
+        for (let i = 0; i < tr.n; i++) {
+          tr.positions[i * 3 + 1] = -1e6;
+          tr.ages[i] = 1.0;
+        }
+        tr.geo.attributes.position.needsUpdate = true;
+        tr.geo.attributes.aAge.needsUpdate = true;
+        tr.head = 0;
+      }
+      map._threeLayer._lastVehiclePos = null;
+      map._threeLayer._lastVehicleRef = null;
+      map._threeLayer._wheelAngle = 0;
+    }
+
+    const legs = MASARI_LEGS.map((leg) => ({
+      ...leg,
+      line: turf.lineString(leg.route),
+      lengthKm: turf.length(turf.lineString(leg.route), { units: 'kilometers' }),
+    }));
+    const totalLen = legs.reduce((sum, leg) => sum + leg.lengthKm, 0);
+    const durationMs = legs.reduce((sum, leg) => sum + leg.durationMs + leg.pauseMs, 0);
+    // Full-route geometry for smooth look-ahead bearing (concat of all legs).
+    const overallLine = turf.lineString(MASARI_ROUTE);
+    const totalRouteKm = turf.length(overallLine, { units: 'kilometers' });
+    bearingRef.current = null; // fresh filter on each activation
+    startedAtRef.current = performance.now();
+
+    const progSource     = map.getSource('masari-progress-src');
+    const transferSource = map.getSource('masari-transfer-src');
+    if (!progSource || !transferSource) return;
+    progSource.setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: [MASARI_ROUTE[0], MASARI_ROUTE[0]] },
+      properties: {},
+    });
+    transferSource.setData({ type: 'FeatureCollection', features: [] });
+    map.setPaintProperty('masari-transfer-pulse', 'circle-opacity', 0);
+
+    // Place the 3D vehicle at the start before the first RAF so the user
+    // sees it immediately when the scene opens.
+    if (map._threeLayer) {
+      const startPt = MASARI_LEGS[0].route[0];
+      const nextPt  = MASARI_LEGS[0].route[1] || startPt;
+      const initBearing = turf.bearing(turf.point(startPt), turf.point(nextPt));
+      bearingRef.current = initBearing;
+      map._threeLayer.setVehicle('microbus', { lngLat: startPt, bearing: initBearing });
+    }
+
+    const showTransfer = (coords, color) => {
+      transferSource.setData({
+        type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: coords },
+          properties: { color },
+        }],
+      });
+      map.setPaintProperty('masari-transfer-pulse', 'circle-opacity', 0.55);
+      map.setPaintProperty('masari-transfer-pulse', 'circle-radius', 18);
+    };
+
+    const step = (now) => {
+      try {
+        const elapsed = now - startedAtRef.current;
+        let remaining = Math.min(elapsed, durationMs);
+        let traveledKm = 0;
+        let activeLeg = legs[0];
+        let point = turf.point(activeLeg.route[0]);
+        let paused = false;
+
+        for (const leg of legs) {
+          activeLeg = leg;
+          if (remaining <= leg.durationMs) {
+            let localT = remaining / leg.durationMs;
+            localT = localT < 0.5
+              ? 4 * localT * localT * localT
+              : 1 - Math.pow(-2 * localT + 2, 3) / 2;
+            const distanceKm = localT * leg.lengthKm;
+            point = turf.along(leg.line, distanceKm, { units: 'kilometers' });
+            traveledKm += distanceKm;
+            break;
+          }
+          remaining -= leg.durationMs;
+          traveledKm += leg.lengthKm;
+          point = turf.point(leg.route[leg.route.length - 1]);
+          if (remaining <= leg.pauseMs) { paused = true; break; }
+          remaining -= leg.pauseMs;
+        }
+
+        const bearing = smoothedLookAheadBearing({
+          overallLine, totalRouteKm,
+          point, traveledKm,
+          bearingStateRef: bearingRef,
+          lookAheadKm: 0.045,
+          lerp: paused ? 0.06 : 0.16,
+        });
+
+        map.setPaintProperty('masari-progress', 'line-color', activeLeg.color);
+        map.setPaintProperty('masari-transfer-pulse', 'circle-color', activeLeg.color);
+
+        if (map._threeLayer) {
+          map._threeLayer.setVehicle(
+            activeLeg.mode === 'METRO' ? 'metro' : 'microbus',
+            { lngLat: point.geometry.coordinates, bearing },
+          );
+        }
+
+        cinematicFollow(map, point.geometry.coordinates, bearing, elapsed, {
+          warmup: 0, targetZoom: 13.8, targetPitch: 58, leadKm: 0.18,
+          centerBlend: 0.13, zoomBlend: 0.06, bearingBlend: 0.07, pitchBlend: 0.05,
+        });
+
+        if (traveledKm > 0.001) {
+          const sliced = turf.lineSliceAlong(overallLine, 0, traveledKm, { units: 'kilometers' });
+          progSource.setData(sliced);
+        }
+
+        if (paused) {
+          showTransfer(point.geometry.coordinates, activeLeg.color);
+          map.setPaintProperty('masari-transfer-pulse', 'circle-radius', 18 + 22 * Math.sin(now / 240));
+        } else {
+          transferSource.setData({ type: 'FeatureCollection', features: [] });
+          map.setPaintProperty('masari-transfer-pulse', 'circle-opacity', 0);
+        }
+
+        if (elapsed < durationMs) {
+          rafRef.current = requestAnimationFrame(step);
+        } else {
+          transferSource.setData({
+            type: 'FeatureCollection',
+            features: [{
+              type: 'Feature',
+              geometry: { type: 'Point', coordinates: MASARI_TRANSFERS[2].coords },
+              properties: { color: '#2A9D8F' },
+            }],
+          });
+          map.setPaintProperty('masari-transfer-pulse', 'circle-color', '#2A9D8F');
+          map.setPaintProperty('masari-transfer-pulse', 'circle-opacity', 0.55);
+          map.setPaintProperty('masari-transfer-pulse', 'circle-radius', 28);
+        }
+      } catch (err) {
+        console.error('[masari step] error:', err);
+        // Keep the RAF chain alive so a transient hiccup doesn't kill the trip
+        rafRef.current = requestAnimationFrame(step);
+      }
+    };
+    console.log('[masari] effect activated, scheduling first RAF');
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      transferSource.setData({ type: 'FeatureCollection', features: [] });
+      map.setPaintProperty('masari-transfer-pulse', 'circle-opacity', 0);
+      map._threeLayer?.hideVehicles();
+    };
+  }, [map, active]);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  LAYLA CHAOS TRIP ANIMATION (scene 3)
+//  Same multi-leg engine as Masari but drives layla-trip-* sources.
+// ═══════════════════════════════════════════════════════════════════════
+function useLaylaTripAnimation(map, active) {
+  const rafRef = useRef(null);
+  const startedAtRef = useRef(0);
+  const bearingRef = useRef(null);
+
+  useEffect(() => {
+    if (!map || !active) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      const transferSource = map?.getSource?.('layla-trip-transfer-src');
+      if (transferSource) transferSource.setData({ type: 'FeatureCollection', features: [] });
+      return;
+    }
+    // FRESH-START RESET — when re-entering the scene (next → prev nav), the
+    // 3D layer can hold stale state from the previous run that prevents the
+    // vehicle from re-appearing. Force a clean slate before scheduling RAF.
+    if (map._threeLayer) {
+      map._threeLayer.hideVehicles();
+      // Also blank the trail buffer so it doesn't draw a long ghost stretch
+      // from the last vehicle parking spot to the new starting point.
+      const tr = map._threeLayer._trail;
+      if (tr) {
+        for (let i = 0; i < tr.n; i++) {
+          tr.positions[i * 3 + 1] = -1e6; // park below ground (invisible)
+          tr.ages[i] = 1.0;
+        }
+        tr.geo.attributes.position.needsUpdate = true;
+        tr.geo.attributes.aAge.needsUpdate = true;
+        tr.head = 0;
+      }
+      map._threeLayer._lastVehiclePos = null;
+      map._threeLayer._lastVehicleRef = null;
+      map._threeLayer._wheelAngle = 0;
+    }
+
+    const legs = LAYLA_TRIP_LEGS.map((leg) => ({
+      ...leg,
+      line: turf.lineString(leg.route),
+      lengthKm: turf.length(turf.lineString(leg.route), { units: 'kilometers' }),
+    }));
+    const durationMs = legs.reduce((sum, leg) => sum + leg.durationMs + leg.pauseMs, 0);
+    const overallLine = turf.lineString(LAYLA_TRIP_ROUTE);
+    const totalRouteKm = turf.length(overallLine, { units: 'kilometers' });
+    bearingRef.current = null;
+    startedAtRef.current = performance.now();
+
+    const progSource     = map.getSource('layla-trip-progress-src');
+    const transferSource = map.getSource('layla-trip-transfer-src');
+    if (!progSource || !transferSource) return;
+
+    progSource.setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: [LAYLA_TRIP_ROUTE[0], LAYLA_TRIP_ROUTE[0]] },
+      properties: {},
+    });
+    transferSource.setData({ type: 'FeatureCollection', features: [] });
+    map.setPaintProperty('layla-trip-transfer-pulse', 'circle-opacity', 0);
+
+    // Place the 3D vehicle at the start (microbus, leg 1) BEFORE the first
+    // RAF — guarantees the user sees it the instant the scene opens, not
+    // only after the first animation frame fires (which can be delayed if
+    // the tab was backgrounded or RAFs were throttled).
+    if (map._threeLayer) {
+      const startPt = LAYLA_TRIP_LEGS[0].route[0];
+      const nextPt  = LAYLA_TRIP_LEGS[0].route[1] || startPt;
+      const initBearing = turf.bearing(turf.point(startPt), turf.point(nextPt));
+      bearingRef.current = initBearing;
+      map._threeLayer.setVehicle('microbus', { lngLat: startPt, bearing: initBearing });
+    }
+
+    const step = (now) => {
+      const elapsed = now - startedAtRef.current;
+      let remaining = Math.min(elapsed, durationMs);
+      let traveledKm = 0;
+      let activeLeg = legs[0];
+      let point = turf.point(activeLeg.route[0]);
+      let paused = false;
+
+      for (const leg of legs) {
+        activeLeg = leg;
+        if (remaining <= leg.durationMs) {
+          let localT = remaining / leg.durationMs;
+          localT = localT < 0.5
+            ? 4 * localT * localT * localT
+            : 1 - Math.pow(-2 * localT + 2, 3) / 2;
+          const distanceKm = localT * leg.lengthKm;
+          point = turf.along(leg.line, distanceKm, { units: 'kilometers' });
+          traveledKm += distanceKm;
+          break;
+        }
+        remaining -= leg.durationMs;
+        traveledKm += leg.lengthKm;
+        point = turf.point(leg.route[leg.route.length - 1]);
+        if (remaining <= leg.pauseMs) { paused = true; break; }
+        remaining -= leg.pauseMs;
+      }
+
+      // Real-vehicle smoothing — look-ahead bearing + LERP (same as masari)
+      const bearing = smoothedLookAheadBearing({
+        overallLine, totalRouteKm,
+        point, traveledKm,
+        bearingStateRef: bearingRef,
+        lookAheadKm: 0.04,
+        lerp: paused ? 0.05 : 0.15,
+      });
+
+      map.setPaintProperty('layla-trip-progress', 'line-color', activeLeg.color);
+
+      // Drive the 3D vehicle (swaps between metro train ↔ microbus per leg)
+      if (map._threeLayer) {
+        map._threeLayer.setVehicle(
+          activeLeg.mode === 'METRO' ? 'metro' : 'microbus',
+          { lngLat: point.geometry.coordinates, bearing },
+        );
+      }
+
+      // Cinematic camera chase — drone-style follow of the vehicle (warmup=0)
+      cinematicFollow(map, point.geometry.coordinates, bearing, elapsed, {
+        warmup: 0, targetZoom: 14.0, targetPitch: 60, leadKm: 0.15,
+        centerBlend: 0.13, zoomBlend: 0.06, bearingBlend: 0.07, pitchBlend: 0.05,
+      });
+
+      if (traveledKm > 0.001) {
+        const sliced = turf.lineSliceAlong(overallLine, 0, traveledKm, { units: 'kilometers' });
+        progSource.setData(sliced);
+      }
+
+      if (paused) {
+        transferSource.setData({
+          type: 'FeatureCollection',
+          features: [{ type: 'Feature',
+                       geometry: { type: 'Point', coordinates: point.geometry.coordinates },
+                       properties: { color: activeLeg.color } }],
+        });
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-color', activeLeg.color);
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-opacity', 0.55);
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-radius', 20 + 24 * Math.sin(now / 260));
+      } else {
+        transferSource.setData({ type: 'FeatureCollection', features: [] });
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-opacity', 0);
+      }
+
+      if (elapsed < durationMs) {
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        // settle at Maadi with a teal arrival pulse
+        transferSource.setData({
+          type: 'FeatureCollection',
+          features: [{ type: 'Feature',
+                       geometry: { type: 'Point', coordinates: LOCATIONS.maadi },
+                       properties: { color: '#2A9D8F' } }],
+        });
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-color', '#2A9D8F');
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-opacity', 0.55);
+        map.setPaintProperty('layla-trip-transfer-pulse', 'circle-radius', 30);
+      }
+    };
+    rafRef.current = requestAnimationFrame(step);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      transferSource.setData({ type: 'FeatureCollection', features: [] });
+      map.setPaintProperty('layla-trip-transfer-pulse', 'circle-opacity', 0);
+      map._threeLayer?.hideVehicles();
+    };
+  }, [map, active]);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MAP SETUP (runs once)
+// ═══════════════════════════════════════════════════════════════════════
+async function setupMapLayers(map) {
+  // (Phase-1 ghost terminals are added at the END of this function, AFTER the
+  // line layers, so the dots draw on top of metro/LRT/BRT lines and aren't
+  // buried under thick coloured ribbons.)
+
+  // ── Districts choropleth (by coverage class) ──
+  map.addSource('districts', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: DISTRICTS.map(d => ({
+      type: 'Feature', geometry: { type: 'Point', coordinates: d.center },
+      properties: { name: d.name, pop: d.pop, coverage: d.coverage },
+    })) },
+  });
+  map.addLayer({
+    id: 'districts-choropleth', type: 'circle', source: 'districts',
+    paint: {
+      'circle-radius': ['match', ['get', 'pop'], 'high', 34, 'med', 24, 16],
+      'circle-color': ['match', ['get', 'coverage'],
+        'under', '#E86F51', 'over', '#2A9D8F', '#E9C46A'],
+      'circle-blur': 0.7,
+      'circle-opacity': 0,
+    },
+  });
+  map.addLayer({
+    id: 'districts-outline', type: 'circle', source: 'districts',
+    paint: {
+      'circle-radius': ['match', ['get', 'pop'], 'high', 34, 'med', 24, 16],
+      'circle-color': 'rgba(0,0,0,0)',
+      'circle-stroke-width': 1.4,
+      'circle-stroke-color': ['match', ['get', 'coverage'],
+        'under', '#E86F51', 'over', '#2A9D8F', '#E9C46A'],
+      'circle-stroke-opacity': 0,
+    },
+  });
+
+  // ── Metro line + icons ──
+  map.addSource('metro-line', {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'LineString',
+      coordinates: METRO_POST_2014.map(s => s.coords) }, properties: {} },
+  });
+  map.addLayer({
+    id: 'metro-line-layer', type: 'line', source: 'metro-line',
+    paint: {
+      'line-color': '#58A6FF',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 9, 5, 12, 8, 15, 12],
+      'line-opacity': 0,
+      'line-blur': 1.2,
+    },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+  map.addSource('metro', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: METRO_POST_2014.map(s => ({
+      type: 'Feature', geometry: { type: 'Point', coordinates: s.coords },
+      properties: { name: s.name, year: s.year },
+    })) },
+  });
+  // Guaranteed-visible glow halo + solid dot (GL shader, no image loading)
+  map.addLayer({
+    id: 'metro-dot-halo', type: 'circle', source: 'metro',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 18, 13, 34, 16, 48],
+      'circle-color': '#58A6FF',
+      'circle-blur': 1.0,
+      'circle-opacity': 0,
+    },
+  });
+  map.addLayer({
+    id: 'metro-dots', type: 'circle', source: 'metro',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 6, 13, 10, 16, 14],
+      'circle-color': '#58A6FF',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#0D1117',
+      'circle-opacity': 0,
+      'circle-stroke-opacity': 0,
+    },
+  });
+  // ── LRT line + icons + catchment circles ──
+  map.addSource('lrt-line', {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'LineString',
+      coordinates: LRT_STATIONS.map(s => s.coords) }, properties: {} },
+  });
+  map.addLayer({
+    id: 'lrt-line-layer', type: 'line', source: 'lrt-line',
+    paint: {
+      'line-color': '#B877C9',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 9, 5, 12, 7.5, 15, 10],
+      'line-opacity': 0,
+      'line-blur': 1.2,
+      'line-dasharray': [3, 1.2],
+    },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+  map.addSource('lrt', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: LRT_STATIONS.map(s => ({
+      type: 'Feature', geometry: { type: 'Point', coordinates: s.coords },
+      properties: { name: s.name },
+    })) },
+  });
+  // Guaranteed-visible LRT halo + dot
+  map.addLayer({
+    id: 'lrt-dot-halo', type: 'circle', source: 'lrt',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 18, 13, 34, 16, 46],
+      'circle-color': '#B877C9',
+      'circle-blur': 1.0,
+      'circle-opacity': 0,
+    },
+  });
+  map.addLayer({
+    id: 'lrt-dots', type: 'circle', source: 'lrt',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 6, 13, 10, 16, 14],
+      'circle-color': '#B877C9',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#0D1117',
+      'circle-opacity': 0,
+      'circle-stroke-opacity': 0,
+    },
+  });
+  // 2-km catchment circles per LRT station
+  const lrtCatchFeatures = LRT_STATIONS.map(s => ({
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [circlePolygon(s.coords, 2)] },
+    properties: { name: s.name },
+  }));
+  map.addSource('lrt-catch', { type: 'geojson', data: { type: 'FeatureCollection', features: lrtCatchFeatures } });
+  map.addLayer({
+    id: 'lrt-catchment-fill', type: 'fill', source: 'lrt-catch',
+    paint: { 'fill-color': '#7B2D8E', 'fill-opacity': 0 },
+  });
+  map.addLayer({
+    id: 'lrt-catchment-line', type: 'line', source: 'lrt-catch',
+    paint: { 'line-color': '#B877C9', 'line-width': 1.5, 'line-opacity': 0, 'line-dasharray': [2, 2] },
+  });
+
+  // ── BRT icons + demand halo + corridor buffer ──
+  map.addSource('brt', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: BRT_STATIONS.map(s => ({
+      type: 'Feature', geometry: { type: 'Point', coordinates: s.coords },
+      properties: { name: s.name, demand: s.demand },
+    })) },
+  });
+  map.addLayer({
+    id: 'brt-demand-halo', type: 'circle', source: 'brt',
+    paint: {
+      'circle-radius': ['interpolate', ['linear'], ['get', 'demand'], 0, 10, 15000, 44],
+      'circle-color': '#E9C46A',
+      'circle-opacity': 0,
+      'circle-blur': 1,
+    },
+  });
+  // Guaranteed-visible BRT dots, sized by demand
+  map.addLayer({
+    id: 'brt-dots', type: 'circle', source: 'brt',
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['get', 'demand'],
+        0, 8, 15000, 22,
+      ],
+      'circle-color': '#E9C46A',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#0D1117',
+      'circle-opacity': 0,
+      'circle-stroke-opacity': 0,
+    },
+  });
+  // BRT corridor buffer (500 m on top-3 stations — H3 overlay)
+  const top3BRT = [...BRT_STATIONS].sort((a, b) => b.demand - a.demand).slice(0, 4);
+  const brtCatchFeatures = top3BRT.map(s => ({
+    type: 'Feature',
+    geometry: { type: 'Polygon', coordinates: [circlePolygon(s.coords, 0.5)] },
+    properties: {},
+  }));
+  map.addSource('brt-catch', { type: 'geojson', data: { type: 'FeatureCollection', features: brtCatchFeatures } });
+  map.addLayer({
+    id: 'brt-catchment-fill', type: 'fill', source: 'brt-catch',
+    paint: { 'fill-color': '#E9C46A', 'fill-opacity': 0 },
+  });
+
+  // ── As-the-crow-flies line ──
+  map.addSource('crow-line', {
+    type: 'geojson',
+    data: { type: 'Feature',
+            geometry: { type: 'LineString', coordinates: [LOCATIONS.imbaba, LOCATIONS.maadi] },
+            properties: {} },
+  });
+  map.addLayer({
+    id: 'crow-line-layer', type: 'line', source: 'crow-line',
+    paint: {
+      'line-color': '#E9C46A', 'line-width': 2,
+      'line-dasharray': [2, 2], 'line-opacity': 0,
+    },
+  });
+
+  // ── Gap lines (from Imbaba to nearest metro / BRT) ──
+  const nearestMetro = METRO_POST_2014[21];
+  const nearestBRT = BRT_STATIONS[4];
+  map.addSource('gap-lines', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [
+      { type: 'Feature', geometry: { type: 'LineString',
+        coordinates: [LOCATIONS.imbaba, nearestMetro.coords] },
+        properties: { label: '3.8 km to metro' } },
+      { type: 'Feature', geometry: { type: 'LineString',
+        coordinates: [LOCATIONS.imbaba, nearestBRT.coords] },
+        properties: { label: '8 km to BRT' } },
+    ] },
+  });
+  map.addLayer({
+    id: 'gap-lines-layer', type: 'line', source: 'gap-lines',
+    paint: {
+      'line-color': '#E86F51', 'line-width': 2.5,
+      'line-dasharray': [3, 2], 'line-opacity': 0,
+    },
+  });
+
+  // ── Masari full route (glow + inner) ──
+  map.addSource('masari-full', {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: MASARI_ROUTE }, properties: {} },
+  });
+  map.addLayer({
+    id: 'masari-glow', type: 'line', source: 'masari-full',
+    paint: { 'line-color': '#58A6FF', 'line-width': 14, 'line-opacity': 0, 'line-blur': 3 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+  map.addLayer({
+    id: 'masari-inner', type: 'line', source: 'masari-full',
+    paint: { 'line-color': '#C9DEF9', 'line-width': 1.2, 'line-opacity': 0, 'line-dasharray': [0.6, 1.6] },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+
+  // Progressive "travelled" portion
+  map.addSource('masari-progress-src', {
+    type: 'geojson',
+    data: { type: 'Feature', geometry: { type: 'LineString', coordinates: [MASARI_ROUTE[0], MASARI_ROUTE[0]] }, properties: {} },
+  });
+  map.addLayer({
+    id: 'masari-progress', type: 'line', source: 'masari-progress-src',
+    paint: { 'line-color': '#E9C46A', 'line-width': 4, 'line-opacity': 0, 'line-blur': 0.3 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+
+  map.addSource('masari-transfer-src', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+  });
+  map.addLayer({
+    id: 'masari-transfer-pulse', type: 'circle', source: 'masari-transfer-src',
+    paint: {
+      'circle-radius': 18,
+      'circle-color': '#E9C46A',
+      'circle-opacity': 0,
+      'circle-blur': 1.15,
+    },
+  });
+
+  // ── Layla's CHAOS trip (Scene 3) — the real 83-minute journey ──
+  // Route glow + inner (same two-layer pattern as masari)
+  map.addSource('layla-trip-src', {
+    type: 'geojson',
+    data: { type: 'Feature',
+            geometry: { type: 'LineString', coordinates: LAYLA_TRIP_ROUTE },
+            properties: {} },
+  });
+  map.addLayer({
+    id: 'layla-trip-glow', type: 'line', source: 'layla-trip-src',
+    paint: { 'line-color': '#E86F51', 'line-width': 14, 'line-opacity': 0, 'line-blur': 3 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+  map.addLayer({
+    id: 'layla-trip-inner', type: 'line', source: 'layla-trip-src',
+    paint: { 'line-color': '#FFEDE6', 'line-width': 1.2, 'line-opacity': 0, 'line-dasharray': [0.6, 1.6] },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+
+  // Progressive "travelled so far" trail — animates as microbus moves
+  map.addSource('layla-trip-progress-src', {
+    type: 'geojson',
+    data: { type: 'Feature',
+            geometry: { type: 'LineString', coordinates: [LAYLA_TRIP_ROUTE[0], LAYLA_TRIP_ROUTE[0]] },
+            properties: {} },
+  });
+  map.addLayer({
+    id: 'layla-trip-progress', type: 'line', source: 'layla-trip-progress-src',
+    paint: { 'line-color': '#E86F51', 'line-width': 4.5, 'line-opacity': 0, 'line-blur': 0.4 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+
+  // Origin / transfer / destination stop markers
+  map.addSource('layla-trip-stops-src', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: LAYLA_TRIP_STOPS.map(s => ({
+      type: 'Feature', geometry: { type: 'Point', coordinates: s.coords },
+      properties: { name: s.name, kind: s.kind },
+    })) },
+  });
+  map.addLayer({
+    id: 'layla-trip-stops', type: 'circle', source: 'layla-trip-stops-src',
+    paint: {
+      'circle-radius': ['match', ['get', 'kind'],
+                        'origin', 10, 'destination', 10, 6],
+      'circle-color': ['match', ['get', 'kind'],
+                        'origin', '#E86F51',
+                        'destination', '#2A9D8F',
+                        '#E9C46A'],
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#0D1117',
+      'circle-opacity': 0,
+      'circle-stroke-opacity': 0,
+    },
+  });
+
+  // Pulsing ring that lights up at each transfer pause
+  map.addSource('layla-trip-transfer-src', {
+    type: 'geojson',
+    data: { type: 'FeatureCollection', features: [] },
+  });
+  map.addLayer({
+    id: 'layla-trip-transfer-pulse', type: 'circle', source: 'layla-trip-transfer-src',
+    paint: {
+      'circle-radius': 20,
+      'circle-color': '#E9C46A',
+      'circle-opacity': 0,
+      'circle-blur': 1.15,
+    },
+  });
+
+  // (Phase-1 ghost terminals are now rendered as 3D objects inside the
+  // Three.js custom layer below — see `makeGhostMarker` and `this.ghosts`.)
+
+  // ── Three.js 3D layer (added last so it draws on top of all 2D layers) ──
+  if (typeof THREE !== 'undefined') {
+    const threeLayer = buildCairoThreeLayer();
+    map.addLayer(threeLayer);
+    map._threeLayer = threeLayer;
+  } else {
+    console.error('[cairo-story] THREE global not found — 3D layer cannot be mounted. Check the three.js CDN script tag.');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  COLOUR LEGEND  (top-right) — what each mode/character colour means
+// ═══════════════════════════════════════════════════════════════════════
+// Two sections: TRANSIT MODES (formal + informal vehicles) and GHOST TERMINALS
+// (the 115 Phase 1 underused stops, sub-classed by distance to nearest new metro).
+const LEGEND_MODES = [
+  { color: '#58A6FF', glyph: 'M',  label: 'Metro · post-2014 build (Line 3 ext.)' },
+  { color: '#4A6FA5', glyph: 'M',  label: 'Metro · pre-2014 (Lines 1 & 2)' },
+  { color: '#B877C9', glyph: 'L',  label: 'LRT · 3-July line' },
+  { color: '#E9C46A', glyph: 'B',  label: 'BRT · Ring Road' },
+  { color: '#F4A261', glyph: '☻', label: 'Layla · the commuter' },
+  { color: '#2A9D8F', glyph: 'O',  label: 'Office · Maadi destination' },
+];
+
+const LEGEND_GHOSTS = [
+  { color: '#E86F51', glyph: '•', label: `Stranded · >2 km (${GHOST_STATS.stranded_over_2km})` },
+  { color: '#E9C46A', glyph: '•', label: `Marginal · 1–2 km (${GHOST_STATS.marginal_1_2km})` },
+  { color: '#2A9D8F', glyph: '•', label: `Reached · <1 km (${GHOST_STATS.reached_under_1km})` },
+];
+
+function LegendRow({ color, glyph, label }) {
+  return (
+    <div className="legend-row">
+      <span className="legend-swatch" style={{ background: color, color }} />
+      <span className="legend-glyph" style={{ color }}>{glyph}</span>
+      <span className="legend-label">{label}</span>
+    </div>
+  );
+}
+
+function ColorLegend() {
+  return (
+    <div className="legend-card">
+      <div className="legend-title">Transit Modes</div>
+      {LEGEND_MODES.map((e) => <LegendRow key={e.label} {...e} />)}
+      <div className="legend-title" style={{ marginTop: 12 }}>
+        Ghost Terminals · {GHOST_STATS.total}
+      </div>
+      {LEGEND_GHOSTS.map((e) => <LegendRow key={e.label} {...e} />)}
+      <div style={{
+        marginTop: 8, fontSize: 9, color: '#8B949E', letterSpacing: '0.06em',
+        borderTop: '1px solid rgba(88,166,255,0.12)', paddingTop: 6,
+      }}>
+        {GHOST_STATS.stranded_pct}% stranded · Phase 1 + post-2014 metro
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MAIN APP
+// ═══════════════════════════════════════════════════════════════════════
+function App() {
+  const mapContainerRef = useRef(null);
+  const mapRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(false);
+  const [diagnostics, setDiagnostics] = useState({
+    layersAdded: 0,
+    lastError: null,
+    visibleNow: 0,
+  });
+
+  // Init map
+  useEffect(() => {
+    if (mapRef.current) return;
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: {
+        version: 8,
+        glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
+        sources: {
+          'carto-dark': {
+            type: 'raster',
+            tiles: [
+              'https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png',
+              'https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png',
+              'https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}@2x.png',
+            ],
+            tileSize: 256,
+            attribution: '© CARTO · © OpenStreetMap contributors',
+          },
+          'carto-labels': {
+            type: 'raster',
+            tiles: [
+              'https://a.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png',
+              'https://b.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png',
+              'https://c.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}@2x.png',
+            ],
+            tileSize: 256,
+          },
+        },
+        layers: [
+          { id: 'carto-dark-layer', type: 'raster', source: 'carto-dark' },
+          { id: 'carto-labels-layer', type: 'raster', source: 'carto-labels',
+            paint: { 'raster-opacity': 0.55 } },
+        ],
+      },
+      center: SCENES[0].center,
+      zoom: SCENES[0].zoom,
+      pitch: SCENES[0].pitch,
+      bearing: SCENES[0].bearing,
+      attributionControl: false,
+    });
+
+    map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+
+    map.on('load', async () => {
+      try {
+        await setupMapLayers(map);
+        const addedLayers = map.getStyle().layers.length;
+        console.log(`[setup] ${addedLayers} map layers (Three.js 3D layer mounted)`);
+        setDiagnostics(d => ({ ...d, layersAdded: addedLayers }));
+
+        mapRef.current = map;
+        setMapReady(true);
+        applyScene(map, SCENES[0]);
+      } catch (err) {
+        console.error('[setup] FAILED:', err);
+        setDiagnostics(d => ({ ...d, lastError: err.message || String(err) }));
+        mapRef.current = map;
+        setMapReady(true);
+      }
+    });
+  }, []);
+
+  // When sceneIdx changes, apply it + update diagnostics
+  useEffect(() => {
+    if (!mapReady || !mapRef.current) return;
+    applyScene(mapRef.current, SCENES[sceneIdx]);
+    const visList = SCENES[sceneIdx].visible || [];
+    const liveVis = visList.filter(id => mapRef.current.getLayer(id));
+    setDiagnostics(d => ({ ...d, visibleNow: liveVis.length }));
+  }, [sceneIdx, mapReady]);
+
+  // Masari animated route on scene 12
+  useMasariAnimation(mapRef.current, mapReady && SCENES[sceneIdx].animate === 'masari-route');
+  // Layla chaos trip on scene 3
+  useLaylaTripAnimation(mapRef.current, mapReady && SCENES[sceneIdx].animate === 'layla-trip');
+
+  // Keyboard controls
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        setSceneIdx(i => Math.min(i + 1, SCENES.length - 1));
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setSceneIdx(i => Math.max(i - 1, 0));
+      } else if (e.key === 'r' || e.key === 'R') {
+        setSceneIdx(0);
+      } else if (e.key === 'p' || e.key === 'P') {
+        setAutoPlay(a => !a);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Autoplay timer — animated scenes get extra dwell so the trip can play through
+  useEffect(() => {
+    if (!autoPlay) return;
+    const animate = SCENES[sceneIdx].animate;
+    let dwell = 8500;
+    if (animate === 'masari-route') dwell = 11500;
+    if (animate === 'layla-trip')   dwell = 13500;   // chaos trip is longer (4 legs + transfers)
+    const t = setTimeout(() => {
+      setSceneIdx(i => i < SCENES.length - 1 ? i + 1 : i);
+    }, dwell);
+    return () => clearTimeout(t);
+  }, [autoPlay, sceneIdx]);
+
+  const scene = SCENES[sceneIdx];
+
+  // CTA: post a message to the parent Streamlit page
+  const postMode = (mode) => {
+    try {
+      window.parent.postMessage({ type: 'cairo-story-cta', mode }, '*');
+    } catch (_) {}
+  };
+
+  return (
+    <>
+      <div ref={mapContainerRef} className="map-stage" />
+      <div className="vignette" />
+      <div className="version-tag">BUILD · V23 · FULL METRO NETWORK</div>
+      <ColorLegend />
+      {mapReady && <TopBar scene={scene} sceneIdx={sceneIdx} total={SCENES.length} />}
+      {mapReady && (
+        <NarrativePanel
+          scene={scene}
+          onReplay={() => setSceneIdx(0)}
+          onGoPhase1={() => postMode('phase1')}
+          onGoPhase2={() => postMode('phase2')}
+          onGoHypotheses={() => postMode('hypothesis')}
+        />
+      )}
+      {mapReady && scene.chart === 'h1'   && <ChartH1   />}
+      {mapReady && scene.chart === 'h2'   && <ChartH2   />}
+      {mapReady && scene.chart === 'h3'   && <ChartH3   />}
+      {mapReady && scene.chart === 'q18b' && <ChartQ18b />}
+      {mapReady && (
+        <BottomBar
+          sceneIdx={sceneIdx}
+          total={SCENES.length}
+          onPrev={() => setSceneIdx(i => Math.max(0, i - 1))}
+          onNext={() => setSceneIdx(i => Math.min(SCENES.length - 1, i + 1))}
+          onJump={(i) => setSceneIdx(i)}
+          autoPlay={autoPlay}
+          setAutoPlay={setAutoPlay}
+          scene={scene}
+        />
+      )}
+
+      {/* Splash */}
+      <div className={'splash ' + (mapReady ? 'hidden' : '')}>
+        <div className="splash-logo">CAIRO · LAYLA · MASARI</div>
+        <div className="splash-sub">Loading cinematic data story…</div>
+        <div className="splash-bar"></div>
+      </div>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+})();
+</script>
+
+</body>
+</html>

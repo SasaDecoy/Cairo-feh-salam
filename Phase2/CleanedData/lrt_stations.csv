@@ -1,0 +1,21 @@
+is_operational,station_en,opened,line,lat,lon,osm_hit_name
+True,Adly Mansour,3 July,LRT,30.1470315,31.4215092,عدلى منصور
+True,El-Obour,3 July,LRT,30.1629263,31.4816102,العبور
+True,Future,3 July,LRT,30.1605118,31.5627986,المستقبل
+True,El-Shorouk,3 July,LRT,30.1796323,31.6057965,الشروق
+True,New Heliopolis,3 July,LRT,30.1837293,31.6526735,هليوبوليس الجديدة
+True,Badr,3 July,LRT,29.8513253,31.2744094,البدرشين
+True,Industrial Park,3 July,LRT,30.2039612,31.7155954,المنطقة الصناعية
+True,Knowledge City,3 July,LRT,30.2307243,31.6916138,محطة القطار الكهربائي الخفيف - مدينة المعارف
+False,West of Ramadan,Under construction,LRT,,,Not available
+False,10th of Ramadan,Under construction,LRT,30.304683,31.7541485,جامعة مدينة العاشر من رمضان
+False,Ramadan City Center,Under construction,LRT,,,Not available
+True,El-Robaiky,3 July,LRT,30.1665323,31.752453,محطة الروبيكي
+True,Hadayek al-Assema,3 July,LRT,30.1366817,31.8067825,حدائق العاصمة
+True,Capital Airport,3 July,LRT,30.0758949,31.7824843,مطار العاصمة
+True,Arts and Culture City,3 July,LRT,,,Not available
+False,Nativity Cathedral,Under construction,LRT,,,Not available
+False,Octagon,Under construction,LRT,,,Not available
+False,International Sports City,Under construction,LRT,,,Not available
+False,Central Capital,Under construction,LRT,,,Not available
+False,Industrial Zone,Under study,LRT,,,Not available

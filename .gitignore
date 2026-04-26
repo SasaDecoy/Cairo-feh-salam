@@ -1,0 +1,56 @@
+# Python / Streamlit
+__pycache__/
+*.py[cod]
+*.pyo
+.python-version
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+.streamlit/secrets.toml
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.claude/
+
+# Temporary / logs
+*.log
+*.tmp
+*.temp
+~$*
+
+# Notebook backups and scratch drafts
+*.bak
+*.bak2
+*.backup
+*.old
+drafts/*.ipynb
+drafts/*copy*.ipynb
+drafts/*copy*.ipynb.*
+drafts/*.bak
+drafts/*.bak2
+drafts/*.q8nanfix.bak
+drafts/*.nshiftfix.bak
+drafts/*.nshiftfix2.bak
+drafts/VehiclesCSV.csv
+
+# Raw scrape/download cache. The deployed app uses processed outputs instead.
+Phase2/RawData/
+
+# Large original source dumps not required by the Streamlit deployment.
+DatasetsCSV/
+DatasetsGeojson/
+
+# Generated local browser/runtime caches
+node_modules/
+.cache/

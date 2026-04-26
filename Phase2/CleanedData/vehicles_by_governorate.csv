@@ -1,0 +1,31 @@
+governorate,year,vehicle_type,count,method,source
+Cairo,2003,passenger_cars_per_1k,199218,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2004,motor_vehicles_per_1k,275840,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Cairo,2004,passenger_cars_per_1k,199218,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2005,motor_vehicles_per_1k,283502,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Cairo,2005,passenger_cars_per_1k,206880,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2006,motor_vehicles_per_1k,298827,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Cairo,2006,passenger_cars_per_1k,214542,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2007,motor_vehicles_per_1k,314151,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Cairo,2007,passenger_cars_per_1k,229867,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2008,motor_vehicles_per_1k,321813,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Cairo,2008,passenger_cars_per_1k,237529,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2009,motor_vehicles_per_1k,344800,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Cairo,2009,passenger_cars_per_1k,253483,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Cairo,2023,motor_vehicles_total,890302,apportioned_by_pop_share,Wikipedia list_of_countries_by_vehicles_per_capita (Egypt 2023)
+Cairo,2023,passenger_cars_est,655474,WB_per_capita_extrapolated × gov_pop,World Bank IS.VEH.PCAR.P3 + S6 population
+Giza,2003,passenger_cars_per_1k,129327,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2004,motor_vehicles_per_1k,179068,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Giza,2004,passenger_cars_per_1k,129327,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2005,motor_vehicles_per_1k,184042,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Giza,2005,passenger_cars_per_1k,134301,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2006,motor_vehicles_per_1k,193990,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Giza,2006,passenger_cars_per_1k,139275,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2007,motor_vehicles_per_1k,203938,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Giza,2007,passenger_cars_per_1k,149223,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2008,motor_vehicles_per_1k,208912,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Giza,2008,passenger_cars_per_1k,154197,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2009,motor_vehicles_per_1k,223834,WB_per_capita × gov_pop,World Bank IS.VEH.NVEH.P3
+Giza,2009,passenger_cars_per_1k,164554,WB_per_capita × gov_pop,World Bank IS.VEH.PCAR.P3
+Giza,2023,motor_vehicles_total,826551,apportioned_by_pop_share,Wikipedia list_of_countries_by_vehicles_per_capita (Egypt 2023)
+Giza,2023,passenger_cars_est,608538,WB_per_capita_extrapolated × gov_pop,World Bank IS.VEH.PCAR.P3 + S6 population

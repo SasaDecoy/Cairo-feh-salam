@@ -1,0 +1,281 @@
+Terminal_ID,Terminal_Name,Routes_As_Origin,Avg_Route_Len_Origin,Routes_As_Dest,Avg_Route_Len_Dest,Total_Routes,Boarding_Near_Terminal,Stops_Near_Terminal,Underused,Zone,Underuse_Severity,Status
+351,Church (Kayan) - New Administrative Capital,2.0,63.3811561793636,2.0,59.83089556755495,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+355,Cairo Alexandria Agriculture Road,6.0,24.105222285838966,2.0,14.567310460106649,8.0,158.0,1,False,Dead Weight,0.0,Has nearby boarding
+356,Jazirat Mohamed (2),0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+357,Ezbat Khairallah,0.0,0.0,0.0,0.0,0.0,78.0,1,False,Marginal,0.0,Has nearby boarding
+23,Traffic Department  (Kattameya),1.0,13.7322535864397,1.0,10.1783834581016,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+102,Dolce,5.0,7.149809180506795,5.0,8.268665337202563,10.0,694.0,1,False,Efficient Hub,0.0,Has nearby boarding
+124,11th District (6th of October),2.0,6.07310260553807,2.0,5.95385169409068,4.0,586.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+86,Al Shabab Entrance,2.0,9.87853849602984,3.0,6.832418399254006,5.0,207.0,1,False,Marginal,0.0,Has nearby boarding
+20,Alf Maskan,25.0,12.651020623551657,24.0,11.118671766715527,49.0,53744.0,1,False,Efficient Hub,0.0,Has nearby boarding
+1,Al Sayeda Aisha,32.0,12.807189369774337,34.0,12.826831719484845,66.0,0.0,0,True,Dead Weight,66.0,"Underused (routes, no boarding)"
+15,Shabab (Obour),4.0,30.737445997983126,4.0,32.77564766758857,8.0,2257.0,1,False,Efficient Hub,0.0,Has nearby boarding
+19,Alf Masnaa,1.0,37.222839655482,1.0,34.2361993249546,2.0,1019.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+326,Mall of Arabia,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+2,Smart Village,1.0,5.31850310617639,2.0,11.30105383492251,3.0,0.0,0,True,Marginal,3.0,"Underused (routes, no boarding)"
+3,10th District (6th of October),5.0,6.6303513177488735,6.0,5.735643128143053,11.0,0.0,0,True,Dead Weight,11.0,"Underused (routes, no boarding)"
+4,Hossary,21.0,32.63058434451126,18.0,26.54468797516248,39.0,0.0,0,True,Dead Weight,39.0,"Underused (routes, no boarding)"
+6,Al Shorouq,3.0,48.329444333004865,3.0,47.63931337979096,6.0,0.0,0,True,Marginal,6.0,"Underused (routes, no boarding)"
+7,Rawda Mosque  (Obour),3.0,24.2330330250762,2.0,25.42720586180075,5.0,0.0,0,True,Marginal,5.0,"Underused (routes, no boarding)"
+9,Remaya (New Mashaal),16.0,25.130083764022004,13.0,24.246628713665288,29.0,0.0,0,True,Dead Weight,29.0,"Underused (routes, no boarding)"
+10,Ommal Square,3.0,13.668673932820255,3.0,13.381625722176546,6.0,1969.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+13,Magda Square,2.0,4.69231147924131,3.0,28.577531857873293,5.0,1068.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+14,Total  (6th of October),1.0,4.54119655947914,1.0,4.95935204225525,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+16,Dawaran Shubra,13.0,28.77622090018642,13.0,29.63753650110185,26.0,16029.0,2,False,Efficient Hub,0.0,Has nearby boarding
+22,Helwan University (Ain Helwan),0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+24,Isaaf,4.0,6.947371280271475,4.0,6.277321926217165,8.0,19406.0,1,False,Efficient Hub,0.0,Has nearby boarding
+25,3rd Settlement  (New Cairo),6.0,36.199171740201265,6.0,36.373964623188336,12.0,1933.0,1,False,Efficient Hub,0.0,Has nearby boarding
+26,Mehwar & Alex Desert Rd,5.0,14.209361124778283,4.0,16.67805204642122,9.0,2180.0,2,False,Efficient Hub,0.0,Has nearby boarding
+27,Darrasa,14.0,15.076669745570042,14.0,15.57000684490578,28.0,0.0,0,True,Dead Weight,28.0,"Underused (routes, no boarding)"
+28,Amr Ibn El Aas,8.0,20.617233864474212,8.0,21.772278924716584,16.0,2692.0,1,False,Efficient Hub,0.0,Has nearby boarding
+29,Abd Al Moneim Riad,58.0,23.083740011654086,57.0,23.658701203158966,115.0,0.0,0,True,Dead Weight,115.0,"Underused (routes, no boarding)"
+30,Abou Al Reesh,9.0,11.988104173843602,7.0,15.770929940481162,16.0,6117.0,1,False,Efficient Hub,0.0,Has nearby boarding
+31,FUE,4.0,20.106881971131525,4.0,20.864602438776764,8.0,681.0,1,False,Efficient Hub,0.0,Has nearby boarding
+32,Haram Mashaal,7.0,18.459947929838968,8.0,21.593077048019563,15.0,5833.0,1,False,Efficient Hub,0.0,Has nearby boarding
+33,Rehab - Gate 13 - 12,3.0,17.386975272668845,4.0,19.231955176725766,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+34,Lebanon Square,18.0,18.551461029631525,19.0,18.699343113333075,37.0,0.0,0,True,Dead Weight,37.0,"Underused (routes, no boarding)"
+35,Masraweya,0.0,0.0,0.0,0.0,0.0,783.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+36,Sheikh Zayed General Hospital,1.0,2.54475587722359,1.0,2.82457673993069,2.0,107.0,1,False,Marginal,0.0,Has nearby boarding
+38,Helwan Ferry,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+39,Badr (Sheikh Zayed),5.0,27.63185449530126,3.0,37.4495749181347,8.0,998.0,1,False,Efficient Hub,0.0,Has nearby boarding
+65,Al Hegaz (Obour Police ),1.0,16.7510059290887,1.0,21.2282403733907,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+66,Gas (Banks Area),19.0,17.695367989150878,21.0,19.64744758441038,40.0,0.0,0,True,Dead Weight,40.0,"Underused (routes, no boarding)"
+40,10th District (Nasr City),21.0,15.047971871275209,22.0,14.879061534754083,43.0,0.0,0,True,Dead Weight,43.0,"Underused (routes, no boarding)"
+42,Saqr Quraish,18.0,17.81971617977222,21.0,15.787579610587008,39.0,9005.0,1,False,Efficient Hub,0.0,Has nearby boarding
+44,Al Muluk,1.0,4.99588813936655,1.0,5.99753190172684,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+45,Al Zawya Al Hamra,12.0,13.811883115925568,12.0,14.574599217927451,24.0,0.0,0,True,Dead Weight,24.0,"Underused (routes, no boarding)"
+46,Rehab - Gate 6,5.0,25.79986941041434,5.0,24.95861604137976,10.0,1447.0,1,False,Efficient Hub,0.0,Has nearby boarding
+47,Ahmed Helmy,30.0,25.836264746971402,26.0,22.74385652985514,56.0,0.0,0,True,Dead Weight,56.0,"Underused (routes, no boarding)"
+48,6th District - 6th of October (Al Souq Al Qadeem),18.0,30.857487602520322,18.0,29.76085228999046,36.0,0.0,0,True,Dead Weight,36.0,"Underused (routes, no boarding)"
+49,Helwan,11.0,36.15231339886017,10.0,35.35285941808351,21.0,19441.0,1,False,Efficient Hub,0.0,Has nearby boarding
+50,Zayed 2000,1.0,10.3811964660605,1.0,1.95706071326112,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+51,Al Motamayez,3.0,15.328444728368966,4.0,12.56003466749865,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+52,Horia Square,1.0,6.20719462089431,0.0,0.0,1.0,4171.443746310315,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+53,Al Sa'a Square,6.0,10.846712629543015,5.0,11.531248801947553,11.0,6099.0,1,False,Efficient Hub,0.0,Has nearby boarding
+54,7th District (Nasr City),23.0,21.25907728513244,21.0,21.317834781813353,44.0,853.0,1,False,Efficient Hub,0.0,Has nearby boarding
+55,Haram & Marioteya,17.0,20.73222714039042,16.0,19.95313947761072,33.0,5491.0,1,False,Efficient Hub,0.0,Has nearby boarding
+56,Sphinx Airport,1.0,16.6122371465803,1.0,15.1239017234502,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+59,Abageyah,5.0,16.7200988072983,5.0,15.78764496308412,10.0,1945.0,1,False,Efficient Hub,0.0,Has nearby boarding
+60,CIC,1.0,4.64109227020441,1.0,5.0195364860866,2.0,1428.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+61,Al Warraq,12.0,14.030168436963242,13.0,15.897231180114296,25.0,0.0,0,True,Dead Weight,25.0,"Underused (routes, no boarding)"
+62,Masaken Al Wehda,8.0,18.177503086126592,8.0,18.13193075640626,16.0,11041.0,2,False,Efficient Hub,0.0,Has nearby boarding
+63,Masaken Zeinhom,5.0,19.3942573627238,6.0,14.657497245973156,11.0,4103.0,1,False,Efficient Hub,0.0,Has nearby boarding
+68,Imbaba Ferry,0.0,0.0,0.0,0.0,0.0,638.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+69,Obour,6.0,46.68611598050243,6.0,47.59767190368206,12.0,1595.0,1,False,Efficient Hub,0.0,Has nearby boarding
+70,7th District (6th of October),2.0,9.26869515320314,2.0,9.9401541445303,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+72,Hegaz Square,4.0,24.169539070513174,4.0,25.403339501672026,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+73,1st Settlement (New Cairo),32.0,33.20397644857769,33.0,34.25083779190078,65.0,155.0,1,False,Dead Weight,0.0,Has nearby boarding
+74,Cairo University Ferry,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+75,Masaken Sheraton,13.0,23.36422047161469,13.0,23.763922021799964,26.0,884.0,1,False,Efficient Hub,0.0,Has nearby boarding
+76,Industrial Zone 3,2.0,3.063151044647065,2.0,2.933739226054265,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+77,Qalaa,4.0,18.230376122415276,5.0,15.802221138446502,9.0,1429.8953121314469,1,False,Efficient Hub,0.0,Has nearby boarding
+78,Al Mostaqbal Entrance,2.0,8.90955592100631,2.0,11.14578461786845,4.0,3986.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+79,Motseian,3.0,20.603653497511498,3.0,19.402116216187967,6.0,7591.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+80,Al Mostafa Mosque,1.0,4.90427018404213,1.0,5.06539347587283,2.0,47.0,1,False,Marginal,0.0,Has nearby boarding
+81,15th of May,5.0,28.63562643801572,4.0,32.4287690676144,9.0,0.0,0,True,Dead Weight,9.0,"Underused (routes, no boarding)"
+82,Moneeb Konayyesa,1.0,24.6920999803547,3.0,31.191086978547034,4.0,2682.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+84,Hamada Emam,1.0,7.67565186326168,1.0,3.54391119211198,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+85,New Marg,45.0,23.014094991581047,42.0,22.12014052451322,87.0,7826.0,1,False,Efficient Hub,0.0,Has nearby boarding
+87,Al Shorouq Water,4.0,37.49832552760302,4.0,38.3218187107915,8.0,395.0,1,False,Efficient Hub,0.0,Has nearby boarding
+88,Matbaa,15.0,23.082447098939802,15.0,23.235461925456157,30.0,0.0,0,True,Dead Weight,30.0,"Underused (routes, no boarding)"
+89,Masallah Al Gadeda (Matareyya),3.0,16.7426477399769,4.0,14.16196096705394,7.0,1333.0,1,False,Efficient Hub,0.0,Has nearby boarding
+91,Al Nozha Al Gadida (Gesr El Suez Garage),16.0,14.989574631571529,17.0,13.599560229992093,33.0,3923.0,1,False,Efficient Hub,0.0,Has nearby boarding
+92,Abbasseya,29.0,17.644991200378435,27.0,17.930444992441576,56.0,23013.0,1,False,Efficient Hub,0.0,Has nearby boarding
+93,Badrasheen Ferry,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+94,Cairo Airport,18.0,24.917014160843923,17.0,25.43085268865077,35.0,8881.0,1,False,Efficient Hub,0.0,Has nearby boarding
+97,Qalyoub,4.0,21.61135533460355,6.0,17.598207529686707,10.0,0.0,0,True,Dead Weight,10.0,"Underused (routes, no boarding)"
+99,Matareya Square,14.0,6.379499514669737,17.0,6.3339170234689846,31.0,15746.0,1,False,Efficient Hub,0.0,Has nearby boarding
+100,Daewoo,1.0,6.55408573211487,1.0,3.21235562249392,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+101,Hyper 1,16.0,25.542147398983726,15.0,15.744917806414556,31.0,0.0,0,True,Dead Weight,31.0,"Underused (routes, no boarding)"
+103,Masaken Ain Shams,15.0,18.54227047451682,15.0,20.190282163319033,30.0,5063.0,1,False,Efficient Hub,0.0,Has nearby boarding
+104,New Cairo Court,1.0,34.0043257088379,4.0,19.41028516164515,5.0,0.0,0,True,Marginal,5.0,"Underused (routes, no boarding)"
+106,Isbiko,11.0,23.503471218950764,8.0,23.752211064525298,19.0,3181.0,1,False,Efficient Hub,0.0,Has nearby boarding
+107,Masaken Othman (6th of October),1.0,11.4348774377057,1.0,6.70698736816892,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+108,Dandy Mall,3.0,13.383670833131783,2.0,15.52030188344365,5.0,2076.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+109,Zahraa Madinet Nasr,15.0,23.33331185807088,16.0,28.679172400509565,31.0,0.0,0,True,Dead Weight,31.0,"Underused (routes, no boarding)"
+110,Kattameya (Mahmoudeya),9.0,24.623699560042713,9.0,27.084440030820115,18.0,5985.0,1,False,Efficient Hub,0.0,Has nearby boarding
+111,Arabella Square,3.0,3.745540007694757,3.0,3.17308699158959,6.0,1351.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+112,Maspero Ferry,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+113,Arab Maadi,6.0,13.238852079314057,4.0,17.4295447478226,10.0,0.0,0,True,Dead Weight,10.0,"Underused (routes, no boarding)"
+114,Al Shorouq Academy,4.0,31.43604565923,2.0,31.7984244109719,6.0,0.0,0,True,Marginal,6.0,"Underused (routes, no boarding)"
+116,Remaya Square,2.0,18.96577969663985,5.0,18.121986468665664,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+117,Hadaba Wosta (Moqattam),9.0,18.06762285748931,12.0,20.247192615489507,21.0,0.0,0,True,Dead Weight,21.0,"Underused (routes, no boarding)"
+118,AUC Bus,7.0,41.89663740609823,7.0,45.719215078454035,14.0,0.0,0,True,Dead Weight,14.0,"Underused (routes, no boarding)"
+119,Al Toub Al Ramly,2.0,23.451283858952948,2.0,25.1190905218387,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+120,Helwan Post Office,3.0,22.83044183169403,4.0,24.775312879153724,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+121,Laylat Al Qadr,19.0,25.01777956458358,15.0,21.312243244255594,34.0,811.0,1,False,Efficient Hub,0.0,Has nearby boarding
+146,Ain Shams Metro,2.0,3.80289681418152,3.0,3.606407604640277,5.0,0.0,0,True,Marginal,5.0,"Underused (routes, no boarding)"
+122,Helwan Metro,4.0,13.344613329614143,9.0,25.478774828869525,13.0,0.0,0,True,Dead Weight,13.0,"Underused (routes, no boarding)"
+123,Al Hamd Square,9.0,20.641457632978476,6.0,19.912230999209264,15.0,1952.0,1,False,Efficient Hub,0.0,Has nearby boarding
+125,New Cairo Academy,4.0,13.500667257609354,2.0,18.2235960560889,6.0,344.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+126,Bohooth (Al Kobri Al Khashab),5.0,4.057964798817502,6.0,5.7386396404475635,11.0,8177.0,1,False,Efficient Hub,0.0,Has nearby boarding
+127,Abou Wafya,6.0,23.64737711518875,6.0,23.714781856102817,12.0,3270.0,1,False,Efficient Hub,0.0,Has nearby boarding
+128,Can Can 12th District  (6th of October),2.0,43.83496982330145,2.0,42.098547615798395,4.0,1493.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+130,Mamaleek -Manial (Meqyas),3.0,27.445192841008534,3.0,27.713711470763638,6.0,0.0,0,True,Marginal,6.0,"Underused (routes, no boarding)"
+132,Zamalek Ferry,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+133,Masarra,2.0,10.692887630932074,1.0,6.42411948422724,3.0,0.0,0,True,Marginal,3.0,"Underused (routes, no boarding)"
+134,Isko,10.0,26.139078509200846,10.0,25.53177468866657,20.0,5650.0,1,False,Efficient Hub,0.0,Has nearby boarding
+135,Kattameya Church,1.0,22.5505619684532,1.0,21.8079798154259,2.0,1203.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+136,10th of Ramadan City,7.0,41.48169306447773,7.0,39.87537226116384,14.0,6976.0,1,False,Efficient Hub,0.0,Has nearby boarding
+137,Bulaq Al Dakrur,29.0,16.509558553312495,25.0,15.980054636367427,54.0,0.0,0,True,Dead Weight,54.0,"Underused (routes, no boarding)"
+138,Hadaek EL Kobba,8.0,11.339065106012985,7.0,3.7341773043368653,15.0,6103.0,1,False,Efficient Hub,0.0,Has nearby boarding
+139,Mostorod,7.0,10.706333431420317,5.0,11.55195771292379,12.0,0.0,0,True,Dead Weight,12.0,"Underused (routes, no boarding)"
+140,Awwel Al Zawya Al Hamra,4.0,9.511813204075844,5.0,5.426802449462366,9.0,5365.0,3,False,Efficient Hub,0.0,Has nearby boarding
+142,Tagneed (Al Remaya),10.0,25.12170217962231,9.0,23.26103425473282,19.0,0.0,0,True,Dead Weight,19.0,"Underused (routes, no boarding)"
+143,Zahraa Ain Shams,4.0,17.939921791796074,4.0,19.048265924289126,8.0,886.0,1,False,Efficient Hub,0.0,Has nearby boarding
+144,Mazlaqan Ain Shams,5.0,7.071549725524396,5.0,6.546356222494038,10.0,3696.0,1,False,Efficient Hub,0.0,Has nearby boarding
+145,Ezbet Al Nakhl,4.0,5.8358597941539,3.0,4.68964230271889,7.0,11051.0,1,False,Efficient Hub,0.0,Has nearby boarding
+147,Masaken Helmeyet Al Zaitoun,2.0,15.865503501918852,2.0,16.824905951210802,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+148,Abou Rawwash,2.0,11.224562607938505,2.0,7.783528236944756,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+149,Kerdasa,7.0,8.452837399930191,6.0,7.059191195175102,13.0,4175.0,1,False,Efficient Hub,0.0,Has nearby boarding
+150,Ramses,35.0,15.649974554450855,41.0,15.395169978008466,76.0,66842.0,1,False,Efficient Hub,0.0,Has nearby boarding
+151,Amiriya,10.0,17.579051189200143,10.0,18.182850979100273,20.0,3555.0,1,False,Efficient Hub,0.0,Has nearby boarding
+152,Ibrahim Bek,8.0,16.526502037362164,8.0,16.870308374076064,16.0,0.0,0,True,Dead Weight,16.0,"Underused (routes, no boarding)"
+153,Qalyoub El Balad,3.0,10.197739835249523,3.0,9.937932120787456,6.0,8968.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+154,Al Wehda Imbaba (Al Bohi),6.0,6.04702394076207,5.0,6.34072123372246,11.0,0.0,0,True,Dead Weight,11.0,"Underused (routes, no boarding)"
+155,Warraq Al Arab (Cima),7.0,11.826114591462895,8.0,11.148887324645342,15.0,835.0,1,False,Efficient Hub,0.0,Has nearby boarding
+156,Ghamra,4.0,10.246902924560114,3.0,9.191430801664053,7.0,15429.0,1,False,Efficient Hub,0.0,Has nearby boarding
+157,Akher Faisal,2.0,14.32512348952844,3.0,26.320399768022167,5.0,1092.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+158,Attaba,38.0,17.11417925071169,37.0,17.47214152376075,75.0,0.0,0,True,Dead Weight,75.0,"Underused (routes, no boarding)"
+159,Mosheer Ahmed Ismail (Sheraton),1.0,30.251584280659,1.0,29.2037471481382,2.0,240.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+160,Qalyoub Exit,5.0,55.262945677929736,8.0,50.545156432197636,13.0,0.0,0,True,Dead Weight,13.0,"Underused (routes, no boarding)"
+161,Nahda City,10.0,22.700533776276313,11.0,30.584542254529755,21.0,0.0,0,True,Dead Weight,21.0,"Underused (routes, no boarding)"
+162,Al Sayeda Nafeesa,7.0,19.779058122622466,6.0,21.360181375081584,13.0,488.0,1,False,Efficient Hub,0.0,Has nearby boarding
+163,Kit Kat Square,5.0,8.160274274550375,5.0,7.4000271760216005,10.0,14156.0,1,False,Efficient Hub,0.0,Has nearby boarding
+165,Asmarrat,6.0,24.4535856453702,6.0,25.460971710698416,12.0,728.0,1,False,Efficient Hub,0.0,Has nearby boarding
+166,Masaken Al Shorouq,6.0,24.363751313708516,6.0,23.52523221472595,12.0,1844.0,1,False,Efficient Hub,0.0,Has nearby boarding
+167,Arab Al Tawaila,7.0,11.244257778642634,6.0,11.982762761713502,13.0,8642.0,1,False,Efficient Hub,0.0,Has nearby boarding
+168,Al Banhawi,3.0,19.99654135705719,3.0,20.653155832272592,6.0,10975.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+169,Sharabeya,1.0,3.59980218580989,1.0,3.68893924868513,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+170,Awwel Makram Ebeid,13.0,15.880525230331623,16.0,19.10297806096182,29.0,17982.579686078072,1,False,Efficient Hub,0.0,Has nearby boarding
+171,Masaken Betcho,4.0,23.349797689915423,4.0,24.558482965949757,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+172,Hadayeq Helwan,1.0,8.0976837498972,1.0,6.77207130978918,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+173,Ahmed Maher Hospital,2.0,10.250929395726619,3.0,7.09912158948957,5.0,10275.262839271729,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+174,Badrasheen,6.0,13.48188531874502,7.0,13.773428447635236,13.0,0.0,0,True,Dead Weight,13.0,"Underused (routes, no boarding)"
+175,Saqqara,1.0,4.49037570811203,1.0,4.43708785955273,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+176,26th of July & Ring Rd,0.0,0.0,1.0,18.9477857062441,1.0,1578.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
+177,Madinat Al Talaba (Imbaba),3.0,17.84363552647258,3.0,17.882283490067213,6.0,3963.134190786282,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+178,Haram Talbeya,1.0,2.27974975773557,1.0,3.29503026323094,2.0,9525.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
+179,Haram Areesh (Sahl Hamza),1.0,13.3792847185543,3.0,9.442277395694983,4.0,4008.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+180,Basrawy,2.0,6.288772601135189,2.0,6.0876196732433705,4.0,21740.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+182,Om Bayoumi (Mintay),7.0,13.654597382281619,7.0,13.038677192102467,14.0,0.0,0,True,Dead Weight,14.0,"Underused (routes, no boarding)"
+183,Al Shaboory Canal,0.0,0.0,0.0,0.0,0.0,4568.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+184,Al Shari' Al Gadeed  (Bahteem),1.0,4.17902719312097,2.0,7.800381263589845,3.0,8411.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
+185,Khosous,5.0,21.698400134720522,5.0,22.19905327776878,10.0,0.0,0,True,Dead Weight,10.0,"Underused (routes, no boarding)"
+186,Al Bassous Steps (Ring Rd),0.0,0.0,0.0,0.0,0.0,313.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+187,Bahtim Square,1.0,5.2516332160138,1.0,5.75382616137313,2.0,1601.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+188,Qawmeya Arabeya,3.0,14.630066627335687,4.0,12.236438639612377,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+189,Mazallat,25.0,17.292074475088185,24.0,18.682049653754827,49.0,7633.0,1,False,Efficient Hub,0.0,Has nearby boarding
+190,Rabaah Al Adaweya Mosque,2.0,16.59433426407375,4.0,19.280475169699848,6.0,4134.228039147461,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+191,Awwel Abbas,3.0,13.122673139533367,2.0,14.002547280245205,5.0,26489.33620304491,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+192,Salam Alexandria,5.0,21.98816923348083,3.0,21.721586929565103,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+194,Jazirat Mohamed,1.0,15.8005770987127,1.0,17.7901767232536,2.0,278.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+195,Awsim,1.0,14.5655550377584,1.0,17.1111087301593,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+196,Athar Al Naby,4.0,25.14173605610475,3.0,21.769440255509636,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+197,Tibeen,5.0,10.617855066339992,5.0,10.760514553776733,10.0,0.0,0,True,Dead Weight,10.0,"Underused (routes, no boarding)"
+198,Saft Al Laban,3.0,14.785289618455579,3.0,15.19465246727461,6.0,1333.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+199,Mazlaqan Al Deweqa,3.0,17.55657773510167,3.0,15.778678044929975,6.0,4125.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+200,Abu Al Houl St,1.0,24.0458257299894,1.0,26.1907851145343,2.0,1250.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+201,Al Sawah Square,3.0,13.513685218824415,1.0,3.75702283194471,4.0,3225.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+202,Hawamdeyya,4.0,14.408474544979367,4.0,14.253034707625773,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+203,Qism El Hadayek,10.0,17.111621404510895,10.0,22.549663251361647,20.0,10924.0,1,False,Efficient Hub,0.0,Has nearby boarding
+204,Obour Market,4.0,26.65156085553772,3.0,26.270457698180422,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+205,Khanka,4.0,9.145190283815467,4.0,9.34611357707581,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+206,Manshiyat Nasser,8.0,12.903224723324625,9.0,12.978182696523405,17.0,0.0,0,True,Dead Weight,17.0,"Underused (routes, no boarding)"
+207,Badr City,6.0,57.11246327953969,7.0,56.73892713198341,13.0,2092.0,1,False,Efficient Hub,0.0,Has nearby boarding
+208,Bashtil,7.0,26.787689729109786,7.0,20.457270029705604,14.0,12638.0,2,False,Efficient Hub,0.0,Has nearby boarding
+209,Filfil Mosque (Bashtil),2.0,8.777554055284345,2.0,8.384158070517575,4.0,216.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+210,Nasr St,1.0,18.0658760546558,1.0,18.3787026830078,2.0,2068.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+211,Orabi Bridge,6.0,14.1692251242605,6.0,13.366429415959074,12.0,37004.0,1,False,Efficient Hub,0.0,Has nearby boarding
+212,Megawra 3 (15th of May),1.0,35.9102633787506,1.0,35.8309119186989,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+213,Megawra 11 (15th of May),0.0,0.0,1.0,42.2133717039282,1.0,0.0,0,True,Marginal,1.0,"Underused (routes, no boarding)"
+214,Saad Zaghloul Metro,1.0,2.96411156912792,1.0,3.08790676757942,2.0,765.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+215,Masaken Almaza,1.0,19.0605442427989,1.0,16.8301511803947,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+216,Faisal St & Ring Rd,2.0,13.46788306522855,3.0,10.102507820263844,5.0,3256.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
+217,Mostorod Ring Rd,5.0,8.413441868287865,4.0,7.2865778324517905,9.0,648.0,1,False,Efficient Hub,0.0,Has nearby boarding
+218,Bab Al Shaaria Square,3.0,11.197798994631983,4.0,11.941705754189087,7.0,12084.265758306965,1,False,Efficient Hub,0.0,Has nearby boarding
+219,Moassaset Al Zakah,3.0,10.321674591712439,3.0,11.791943243430472,6.0,208.0,1,False,Marginal,0.0,Has nearby boarding
+220,Al Marg Police,1.0,2.2406627029962,2.0,3.2734210192889597,3.0,2972.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+221,Applied Arts - Cairo University,2.0,7.24460027234464,1.0,9.66131733167973,3.0,0.0,0,True,Marginal,3.0,"Underused (routes, no boarding)"
+222,8th District (Nasr City) - Al tabba,16.0,22.694532825081463,15.0,23.887000984427868,31.0,7933.0,1,False,Efficient Hub,0.0,Has nearby boarding
+223,Basateen,8.0,14.102930812651408,8.0,13.85909606857302,16.0,953.0,1,False,Efficient Hub,0.0,Has nearby boarding
+224,Al Magzar (Mariouteya),4.0,18.65595118730281,4.0,20.765389794375682,8.0,11311.0,1,False,Efficient Hub,0.0,Has nearby boarding
+225,Masaken Othman (Ezbet El Nakhl),5.0,11.810892885939742,7.0,9.720396842654866,12.0,0.0,0,True,Dead Weight,12.0,"Underused (routes, no boarding)"
+226,El Kafr (Birak Al Khiyam),2.0,3.130539687491365,1.0,3.5204975904787,3.0,2256.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+227,Nahia,2.0,5.406652659843795,3.0,4.5719068629512405,5.0,0.0,0,True,Marginal,5.0,"Underused (routes, no boarding)"
+228,Qasr Al Einy,3.0,7.810660576014158,3.0,8.70488367120018,6.0,0.0,0,True,Marginal,6.0,"Underused (routes, no boarding)"
+229,Mohagreen (Ezbet Al Nakhl),2.0,5.45916639616685,2.0,3.8095064345645904,4.0,6941.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+230,Faisal Tawabek,1.0,26.4134673355052,2.0,8.39963794214964,3.0,7607.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
+231,Al Malek Al Saleh,2.0,4.908624637493094,2.0,4.912480977927675,4.0,128.0,1,False,Marginal,0.0,Has nearby boarding
+232,Imbaba,39.0,19.264805669777882,36.0,18.03935247607927,75.0,0.0,0,True,Dead Weight,75.0,"Underused (routes, no boarding)"
+233,Al-Salam (10th of Ramadan),59.0,26.697116468377352,64.0,27.62732970602781,123.0,0.0,0,True,Dead Weight,123.0,"Underused (routes, no boarding)"
+234,Saqqara Traffic Office,1.0,19.7735207172101,1.0,20.802940187696,2.0,6636.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+235,Koleyet Al Banat - Ain Shams University,3.0,31.143372590204702,3.0,33.2979303326479,6.0,0.0,0,True,Marginal,6.0,"Underused (routes, no boarding)"
+236,Lotus  (5th Settlement),4.0,35.286089528565554,4.0,38.59124046919268,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+237,El Itihad Square (Maadi),1.0,37.7165061646501,1.0,34.5961285664032,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+238,El Warsha (Ezbet Al Nakhl),2.0,15.257254149555775,2.0,15.6256277947145,4.0,2768.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+239,Bashtil El Balad,2.0,4.307443151889575,3.0,4.25652719960808,5.0,2859.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+240,Kafr Al Shurafa,1.0,4.38658345085666,1.0,4.53434263599794,2.0,2696.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+241,Ring Rd Exit to Khosous,3.0,38.6989506820124,2.0,46.19014832695335,5.0,5372.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+242,Abdullah El Refaey,1.0,5.61621058162465,1.0,5.74646023417639,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+243,Bus Stop 43 (Matareya),1.0,13.9125047317774,1.0,16.192931062568,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+244,Helmeyet El Zaitoun Metro,2.0,8.15164728219196,2.0,8.063854874279066,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+245,Kafr Tohormos,3.0,22.507761369560683,3.0,22.345486962696256,6.0,13640.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+246,Korba,2.0,6.93394788430552,2.0,9.50955601722622,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+247,Koleyet Al Banat - Azhar University,4.0,14.9490921700983,4.0,15.0910858256957,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+248,Kolleyet Al Zeraah (Ain Shams University),4.0,7.29175830618805,7.0,15.05452932649959,11.0,0.0,0,True,Dead Weight,11.0,"Underused (routes, no boarding)"
+249,Fayda Kamel,3.0,3.4450803432540638,4.0,5.108285320349455,7.0,19493.0,1,False,Efficient Hub,0.0,Has nearby boarding
+250,Maadi Metro,3.0,4.506899952669911,4.0,3.7889831805489322,7.0,2858.0,1,False,Efficient Hub,0.0,Has nearby boarding
+251,Al Sheikh Mansour,3.0,3.8778652861375735,2.0,3.17829841246309,5.0,0.0,0,True,Marginal,5.0,"Underused (routes, no boarding)"
+252,Awwel Faisal,1.0,6.22922267624715,1.0,6.21067739765013,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+253,Cairo University,3.0,24.035282042197156,3.0,25.3566637506533,6.0,6622.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+255,Barageel St,2.0,5.645489804351145,2.0,6.314439977356425,4.0,774.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+256,Khalafawy Square,2.0,3.588731640855385,1.0,2.30716214869584,3.0,9060.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+258,Zahraa Metro,4.0,10.181699426238568,3.0,12.086401311395527,7.0,4597.0,1,False,Efficient Hub,0.0,Has nearby boarding
+259,Moassasa,45.0,23.154551272800934,41.0,23.14461136648507,86.0,20661.0,1,False,Efficient Hub,0.0,Has nearby boarding
+261,Madinat Al Solb  (Al Tibeen),1.0,36.8850110543478,1.0,38.0009750705631,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+263,Kilo 4 & Half,15.0,20.53840269272231,15.0,20.60498689673875,30.0,15392.0,1,False,Efficient Hub,0.0,Has nearby boarding
+264,Abou El Numrus,2.0,5.026444574653975,2.0,4.990912046863735,4.0,3684.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+265,Shabramant,3.0,6.04663688850244,3.0,6.0938212718574265,6.0,2726.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+266,Abboud,9.0,16.59837784224327,10.0,13.670452413150821,19.0,26925.0,1,False,Efficient Hub,0.0,Has nearby boarding
+267,Znen (Awwel Al Eshreen),8.0,15.170953619218698,8.0,15.260103700186528,16.0,19890.0,2,False,Efficient Hub,0.0,Has nearby boarding
+268,Cairo University Metro,1.0,1.85409991175653,1.0,1.77909618527353,2.0,13939.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+269,Mazghuna,3.0,17.03601647371862,3.0,18.198417687883833,6.0,0.0,0,True,Marginal,6.0,"Underused (routes, no boarding)"
+270,Marioteya & Ring Rd,4.0,22.756139827356506,3.0,28.333280017146766,7.0,0.0,0,True,Dead Weight,7.0,"Underused (routes, no boarding)"
+271,Dokki,1.0,3.79800341104759,1.0,3.73291331277885,2.0,4276.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
+272,Roxy,5.0,5.707629544853126,5.0,6.232640164666738,10.0,0.0,0,True,Dead Weight,10.0,"Underused (routes, no boarding)"
+273,Omraneyya,1.0,4.89810753112821,1.0,3.88855471532058,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+274,Al Sayeda Zeinab,1.0,5.12022474659031,1.0,5.21098410023925,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+275,Ard El Lewaa,6.0,4.160250782682366,5.0,4.172690195665514,11.0,0.0,0,True,Dead Weight,11.0,"Underused (routes, no boarding)"
+276,Moneeb,46.0,21.179953241860623,46.0,22.44709630312246,92.0,0.0,0,True,Dead Weight,92.0,"Underused (routes, no boarding)"
+277,Madinat Al Bo'oth Al Eslamyya,1.0,4.04691180058826,1.0,4.05603919772128,2.0,172.0,1,False,Marginal,0.0,Has nearby boarding
+279,Giza Square,42.0,16.88662297985633,39.0,18.66086887212395,81.0,33495.0,1,False,Efficient Hub,0.0,Has nearby boarding
+280,Abou Zaabal,4.0,10.607701286090439,5.0,11.055883923436332,9.0,0.0,0,True,Dead Weight,9.0,"Underused (routes, no boarding)"
+281,Dar El Salam,4.0,5.500136936735692,4.0,6.184115590174898,8.0,0.0,0,True,Dead Weight,8.0,"Underused (routes, no boarding)"
+327,"Omara, Bashtil",0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+328,Akher Zahraa Street,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+329,Awwel Gamal - Gesr EL Suez,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+330,Saray Al Qobba,2.0,42.48099446307725,2.0,41.4120933403863,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+331,Abu Yusif (Ezbet El Haggana),0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+332,Awwel Al Qawmeyya Al Arabeyya,0.0,0.0,0.0,0.0,0.0,417.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+340,R2 - New Administrative Capital,1.0,44.5920421682857,1.0,47.833163266326,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+341,Almaza Superjet,0.0,0.0,0.0,0.0,0.0,2066.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+342,Mabyadah Square - Rod El Farag,1.0,45.5691164714095,1.0,46.3870576783719,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+343,Kuwaiti Mosque - Zahraa Maadi,0.0,0.0,0.0,0.0,0.0,225.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+333,Al Qanatir Al Khayriyyah,5.0,23.05272817447272,6.0,19.7780138751649,11.0,0.0,0,True,Dead Weight,11.0,"Underused (routes, no boarding)"
+334,Bigam,4.0,15.234878510242108,4.0,14.452218888530743,8.0,11778.0,1,False,Efficient Hub,0.0,Has nearby boarding
+335,Kolleyet Al Zeraah (Cairo University),1.0,21.7682458790741,2.0,19.11385628212545,3.0,1643.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+336,Al Omraneyya Al Gadida,11.0,23.510499252687797,11.0,22.683313062796945,22.0,13856.0,1,False,Efficient Hub,0.0,Has nearby boarding
+337,Masaken Dahshour,5.0,35.637466744238296,5.0,33.0508375411068,10.0,0.0,0,True,Dead Weight,10.0,"Underused (routes, no boarding)"
+338,Al Bassous,1.0,3.51458547468477,1.0,3.53451329332556,2.0,3820.0,1,False,Overcrowded / Underserved,0.0,Has nearby boarding
+339,Wizarat District - New Administrative Capital,2.0,64.10982434164605,2.0,66.18504137961325,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+344,Carrefour - Maadi,2.0,6.48871510494849,2.0,7.004715662619676,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+345,Al Waha (Garage Al Mostaqbal),0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+346,Hadayek AL Ahram (Second Gate),2.0,29.22802948158595,2.0,26.0207268420987,4.0,0.0,0,True,Marginal,4.0,"Underused (routes, no boarding)"
+347,October (MM),1.0,40.1634234614049,1.0,36.1545648981571,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+349,City Stars,1.0,33.4476726047316,1.0,34.5800044241778,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+348,Zayed (MM),2.0,15.773489862633404,2.0,18.809900230200043,4.0,152.0,1,False,Marginal,0.0,Has nearby boarding
+352,Al Mansheya Al Jadeeda,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+353,Manshiyet Al Bakary,0.0,0.0,0.0,0.0,0.0,0.0,0,False,Marginal,0.0,Has nearby boarding
+354,Akher Tersa,1.0,17.575369677229,1.0,17.6885111170875,2.0,0.0,0,True,Marginal,2.0,"Underused (routes, no boarding)"
+358,Wataneya Moqatam,0.0,0.0,0.0,0.0,0.0,7004.0,2,False,Overcrowded / Underserved,0.0,Has nearby boarding
