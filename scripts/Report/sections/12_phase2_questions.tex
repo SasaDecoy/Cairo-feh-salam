@@ -1,0 +1,302 @@
+% =====================================================================
+% Section 12, Phase 2 research questions Q13–Q25 (humanised, single
+% bundled figure per question from notebook_sections/)
+% =====================================================================
+\makesectioncover{Phase 2 \textbullet\ The Thirteen Questions}
+
+\section{Phase 2 \textbullet\ Thirteen Research Questions}
+\label{sec:phase2-questions}
+
+The Phase 2 analysis notebook walks through thirteen questions, numbered
+Q13 to Q25 to continue the Phase 1 numbering. Every question reads from
+the cleaned and integrated outputs of Notebook 1 and from the relevant
+Phase 1 CSVs. For each question we say what we are asking, where the
+data came from, what method we used, and what the resulting visualisation
+shows. The figure for every question is the bundled set of charts that
+the analysis notebook produced for that question.
+
+% --------------------------------------------------------------------
+\subsection{Q13 \textbullet\ Metro coverage and density}
+
+Did each metro line open into the population geography that existed at
+the time of opening? An older station should not be judged against
+2018 population alone, so we matched every metro station to its nearest
+district and used the closest available population year (1996, 2006,
+2017 or 2023).
+
+Data: \fn{metro\_stations.csv} for the 89 stations with line and
+opening year, joined to \fn{districts\_wide.csv} for district
+centroids and yearly population. Method: a Spearman rank correlation
+per line between opening year and adjacent-district population, plus
+a scatter per line.
+
+\figitem{phase2/sections/q13_notebook_visuals.png}{1.0}{Q13 bundled
+visuals from the analysis notebook.}{fig:q13b}
+
+What we see: Lines 1 and 2 (built before 2005) sit inside the older
+dense core. Line 3, extended through 2024, has its newer Phase 3B and
+3C stations pushing into denser districts like Imbaba and Mohandessin.
+That part of the planning improved over time; the next question tests
+whether it actually reached the 115 ghost terminals from Phase 1.
+
+% --------------------------------------------------------------------
+\subsection{Q14 \textbullet\ Ghost terminals near the new metro}
+
+If Phase 1's ghost terminals (G1) sit close to a new Phase 3 metro
+station, the terminal probably became redundant because riders shifted
+to rail. If they sit far away, the structural problem from Phase 1 is
+still there and the new rail did not address it.
+
+Data: \fn{merged\_G\_underused\_terminals.csv} (the 115 ghosts) and
+the post-2014 cohort of \fn{metro\_stations.csv}. Method: for each
+ghost, take the haversine distance to the nearest post-2014 metro
+station, keep the minimum, and bucket into 0--1 km, 1--2, 2--5, 5--10,
+and \stat{$>$10 km}.
+
+\figitem{phase2/sections/q14_notebook_visuals.png}{1.0}{Q14 bundled
+visuals: distance buckets and the spatial diagnostic.}{fig:q14b}
+
+The result: only \stat{9 of the 115 ghosts (8\%)} sit within 1 km of a
+post-2014 metro station. \stat{97 of 115 (84\%)} are beyond 2 km. The
+buckets read \stat{3 / 6 / 9 / 27 / 70} from nearest to farthest. The
+new metro did not reach the underused-terminal cohort that Phase 1
+flagged.
+
+% --------------------------------------------------------------------
+\subsection{Q15 \textbullet\ Metro and bus or microbus terminal integration}
+
+Even where the metro and the older terminals do coexist, the question
+is whether they integrate. A metro station near a high-route terminal
+gives riders a quick transfer into the informal network; a station far
+from any terminal is isolated infrastructure.
+
+Data: metro stations with opening year plus the Phase 1 terminal
+points. Method: for every metro station we found the nearest terminal,
+attached its route count, passenger flow and ghost flag, and looked at
+the per-line distribution of transfer distance.
+
+\figitem{phase2/sections/q15_notebook_visuals.png}{1.0}{Q15 bundled
+visuals from the analysis notebook.}{fig:q15b}
+
+What it shows: older lines sit close to existing mawaqif and integrate
+naturally. Some Line 3 stations, especially toward the eastern
+extension, sit further from the informal terminal layer and therefore
+need an explicit routing layer to be useful as a transfer point.
+
+% --------------------------------------------------------------------
+\subsection{Q16 \textbullet\ Fastest-growing districts and coverage}
+
+A planning network that follows demand should serve growth as well as
+standing population. Q16 takes the 15 districts with the highest CAGR
+(2006 to 2017) and asks whether they have any new-mode coverage at
+all.
+
+Data: \fn{districts\_wide.csv} for CAGR plus the integrated station
+layer for nearby station counts inside a 3 km buffer.
+
+\figitem{phase2/sections/q16_notebook_visuals.png}{1.0}{Q16 bundled
+visuals: top-15 fastest-growing districts and their coverage.}{fig:q16b}
+
+The top-growth list is dominated by satellite cities such as New Cairo
+1, 6th October City 1 and 3, Ash-Shuruq, and Sheikh Zayed. Established
+dense districts like El Marg and Al-Warraq grow more slowly. Most of
+the new metro extensions went to the satellite cities, which means a
+lot of the slower-growth dense districts received little new coverage.
+
+% --------------------------------------------------------------------
+\subsection{Q17 \textbullet\ Population density vs. underserved score}
+
+We test whether underservedness (Phase 1 G4) is just a density artefact
+or a real coverage mismatch. If it were simply density, the score
+would correlate trivially with population. If it correlates strongly
+with population the underservedness is structural; those are the
+districts where the gap is largest.
+
+Data: \fn{q17\_dense\_underserved\_hexes.csv}, recomputed from Phase 1's
+hex layer plus S6 district population. Method: a Spearman correlation,
+a hex-bin joint distribution with marginal histograms, and a quadrant
+overlay highlighting the dense and underserved cells.
+
+\figitem{phase2/sections/q17_notebook_visuals.png}{1.0}{Q17 bundled
+visuals.}{fig:q17b}
+
+The result is \stat{$\rho = 0.548$, $p < 10^{-100}$}. The densest hexes
+are also the most underserved. The market problem is not just density,
+it is density combined with weak coverage.
+
+% --------------------------------------------------------------------
+\subsection{Q18 \textbullet\ Informal-transport share by density}
+
+If informal microbus dependence concentrated only in the dense core,
+it would be a poverty-pocket problem. If it sits flat across density
+tiers, the informal network is the substrate everywhere.
+
+Data: Phase 1 boarding (informal vs. total) joined to S6 district
+population. Method: Spearman correlation plus an OLS slope.
+
+\figitem{phase2/sections/q18_notebook_visuals.png}{1.0}{Q18 bundled
+visuals: informal share by density.}{fig:q18b-tier}
+
+The slope is statistically zero (\stat{$\rho = 0.025$, $p = 0.40$}).
+Informal share averages around \stat{47\%} across every density tier.
+Microbuses are the everyday substrate, not a poverty pocket.
+
+% --------------------------------------------------------------------
+\subsection{Q18b \textbullet\ Gap-closure matrix \textbullet\ the verdict}
+
+Q18b cross-tabulates the four Phase 1 gaps (G1 to G4) against the
+three post-2014 modes (Metro L3, LRT, BRT). Every cell is the
+percentage of that gap's sites that sit within 2 km of a station of
+that mode.
+
+Data: the four gap-site sets (115 ghosts, 19 empty-return, around
+1{,}340 vehicle-mismatch routes, 79 underserved hexes) buffered
+against each mode's stations. Method: per cell, count gap sites
+inside a 2 km haversine buffer of any station of that mode, report
+as a percentage.
+
+\figitem{phase2/sections/q18_notebook_visuals.png}{1.0}{The gap-closure
+matrix is the most important single chart in this report. The bundled
+Q18 figure shows it together with the per-tier informal share.}{fig:q18b}
+
+The matrix verdict: \stat{no cell above 25\%}, most below \stat{16\%},
+and the single best cell is BRT $\times$ G3 at \stat{25.0\%}. The
+post-2014 build closes a quarter or less of any single gap.
+
+% --------------------------------------------------------------------
+\subsection{Q19 \textbullet\ GTFS coverage vs. Phase 1 reality}
+
+There is a data gap as well as an infrastructure gap. We compare the
+formal published GTFS network against the Phase 1 measured reality and
+ask which Phase 1 stops sit outside an 800 m GTFS catchment.
+
+Data: \fn{gtfs\_stops.csv} (S1) vs. Phase 1 boarding. Method: nearest
+GTFS stop per Phase 1 stop with a coverage flag.
+
+\figitem{phase2/sections/q19_notebook_visuals.png}{1.0}{Q19 bundled
+visuals: GTFS coverage and the agency split.}{fig:q19b}
+
+A meaningful share of informal-heavy stops sits beyond the 800 m
+catchment. The data asymmetry is real and quantifiable.
+
+% --------------------------------------------------------------------
+\subsection{Q20 \textbullet\ BRT corridor vs. informal demand}
+
+The BRT is the contrast case for the H3 hypothesis. Q20 ranks every
+BRT station by the informal demand inside its 500 m buffer.
+
+Data: \fn{brt\_stations.csv} (S5) plus Phase 1 boarding. Method: per
+station, sum daily informal boardings within 500 m, rank descending.
+
+\figitem{phase2/sections/q20_notebook_visuals.png}{1.0}{Q20 bundled
+visuals: BRT stations ranked by nearby informal demand.}{fig:q20b}
+
+A clear top tier of BRT stations carries thousands of informal
+boardings within 500 m. That top tier is what drives the H3 result.
+
+% --------------------------------------------------------------------
+\subsection{Q21 \textbullet\ Fare per km, formal vs. informal}
+
+Accessibility is not only spatial, it is also economic. Q21 asks how
+much riders pay per km on each mode.
+
+Data: \fn{cleaned\_routes.csv} (Phase 1) plus GTFS fare attributes.
+Method: per route compute LE/km, group by mode, plot as a box.
+
+\figitem{phase2/sections/q21_notebook_visuals.png}{1.0}{Q21 bundled
+visuals: fare per kilometre by mode.}{fig:q21b}
+
+Real numbers: formal bus is around \stat{0.22 LE/km}, formal metro
+\stat{0.25 LE/km}, microbus \stat{0.62 LE/km} (about 3$\times$ formal),
+tomnaya \stat{1.30 LE/km} (around 6$\times$ formal). The implication
+is that for many origin-destination pairs the metro is unreachable, so
+riders default to the higher per-kilometre microbus fare.
+
+% --------------------------------------------------------------------
+\subsection{Q22 \textbullet\ Metro under-performance vs. population}
+
+Move from raw counts to a coverage expectation. We fit metro stations
+as a function of district population. The residual (actual minus
+predicted) is the under-coverage metric.
+
+Data: \fn{metro\_stations.csv} plus S6 districts. Method: OLS
+regression of stations on population (3 km radius per district
+centroid), then rank residuals.
+
+\figitem{phase2/sections/q22_notebook_visuals.png}{1.0}{Q22 bundled
+visuals: top-15 worst residuals and the per-governorate distribution.}{fig:q22b}
+
+The four worst residuals are \strval{Ad-Duqqi} ($-9.28$),
+\strval{Sheikh Zayed} ($-9.09$), \strval{6th October City 1 \& 3}
+($-8.52$) and \strval{Al-Hawamidiyah} ($-8.14$). All are dense or
+fast-growing edges in Giza or Qalyubia. This is the ranking that the
+final coverage-need map is built from.
+
+% --------------------------------------------------------------------
+\subsection{Q23 \textbullet\ Adly Mansour as a convergence node}
+
+Adly Mansour is a symbolic interchange where Metro Line 3, the LRT,
+the BRT and several Phase 1 informal terminals come together inside
+2.5 km. We measure how its station density compares against 150 random
+2.5 km clusters elsewhere in Cairo.
+
+Data: integrated station and terminal layers plus Phase 1 boarding.
+Method: count modes, count stations, then compute the percentile rank
+of Adly Mansour against the random sample.
+
+\figitem{phase2/sections/q23_notebook_visuals.png}{1.0}{Q23 bundled
+visuals.}{fig:q23b}
+
+\stat{Four modes within 2.5 km}, \stat{eight stations or terminals
+total}, but only the \stat{21st percentile} of random Cairo clusters
+by station density. Symbolically multimodal, statistically average.
+
+% --------------------------------------------------------------------
+\subsection{Q24 \textbullet\ K-Means coverage-need synthesis (AI Technique 2)}
+
+Single-variable rankings cannot describe a market. The project needs
+a segmentation, which is why Q24 runs K-Means on five engineered
+features per district.
+
+Data: S6 districts plus the integrated station layer. Method: K-Means
+with \stat{$k=4$}, k-means++ initialisation, $n_{\text{init}}=50$,
+features = \fn{log\_pop\_2023}, \fn{CAGR\,\%}, stations within 3 km,
+informal stops within 3 km, and a Cairo-governorate indicator. We
+re-ran across five seeds and got an Adjusted Rand Index of
+\stat{1.00}, so the partition is fully stable. Silhouette at $k=4$ is
+\stat{0.412}.
+
+\figitem{phase2/sections/q24_notebook_visuals.png}{1.0}{Q24 bundled
+visuals: elbow and silhouette, cluster heatmap, opportunity score,
+parallel coordinates and the cluster radar.}{fig:q24b}
+
+Four clusters come out:
+
+\begin{itemize}
+ \item Formal-Served Core: 31 districts, CAGR 0.19\%, about
+ \stat{5.6M} residents.
+ \item Peripheral Growth: 19 districts, CAGR 2.83\%, about
+ \stat{9.2M} residents.
+ \item Mixed (cluster 2): 12 districts, CAGR 2.17\%, about
+ \stat{4.2M} residents.
+ \item Low-Activity Outskirts: 6 districts, CAGR 11.93\%.
+\end{itemize}
+
+The first three together are \stat{62 districts and 18.9 million
+residents}. That is the addressable market for any product that
+bridges the two systems.
+
+% --------------------------------------------------------------------
+\subsection{Q25 \textbullet\ Masari bridge \textbullet\ informal to formal}
+
+Q25 asks how connectable the informal layer is to the formal layer.
+For every informal-heavy Phase 1 stop we find the nearest formal node
+(GTFS, metro, LRT, BRT) and treat the connector as the missing
+product layer.
+
+\figitem{phase2/sections/q25_notebook_visuals.png}{1.0}{Q25 bundled
+visuals: the Masari bridge schematic.}{fig:q25b}
+
+Most informal-heavy stops sit within walking distance of some formal
+node, so the bridges already exist physically. What is missing is the
+software that surfaces them in one screen.

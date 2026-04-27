@@ -1,6 +1,6 @@
 name,native_ar,status,governorate,pop_1996,pop_2006,pop_2017,pop_2023,cagr_2006_2017,centroid_lat,centroid_lon,centroid_source
 Ad-Duqqī,قسم الدقي,Kism (fully urban),Al-Jīzah [ Giza ],,83430.0,70926.0,76528.0,-0.0146525794804921,30.0388955,31.2125563,nominatim
-Al-Ahrām,قسم الأهرام,Kism (fully urban),Al-Jīzah [ Giza ],,,659305.0,711161.0,,29.9842871,31.1344924,nominatim
+Al-Ahrām,قسم الأهرام,Kism (fully urban),Al-Jīzah [ Giza ],,,659305.0,711161.0,,29.984138,31.1345749,nominatim
 Al-'Ajūzah,قسم العجوزة,Kism (fully urban),Al-Jīzah [ Giza ],,258511.0,278479.0,300422.0,0.006786964703455,30.0549435,31.2127281,nominatim
 Al-'Ayyāṭ,مركز العياط,Markaz,Al-Jīzah [ Giza ],280872.0,352317.0,492178.0,557971.0,0.0308582796508236,29.6195757,31.2581312,nominatim
 Al-Badrashayn [ Badrshein ],مركز البدرشين,Markaz,Al-Jīzah [ Giza ],285858.0,383610.0,537133.0,606623.0,0.031074803565174,30.01,31.21,gov_fallback
@@ -16,8 +16,8 @@ Aṭfīḥ [ Atfeh ],مركز أطفيح,Markaz,Al-Jīzah [ Giza ],199548.0,2669
 Aṭ-Ṭālbīah,قسم الطالبيه,Kism (fully urban),Al-Jīzah [ Giza ],,,457667.0,493760.0,,30.01,31.21,gov_fallback
 Awsīm [ Ossim ],مركز أوسيم,Markaz,Al-Jīzah [ Giza ],193751.0,275059.0,382779.0,430609.0,0.0304987675412997,30.01,31.21,gov_fallback
 Būlāq al-Dakrūr,قسم بولاق الدكرور,Kism (fully urban),Al-Jīzah [ Giza ],,701655.0,960031.0,1035628.0,0.028912231914602,30.01,31.21,gov_fallback
-Imbābah [ Imbaba ],قسم امبابة,Kism (fully urban),Al-Jīzah [ Giza ],523265.0,598882.0,632599.0,682349.0,0.0049917032798976,30.0759374,31.2075704,nominatim
-Imbābah [ Imbaba ],مركز إمبابة,Markaz,Al-Jīzah [ Giza ],,391363.0,515512.0,586089.0,0.0253640631067606,30.0759374,31.2075704,nominatim
+Imbābah [ Imbaba ],قسم امبابة,Kism (fully urban),Al-Jīzah [ Giza ],523265.0,598882.0,632599.0,682349.0,0.0049917032798976,30.088512,31.215927,nominatim
+Imbābah [ Imbaba ],مركز إمبابة,Markaz,Al-Jīzah [ Giza ],,391363.0,515512.0,586089.0,0.0253640631067606,30.088512,31.215927,nominatim
 Kirdāsah,مركز كرداسة,Markaz,Al-Jīzah [ Giza ],,,447593.0,501949.0,,30.0315846,31.111881,nominatim
 Madīnat Sittah Uktūbar 2 [ 6th of October City ],قسم ثان 6 أكتوبر,Kism (fully urban),Al-Jīzah [ Giza ],,115302.0,196373.0,211811.0,0.049596241242684,29.9723458,30.9409205,nominatim
 Madīnat Sittah Uktūbar 1 & 3 [ 6th of October City ],قسم أول 6 أكتوبر / قسم ثالث 6 أكتوبر,Kism (fully urban),Al-Jīzah [ Giza ],,38791.0,152497.0,164491.0,0.1325260787522582,29.9723458,30.9409205,nominatim
@@ -30,7 +30,7 @@ Al-Azbakiyah [ Azbakeya ],قسم الأزبكية,Kism (fully urban),Al-Qāhirah
 Al-Basātīn,قسم البساتين,Kism (fully urban),Al-Qāhirah [ Cairo ],326220.0,390894.0,495443.0,532191.0,0.0217807096466446,29.9630749,31.3102454,nominatim
 Al-Jamāliyah,قسم الجمالية,Kism (fully urban),Al-Qāhirah [ Cairo ],59159.0,49834.0,36368.0,39077.0,-0.0282309546743027,30.05,31.25,gov_fallback
 Al-Khalīfah,قسم الخليفة,Kism (fully urban),Al-Qāhirah [ Cairo ],,,105235.0,113064.0,,30.05,31.25,gov_fallback
-Al-Ma'ādī [ Maadi ],قسم المعادي,Kism (fully urban),Al-Qāhirah [ Cairo ],70415.0,78122.0,88575.0,95194.0,0.0114815899066138,29.9597112,31.2580771,nominatim
+Al-Ma'ādī [ Maadi ],قسم المعادي,Kism (fully urban),Al-Qāhirah [ Cairo ],70415.0,78122.0,88575.0,95194.0,0.0114815899066138,29.9598403,31.258163,nominatim
 Al-Marj [ El Marg ],قسم المرج,Kism (fully urban),Al-Qāhirah [ Cairo ],251589.0,507035.0,798646.0,858032.0,0.0421682854468798,30.1415494,31.3418801,nominatim
 Al-Ma'ṣarah,قسم المعصره,Kism (fully urban),Al-Qāhirah [ Cairo ],,252780.0,270032.0,290148.0,0.0060199498017221,30.05,31.25,gov_fallback
 Al-Maṭariyah [ Matariyyah ],قسم المطرية,Kism (fully urban),Al-Qāhirah [ Cairo ],498670.0,498663.0,602485.0,647260.0,0.017342505984605,30.05,31.25,gov_fallback
@@ -44,14 +44,14 @@ An-Nuzhah,قسم النزهة,Kism (fully urban),Al-Qāhirah [ Cairo ],154969.0,
 Ash-Sharābiyah,قسم الشرابية,Kism (fully urban),Al-Qāhirah [ Cairo ],247433.0,215595.0,187201.0,201154.0,-0.0127560109693346,30.05,31.25,gov_fallback
 Ash-Shurūq,قسم الشروق,Kism (fully urban),Al-Qāhirah [ Cairo ],,22570.0,87285.0,93759.0,0.130838881760211,30.1794734,31.6057531,nominatim
 As-Sāḥil,قسم الساحل,Kism (fully urban),Al-Qāhirah [ Cairo ],333929.0,305322.0,316421.0,339975.0,0.0032513330597856,30.05,31.25,gov_fallback
-As-Salām 1,قسم أول السلام,Kism (fully urban),Al-Qāhirah [ Cairo ],304553.0,441000.0,480721.0,516440.0,0.0078710134532578,30.0595737,31.5362573,nominatim
-As-Salām 2,قسم ثان السلام,Kism (fully urban),Al-Qāhirah [ Cairo ],52329.0,108000.0,153772.0,165186.0,0.0326432697246414,30.0595737,31.5362573,nominatim
+As-Salām 1,قسم أول السلام,Kism (fully urban),Al-Qāhirah [ Cairo ],304553.0,441000.0,480721.0,516440.0,0.0078710134532578,30.0347463,31.5119014,nominatim
+As-Salām 2,قسم ثان السلام,Kism (fully urban),Al-Qāhirah [ Cairo ],52329.0,108000.0,153772.0,165186.0,0.0326432697246414,30.0347463,31.5119014,nominatim
 As-Sayyidah Zaynab,قسم السيدة زينب,Kism (fully urban),Al-Qāhirah [ Cairo ],156142.0,132249.0,136278.0,146446.0,0.0027319438617259,30.05,31.25,gov_fallback
 At-Tibbīn,قسم التبين,Kism (fully urban),Al-Qāhirah [ Cairo ],59366.0,68897.0,72040.0,77413.0,0.004063587216984,30.05,31.25,gov_fallback
 Aẓ-Ẓāhir,قسم الظاهر,Kism (fully urban),Al-Qāhirah [ Cairo ],67031.0,64009.0,71870.0,77236.0,0.0105861163232809,30.0707688,31.2460061,nominatim
 Az-Zamālik [ Zamalek ],قسم الزمالك,Kism (fully urban),Al-Qāhirah [ Cairo ],15343.0,17365.0,14946.0,16064.0,-0.0135449736868271,30.0204678,31.2254432,nominatim
 Az-Zāwiyah al-Ḥamrā',قسم الزاوية الحمراء,Kism (fully urban),Al-Qāhirah [ Cairo ],306165.0,315465.0,318170.0,341866.0,0.0007764913432919,30.05,31.25,gov_fallback
-Az-Zaytūn [ Zeitoun ],قسم الزيتون,Kism (fully urban),Al-Qāhirah [ Cairo ],159172.0,156910.0,174176.0,187179.0,0.0095355298127683,30.1084626,31.3057943,nominatim
+Az-Zaytūn [ Zeitoun ],قسم الزيتون,Kism (fully urban),Al-Qāhirah [ Cairo ],159172.0,156910.0,174176.0,187179.0,0.0095355298127683,30.1099985,31.3130319,nominatim
 Bāb ash-Sha'riyah,قسم باب الشعرية,Kism (fully urban),Al-Qāhirah [ Cairo ],59956.0,54084.0,46673.0,50140.0,-0.0133081578376154,30.05,31.25,gov_fallback
 Būlāq,قسم بولاق,Kism (fully urban),Al-Qāhirah [ Cairo ],75098.0,62470.0,48147.0,51741.0,-0.0233971775862313,30.0338799,31.1910129,nominatim
 Dār as-Salām,قسم دار السلام,Kism (fully urban),Al-Qāhirah [ Cairo ],340708.0,430763.0,525638.0,564684.0,0.018260605129079,30.05,31.25,gov_fallback

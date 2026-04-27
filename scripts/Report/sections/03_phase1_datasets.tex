@@ -1,0 +1,137 @@
+% =====================================================================
+% Section 03, Phase 1 original datasets
+% =====================================================================
+
+\section{Phase 1 \textbullet\ The Seven Original Datasets}
+\label{sec:phase1-datasets}
+
+All seven raw files live in \fn{DatasetsGeojson/} at the repo root.
+They arrive in the geographic CRS \stat{EPSG:4326} (lon/lat in degrees)
+and are reprojected to \stat{EPSG:32636} (UTM Zone 36N, metres) before
+any spatial work.
+
+\subsection{Inventory and what each dataset represents}
+
+\rowcolors{2}{darkpanel}{darkbg}
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{@{}
+ >{\color{plotorange}\bfseries}l
+ >{\color{bodytext}}l
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{bodytext}}X @{}}
+\toprule
+\color{plotblue}File &
+\color{plotblue}Geometry &
+\color{plotblue}Rows &
+\color{plotblue}What it represents \\
+\midrule
+\fn{Cairo Daily Boarding.json} & Point & 1{,}302 & Bus / microbus stops with daily boarding-and-alighting counts split by time-of-day and by formal/informal mode \\
+\fn{Public Transport Routes.json} & LineString & 1{,}784 & Route lines with route code, vehicle type, fare, route length, terminal IDs, and trip metadata \\
+\fn{Public Transport Terminals.json} & Point & 280 & Physical terminal locations (\emph{mawaqif}), origin/destination of routes \\
+\fn{Public Transport Passenger Flow.json} & LineString & 9{,}258 & Road segments with passengers/hour throughput \\
+\fn{Public Transport Vehicles Flow.json} & LineString & 5{,}592 & Road segments with vehicles/hour throughput \\
+\fn{Public Transport Commercial Speeds 2.json} & LineString & 26{,}154 & Road segments with average bus speed by time-of-day \\
+\fn{Population \& Employment Access.json} & Polygon & 1{,}525 & 1\,km$^2$ H3 hexagonal grid with population, jobs, and accessibility scores \\
+\bottomrule
+\end{tabularx}
+\caption{The seven Phase 1 GeoJSON datasets. Total: \stat{45{,}889}~rows, three geometry types.}
+\end{table}
+\rowcolors{0}{}{}
+
+\subsection{Dataset profile}
+
+A short profile of each file's most important fields and the questions
+it underwrites:
+
+\subsubsection{Boarding (\fn{Cairo Daily Boarding.json})}
+
+The largest behavioural dataset in the project. Each row is a stop
+(point) with twelve numeric counts split by time-of-day (morning vs
+all-day) and by mode (formal-only, informal-only, all). Key fields:
+
+\begin{itemize}
+ \item \fn{Stop\_Name}, human-readable stop name (sometimes Arabic).
+ \item \fn{Daily\_All\_BA}, \fn{Daily\_Formal\_BA}, \fn{Daily\_Informal\_BA}
+, total daily boardings/alightings, by mode share.
+ \item \fn{Morning\_*\_BA}, equivalent counts restricted to the morning
+ peak.
+\end{itemize}
+
+\textbf{Used by:} Q1 (job accessibility vs. alighting), Q3 (corridor
+adherence), Q4 (formal vs. informal dominance), Q6 (route supply vs.
+demand), Q7 (morning vs. evening symmetry), Q8 (spatial autocorrelation),
+Q9 (underserved hexes), Q11 (terminal-zone classification).
+
+\subsubsection{Routes (\fn{Public Transport Routes.json})}
+
+The supply-side description of the network. Each row is a published
+route line with vehicle type, fare, length, and origin/destination
+terminal IDs. Critical fields:
+
+\begin{itemize}
+ \item \fn{Vehicle\_Type} (\strval{microbus}, \strval{bus}, \strval{minibus}, \strval{tomnaya}, \strval{box}).
+ \item \fn{Vehicle\_Capacity}, used to derive the formal/informal
+ classification (\fn{Transport\_Class}).
+ \item \fn{Fare}, \fn{Route\_Length\_km}.
+ \item \fn{Origin\_Terminal\_ID}, \fn{Dest\_Terminal\_ID} (foreign keys to terminals).
+\end{itemize}
+
+\textbf{Used by:} Q2 (route symmetry), Q4 (formal vs. informal), Q6 (route
+supply vs. passenger demand), Q10 (empty-return), Q11 (route counts per
+terminal), Q12 (vehicle-route fit). \textit{This is the most-modified
+dataset in cleaning, \stat{45.9\%} of fares are null and require KNN
+imputation.}
+
+\subsubsection{Terminals (\fn{Public Transport Terminals.json})}
+
+The 280 \emph{mawaqif} that anchor route origins and destinations. Used
+as the spatial join target for boarding-near-terminal and flow-near-terminal
+buffers (see merges D, F, G). Both English and Arabic names are
+preserved (\fn{Terminal\_Name}, \fn{Terminal\_Name\_AR}).
+
+\subsubsection{Passenger Flow / Vehicle Flow}
+
+These are the segment-level flow datasets. Each row is a road-segment
+LineString with hourly throughput. Together they enable the
+\stat{Empty Return Index} that defines G2 (\fn{1, passengers/vehicles},
+clipped to $[0, 1]$).
+
+\subsubsection{Commercial Speeds}
+
+The largest dataset (26{,}154 rows), segment-level average commercial
+speed by time-window. Used by Q12 to compare vehicle types against the
+real road conditions they operate on.
+
+\subsubsection{Population \& Employment Access}
+
+The 1{,}525-row demand dataset. Each row is a 1\,km\textsuperscript{2}
+H3 hexagon with:
+
+\begin{itemize}
+ \item \fn{Population\_2018} (raw count), \fn{Pop\_Male} / \fn{Pop\_Female} splits.
+ \item \fn{Jobs\_In\_Hex}, formal employment count.
+ \item \fn{Jobs\_Accessible\_60min}, number of jobs reachable within
+ a 60-minute commute.
+ \item \fn{Jobs\_Pct\_Accessible\_60min}, the same as a percent of all
+ jobs in Cairo.
+\end{itemize}
+
+This is the dataset that lets us connect transport \emph{infrastructure}
+to transport \emph{demand}.
+
+\subsection{Coordinate Reference System and units}
+
+\begin{callout}
+\textbf{\color{plotblue}Why we reproject to EPSG:32636.}\quad
+The raw files arrive in \stat{EPSG:4326} (lon/lat in degrees). Degrees
+are useless for distance work, at Cairo's latitude (30\textdegree~N)
+one degree of longitude is $\approx$\stat{96\,km} while one degree of
+latitude is $\approx$\stat{111\,km}. Every analysis using a buffer (Q3
+120-m corridor, Q11 100-m ghost-terminal test, Phase 2 H3 500-m BRT
+corridor), a nearest-neighbour join, or an area calculation must be in
+metres. \stat{UTM Zone 36N} is the right projected CRS for Egypt, distances
+and areas come out correct without manual scaling. Every cleaned CSV
+and every downstream analysis assumes metres.
+\end{callout}

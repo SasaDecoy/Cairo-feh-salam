@@ -1,0 +1,67 @@
+% =====================================================================
+% Section 13, Phase 2 questions conclusion
+% =====================================================================
+
+\section{Phase 2 \textbullet\ What the Thirteen Questions Collectively Show}
+\label{sec:phase2-questions-conclusion}
+
+The thirteen Phase 2 research questions are not independent, they are
+a single argument disguised as a sequence. Read together, they
+establish four claims that the formal hypothesis tests in
+Section~\ref{sec:phase2-hypotheses} will then formalise.
+
+\subsection*{Claim 1, The new infrastructure does not follow density}
+
+Q13 (per-line scatter), Q14 (84\% of ghosts beyond 2\,km of any new
+metro), Q16 (fastest-growing districts with zero coverage), and Q22
+(top-15 worst residuals all in Giza/Qalyubia) all point in the same
+direction: the post-2014 metro/LRT investment lands away from where
+people already live.
+
+\subsection*{Claim 2, Underservedness is structural, not just dense}
+
+Q17 ($\rho = 0.548$) shows that the densest hexes are systematically
+the most underserved. Q18 ($\rho = 0.025$, flat) shows that informal
+modal share is the same across density tiers, which means the
+informal network is the substrate everywhere, not a poverty pocket.
+Together: Cairo has an everywhere-informal background and a
+selectively-formal foreground that does not align.
+
+\subsection*{Claim 3, BRT is the contrast case}
+
+Q20 (BRT corridor demand) shows that BRT stations sit on top of
+\emph{existing} informal demand. Q18b's gap-closure matrix bears it
+out: the only cell at 25\% (the matrix maximum) is BRT $\times$ G3
+(vehicle mismatch). \kw{Not all post-2014 infrastructure is equally
+weak, BRT is what demand-aligned planning looks like in this dataset.}
+
+\subsection*{Claim 4, There is a real, sized market for closing the gap}
+
+Q24's K-Means delivers a 4-cluster partition with \stat{ARI = 1.00}
+stability. Three of those clusters
+(Formal-Served Core + Peripheral Growth + Mixed) make up
+\stat{62 districts, 18.9 million residents},
+the addressable market for a product that visibly bridges the two
+systems. Q25 shows the bridges already exist physically; what is
+missing is the software layer that surfaces them.
+
+\subsection*{The market-sizing visual}
+
+\figitem{phase2/market_sizing_bar.png}{1.0}{Cluster population scale,
+Formal-Served Core, Peripheral Growth, and Mixed sum to 18.9M
+residents. The Low-Activity Outskirts cluster is excluded from the
+addressable market.}{fig:market-sizing}
+
+\figitem{phase2/sunburst_market.png}{1.0}{Sunburst, governorate $\to$ K-Means cluster $\to$ district, sized by 2023 population. Reveals the geographic distribution of each market segment.}{fig:sunburst}
+
+\subsection*{What the questions cannot do alone}
+
+Descriptive questions describe; they do not formally test. The
+quantitative claims in this section are visible in the Plotly figures
+but they remain \emph{visual} arguments. The next section
+(\ref{sec:phase2-hypotheses}) takes the three strongest of these
+visual arguments, coverage--need mismatch, LRT catchment deficit, BRT
+corridor match, and runs each of them through a non-parametric
+hypothesis test with effect sizes. That is where ``the dense ones
+look underserved'' becomes \stat{$\varepsilon^2 = 0.826$} and ``LRT
+serves few people'' becomes \stat{Cliff's $\delta = -0.991$}.

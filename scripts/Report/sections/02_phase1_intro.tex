@@ -1,0 +1,48 @@
+% =====================================================================
+%  Section 02 — Phase 1 introduction (verbatim user paraphrase)
+% =====================================================================
+\makesectioncover{Phase 1 \textbullet\ The Existing Reality}
+
+\section{Phase 1 \textbullet\ The Existing Reality}
+\label{sec:phase1-intro}
+
+In this phase we are trying to know what the existing transport is.
+It is an auditing phase before discussing anything regarding the new
+infrastructure and whether they are helpful or not.
+
+The work is divided into two notebooks:
+
+\begin{itemize}
+  \item \fn{Cleaning Data.ipynb} — here we simply load seven raw
+        GeoJSON datasets, we then reproject them into a common CRS,
+        we use KNN to impute missing values, and we build seven
+        spatial attribute merges that will be used further on in the
+        analysis section.
+  \item \fn{Visual Analysis.ipynb} — here we are answering twelve
+        exploratory questions by using the merges from the first
+        cleaning notebook, and we produce 40 Plotly visualisations.
+        The questions result in 4 gaps that are the base for Phase 2
+        hypotheses; the 4 gaps are ghost terminals, empty-return
+        terminals, vehicle-route mismatch, and underserved hexagons.
+\end{itemize}
+
+\subsection{Two-system framing}
+
+In this report we will use two important labels:
+
+\begin{itemize}
+  \item \kw{System A} (formal), which is the published network. In
+        Phase 1 we approximate it by routes with fares and the
+        published \fn{Public Transport Terminals.json}. However, in
+        Phase 2 this is mixed with GTFS, the metro network website,
+        the LRT and the BRT.
+  \item \kw{System B} (informal), this is what the city actually uses
+        every morning. In Phase 1 we brought its data from
+        \fn{Cairo Daily Boarding.json} and the passenger-flow segments
+        \fn{Public Transport Passenger Flow.json}.
+\end{itemize}
+
+The whole idea behind Phase 1 is to ensure the two systems can be
+compared on the same map under the same set of metrics, such as
+distances, boarding totals, and fare per km. The 4 structural gaps are
+the cells where the comparison fails.

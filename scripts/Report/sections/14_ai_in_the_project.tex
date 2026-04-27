@@ -1,0 +1,240 @@
+% =====================================================================
+% Section 14, AI in the Project
+% =====================================================================
+\makesectioncover{AI in the Project}
+
+\section{AI in the Project}
+\label{sec:ai}
+
+\subsection{Why AI at all}
+
+Cairo Public Transport is, at its core, a city-scale data-integration,
+segmentation, and spatial-pattern problem. Each of those three problem
+classes has a classical method that nearly works and a non-classical
+method that closes the last 20\% of the gap. The project picks the
+classical method first and adds an AI technique only where the
+classical method fails on a concrete, named case.
+
+There are three AI techniques in the project. Every one of them is the
+answer to a problem the cleaning notebook ran into and could not
+otherwise solve cleanly. We document each as: \emph{What problem it
+solves}, \emph{Why classical methods fail there}, \emph{How it works},
+\emph{Why it is effective for this problem}, and \emph{What we do not
+claim}.
+
+% --------------------------------------------------------------------
+\subsection{AI Technique 1 \textbullet\ SBERT multilingual semantic matching}
+
+\textbf{Where it lives.} \fn{Phase2/Phase2\_Scraping\_Cleaning.ipynb}, Stage 4 of the four-stage integration pipeline (see
+\S\ref{sec:phase2-integration}).
+
+\textbf{Problem it solves.} Cross-script (Arabic $\leftrightarrow$ English)
+station-name matching. When integrating Wikipedia metro stations
+(English-first), Google Maps BRT scrapes (mixed), and Phase 1
+informal terminals (Arabic-first), the same physical mawfaq can be
+written as:
+
+\begin{itemize}
+ \item \ar{عدلي منصور} (Arabic), \strval{Adly Mansour} (English), \strval{Adli Mansour} (transliterated)
+ \item \ar{ميدان مصر الجديدة}, \strval{Heliopolis Square}
+ \item \ar{ملعب القاهرة}, \strval{Cairo Stadium}
+\end{itemize}
+
+\textbf{Why classical methods fail here.} RapidFuzz token-sort uses
+character-level edit distance; Arabic and English share zero
+characters so the score is always near zero. \fn{uroman}
+transliteration helps with phonetic equivalents (\ar{المرج} $\to$
+\strval{almrj}) but breaks on the cases above where the cross-language
+form is \emph{semantic} rather than phonetic
+(\strval{Heliopolis Square} is not a phonetic rendering of
+\ar{ميدان مصر الجديدة}).
+
+\textbf{How it works.}
+\begin{enumerate}
+ \item Each station name is encoded by
+ \fn{sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+ into a \stat{384-dim} embedding vector.
+ \item The model was pre-trained on parallel sentence pairs across 50+
+ languages including Arabic and English, so semantically
+ equivalent sentences land near each other in the embedding
+ space regardless of script.
+ \item Pairwise cosine similarity is computed for every candidate
+ pair surviving Stages 1--3.
+ \item Pairs above $\tau = 0.65$ are accepted as matches.
+\end{enumerate}
+
+\begin{lstlisting}[caption={Stage-4 SBERT matching, simplified.}]
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+model = SentenceTransformer(
+ "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+)
+emb_p1 = model.encode(phase1_names) # (n1, 384)
+emb_p2 = model.encode(phase2_names) # (n2, 384)
+
+# Cosine similarity matrix (n1 x n2)
+e1 = emb_p1 / np.linalg.norm(emb_p1, axis=1, keepdims=True)
+e2 = emb_p2 / np.linalg.norm(emb_p2, axis=1, keepdims=True)
+sim = e1 @ e2.T
+
+mask = sim >= 0.65 # threshold
+\end{lstlisting}
+
+\textbf{Why effective here.}
+\begin{itemize}
+ \item Egyptian station names are \emph{bilingual by convention}. The same node will appear in both languages across our sources.
+ SBERT was made for exactly this.
+ \item MiniLM is small (384-dim, $<$120\,M parameters) and fast on CPU. At $\sim$50 stations per source, we don't need a larger model.
+ \item Stages 1--3 catch $\sim$80\% of pairs cheaply; SBERT recovers
+ the cross-script tail without paying its cost on the easy
+ cases. The cascade structure is what makes the AI technique
+ affordable.
+\end{itemize}
+
+\textbf{What we do not claim.} The threshold $\tau = 0.65$ is calibrated on a 5-pair gold set. That is small. Section~\ref{sec:phase2-integration}
+records the honest bound: SBERT matches are \emph{strong candidates},
+not ground truth, and every Phase 2 hypothesis has been run with the
+SBERT-only matches dropped to confirm robustness.
+
+% --------------------------------------------------------------------
+\subsection{AI Technique 2 \textbullet\ K-Means district segmentation}
+
+\textbf{Where it lives.} \fn{Phase2/Phase2\_Analysis\_Hypothesis.ipynb}, Q24.
+
+\textbf{Problem it solves.} Multidimensional district segmentation.
+Single-variable rankings (``rank by population'', ``rank by station
+count'') cannot describe the joint structure of demand, density,
+growth, and infrastructure. Without a joint segmentation we cannot
+size a market.
+
+\textbf{Why a single-variable approach fails.} The product story (Section
+\ref{sec:synthesis}) needs to identify districts where coverage is
+weak \emph{and} demand is high \emph{and} growth is sustained. Any one
+of those filters alone produces a different ranking; the joint set
+cannot be reproduced by sorting on any single column.
+
+\textbf{How it works.}
+\begin{enumerate}
+ \item Five engineered features per district:
+ \fn{log(Population\_2023)}, \fn{CAGR \%} (2006$\to$2017),
+ stations within 3\,km, informal stops within 3\,km,
+ Cairo-governorate indicator.
+ \item Z-score standardisation so no feature dominates the distance.
+ \item K-Means with \fn{k=4}, \fn{init="k-means++"}, \fn{n\_init=50}.
+ \item Choice of $k$ defended by an elbow + silhouette scan
+ (silhouette at $k=4$ = \stat{0.412}, the local maximum).
+ \item Stability validated via re-running across 5 random seeds and
+ computing Adjusted Rand Index, \stat{ARI = 1.00} (every seed
+ produces the identical partition).
+\end{enumerate}
+
+\textbf{Why effective here.}
+\begin{itemize}
+ \item Continuous z-scored features map cleanly to Euclidean distance
+, the problem is well-posed for K-Means.
+ \item $k=4$ is intuitively interpretable: Formal-Served Core,
+ Peripheral Growth, Mixed, Low-Activity Outskirts.
+ \item \stat{ARI = 1.00} is unusually strong stability. The partition is reproducible for any seed, which makes it
+ defensible as the foundation for a market-sizing claim.
+\end{itemize}
+
+\textbf{What we do not claim.} K-Means is \emph{descriptive}, not
+\emph{causal}. The 18.9M-resident addressable market estimated from
+the partition is a sizing claim, not a forecast. The clusters are a
+useful prism through which to understand the city, not a prediction of
+which districts will or will not adopt a product.
+
+% --------------------------------------------------------------------
+\subsection{AI Technique 3 \textbullet\ Moran's I spatial autocorrelation}
+
+\textbf{Where it lives.} \fn{Phase2/Phase2\_Analysis\_Hypothesis.ipynb}, H1 robustness check.
+
+\textbf{Problem it solves.} Once Kruskal-Wallis says ``dense districts
+are systematically under-served'' (H1's main result), the next question
+is: \emph{is the under-service spatially concentrated, or randomly
+scattered through the city?} This question is qualitative when asked
+by eye and quantitative when asked by Moran's~I. The answer materially
+changes the planning recommendation.
+
+\textbf{Why a single hypothesis test is not enough.} Kruskal-Wallis
+treats districts as independent. If the under-served districts cluster
+geographically (e.g. all in north-west Cairo), the planning
+intervention is local, open a single corridor and the gap closes. If
+they are scattered, no single corridor can close the gap. The two
+worlds look identical to Kruskal-Wallis.
+
+\textbf{How it works.}
+\begin{enumerate}
+ \item Build a spatial weight matrix $W$ with
+ \fn{pysal.lib.weights.KNN(centroids, k=4)}, row-standardised.
+ We use \kw{KNN-as-contiguity} on Nominatim district centroids
+ (S6) because Cairo districts are administrative polygons of
+ irregular shape and we want neighbour relationships defined
+ by centroid proximity, not shared-boundary.
+ \item For each district, $z_i = x_i, \bar{x}$ where $x$ is the
+ per-district stations-per-100k.
+ \item Compute Moran's I:
+ $I = \frac{n}{\sum_{i,j} w_{ij}} \cdot
+ \frac{\sum_{i,j} w_{ij} z_i z_j}{\sum_i z_i^2}$.
+ \item Run \fn{esda.Moran(values, w, permutations=999)} to get an
+ empirical p-value.
+\end{enumerate}
+
+\textbf{Why effective here.}
+\begin{itemize}
+ \item Moran's I is the canonical tool for the question. There is no
+ cleaner alternative.
+ \item The 999-permutation p-value avoids any normality assumption.
+ \item It is \emph{additive evidence}, not a substitute for the main
+ Kruskal test, if Moran's I had said ``not clustered'' the
+ Kruskal result would still hold, just with different planning
+ implications.
+\end{itemize}
+
+\textbf{What we do not claim.} The Phase 2 result is
+\stat{I = 0.087, z = 1.805, p = 0.0500}, borderline-positive.
+$n = 68$ districts is at the lower edge of where Moran's I has
+statistical bite; with $n = 200$ districts the same effect would have
+a much smaller p-value. We treat the result as \emph{suggestive}:
+under-service is geographically concentrated, but not so cleanly that
+a single corridor would close the gap.
+
+% --------------------------------------------------------------------
+\subsection{When AI was decisive and when it wasn't}
+
+\begin{callout}
+\textbf{\color{plotblue}Honest reading of the AI contribution.}\quad
+SBERT was \emph{decisive} for cross-script integration, without it,
+matching \strval{Adly Mansour} to \ar{عدلي منصور} would have required
+manual review of every candidate pair. K-Means is \emph{descriptively
+powerful and reproducible} but does not prove a causal claim about
+market opportunity. Moran's I is \emph{the right tool for the
+geographic-clustering question} but the dataset (n=68) is small, so
+the p-value lands on the boundary rather than well inside.
+
+The project does not pretend AI made any of its arguments true. It
+made specific technical problems tractable. Every conclusion in
+Section~\ref{sec:synthesis} rests on the underlying data, the AI
+techniques are part of how we got the data into shape.
+\end{callout}
+
+\subsection{Where each AI technique sits in the pipeline}
+
+\begin{callout}
+\textbf{\color{plotblue}Pipeline location of each AI technique.}\quad
+\begin{itemize}
+ \item \kw{Raw scraped sources} (S1, S3--S8) $\to$
+ per-source cleaning (KNN imputation, \fn{uroman}
+ transliteration, type casting) $\to$
+ integration stages 1--3 (KNN spatial, OSM cross-verify,
+ RapidFuzz).
+ \item \kw{AI 1, SBERT} sits at integration Stage 4. It is the last
+ link in the integration cascade.
+ \item Cleaned + integrated layer feeds into Phase 2 analysis.
+ \item \kw{AI 2, K-Means} runs at Q24 to produce the 4-cluster
+ district segmentation.
+ \item \kw{AI 3, Moran's I} runs as the spatial robustness check on
+ H1.
+\end{itemize}
+\end{callout}

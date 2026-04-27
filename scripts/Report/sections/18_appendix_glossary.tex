@@ -1,0 +1,92 @@
+% =====================================================================
+% Section 18, Glossary
+% =====================================================================
+\section{Glossary}
+\label{sec:glossary}
+
+\textbf{Statistical methods.}
+
+\begin{itemize}
+ \item \kw{ANOVA}, Analysis of variance. Parametric test for $> 2$
+ group means. Replaced by Kruskal-Wallis when normality fails.
+ \item \kw{ARI}, Adjusted Rand Index. Measure of clustering
+ reproducibility; 1.0 = identical partitions across runs.
+ \item \kw{Cliff's $\delta$}, Non-parametric effect size:
+ $(\#x>y, \#x<y) / (n_1 n_2)$, range $[-1, 1]$.
+ \item \kw{$\varepsilon^2$} (epsilon-squared), Effect size for
+ Kruskal-Wallis: $(H, k + 1)/(N, k)$.
+ \item \kw{KNN}, K-Nearest Neighbours. Used here both as imputer
+ ($k=5$) and as spatial weight matrix ($k=4$ for Moran's I).
+ \item \kw{Kruskal-Wallis H}, Non-parametric test for $> 2$ groups,
+ based on global ranks.
+ \item \kw{K-Means}, Iterative clustering minimising within-cluster
+ sum of squares.
+ \item \kw{Mann-Whitney U}, Non-parametric test for two groups.
+ \item \kw{Moran's I}, Spatial autocorrelation statistic.
+ \item \kw{Permutation test}, Empirical p-value via shuffled labels.
+ \item \kw{Spearman $\rho$}, Rank-correlation coefficient.
+\end{itemize}
+
+\textbf{Geo-spatial.}
+
+\begin{itemize}
+ \item \kw{CRS}, Coordinate Reference System.
+ \item \kw{EPSG:4326}, WGS84 lat/lon in degrees. Geographic CRS.
+ \item \kw{EPSG:32636}, UTM Zone 36N. Projected CRS in metres,
+ correct for Egypt.
+ \item \kw{H3}, Uber's hexagonal spatial index. The Phase 1
+ population grid uses 1\,km\textsuperscript{2} H3 cells.
+ \item \kw{sjoin}, Spatial join (\fn{geopandas.sjoin}). Predicate
+ $\in$ \{within, contains, intersects, \ldots\}.
+\end{itemize}
+
+\textbf{Transport \& project specific.}
+
+\begin{itemize}
+ \item \kw{BRT}, Bus Rapid Transit. The Cairo Ring-Road BRT.
+ \item \kw{CAGR}, Compound Annual Growth Rate. Used on 2006$\to$2017
+ district populations.
+ \item \kw{Empty Return Index}, $1, \text{passengers}/\text{vehicles}$
+ within a 50-m terminal buffer. The metric for Phase 1 G2.
+ \item \kw{Ghost terminal}, A Phase 1 terminal with $\geq 1$ route
+ but zero boarding within a 100-m buffer. The metric for G1.
+ \item \kw{GTFS}, General Transit Feed Specification. The standard
+ published-network bundle (S1).
+ \item \kw{LRT}, Light-Rail Transit. The Cairo LRT to the New
+ Administrative Capital.
+ \item \kw{Mawfaq / mawaqif}, Arabic for ``terminal'' / plural
+ ``terminals''. Used interchangeably with \emph{terminal}
+ throughout the report.
+ \item \kw{Phase} (metro phase), Metro Phase~1 ($\le$1996),
+ Phase~2 (1996--2012), Phase~3 ($>$2012). The post-2014 cohort
+ used for cross-phase comparisons.
+ \item \kw{System A / B}, Formal / informal transport networks.
+ \item \kw{Underserved Score}, Phase 1 G4 metric:
+ $\text{pct\_rank(Population)}, \text{pct\_rank(Boarding total)}$,
+ clipped to $[0, 1]$.
+\end{itemize}
+
+\textbf{AI / NLP.}
+
+\begin{itemize}
+ \item \kw{RapidFuzz}, Token-sort fuzzy string matching at
+ threshold $\tau = 88$.
+ \item \kw{SBERT}, Sentence-BERT. We use
+ \fn{sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+ at $\tau = 0.65$ cosine.
+ \item \kw{uroman}, Phonetic transliteration tool used to romanise
+ Arabic station names without translating them.
+\end{itemize}
+
+\textbf{Data sources.}
+
+\begin{itemize}
+ \item \kw{S1}, Transport-for-Cairo GTFS feed.
+ \item \kw{S3}, Wikipedia metro master list.
+ \item \kw{S4}, Wikipedia LRT.
+ \item \kw{S5}, Google Maps BRT scrape.
+ \item \kw{S6}, citypopulation.de Greater Cairo districts +
+ Nominatim centroids.
+ \item \kw{S7}, Wikipedia + World Bank vehicle ownership.
+ \item \kw{S8}, OpenStreetMap Overpass API.
+\end{itemize}
