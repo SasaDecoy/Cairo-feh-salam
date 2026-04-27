@@ -38,7 +38,13 @@ def make_driver():
     opts.add_argument("--headless=new")
     opts.add_argument(f"--window-size={VIEWPORT_W},{VIEWPORT_H}")
     opts.add_argument("--hide-scrollbars")
-    opts.add_argument("--disable-gpu")
+    # Plotly's Scattergl/Heatmapgl traces need a real WebGL context. With
+    # --disable-gpu they fall back to "WebGL not supported". SwiftShader
+    # gives us software WebGL inside headless Chrome.
+    opts.add_argument("--use-gl=angle")
+    opts.add_argument("--use-angle=swiftshader")
+    opts.add_argument("--enable-webgl")
+    opts.add_argument("--ignore-gpu-blocklist")
     opts.add_argument("--no-sandbox")
     opts.add_argument("--disable-dev-shm-usage")
     service = Service(ChromeDriverManager().install())
@@ -112,9 +118,34 @@ def shoot(driver, html_path: Path, out_path: Path) -> bool:
         return False
     inject_dark_theme(driver)
     folium = is_folium(html_path)
+    # The notebook_sections bundles stack many charts vertically. They
+    # need a full-page screenshot, not a per-element capture.
+    is_section_bundle = (
+        "notebook_sections" in html_path.parts
+        and html_path.name.endswith("_notebook_visuals.html")
+    )
     time.sleep(FOLIUM_WAIT_S if folium else PLOTLY_WAIT_S)
     inject_dark_theme(driver)  # re-inject after JS finishes
     time.sleep(0.5)
+    if is_section_bundle:
+        try:
+            full_h = driver.execute_script(
+                "return Math.max(document.body.scrollHeight, "
+                "document.documentElement.scrollHeight);"
+            )
+            full_h = max(VIEWPORT_H, min(int(full_h) + 40, 12000))
+            driver.set_window_size(VIEWPORT_W, full_h)
+            time.sleep(1.0)
+            inject_dark_theme(driver)
+            time.sleep(0.5)
+        except Exception:
+            pass
+        try:
+            driver.save_screenshot(str(out_path))
+            return True
+        except Exception as exc:
+            print(f"  ! full-page screenshot failed: {exc}")
+            return False
     selector = ".folium-map" if folium else "div.plotly-graph-div"
     return screenshot_element_or_page(driver, out_path, selector)
 
@@ -144,6 +175,13 @@ nb_visuals = P2_EXPORTS / "notebook_visuals"
 if nb_visuals.exists():
     for html in sorted(nb_visuals.glob("*.html")):
         JOBS.append((html, FIGURES / "phase2" / "notebook" / f"{safe_stem(html.stem)}.png"))
+
+# ---- Phase 2 Exports/notebook_sections (bundled per Q/H, 16 files) -> figures/phase2/sections/
+# These are the canonical, up-to-date renders the report uses.
+nb_sections = P2_EXPORTS / "notebook_sections"
+if nb_sections.exists():
+    for html in sorted(nb_sections.glob("*.html")):
+        JOBS.append((html, FIGURES / "phase2" / "sections" / f"{safe_stem(html.stem)}.png"))
 
 
 def main():

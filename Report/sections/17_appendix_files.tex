@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 17 — Appendix: file manifest
+% Section 17, Appendix: file manifest
 % =====================================================================
 \appendix
 \makesectioncover{Appendix · File Manifest}
@@ -15,18 +15,18 @@ these files.
 
 \fn{DatasetsGeojson/}
 \begin{itemize}\setlength{\itemsep}{0pt}
-  \item \fn{Cairo Daily Boarding.json} (1{,}302 rows, Point)
-  \item \fn{Public Transport Routes.json} (1{,}784 rows, LineString)
-  \item \fn{Public Transport Terminals.json} (280 rows, Point)
-  \item \fn{Public Transport Passenger Flow.json} (9{,}258 rows, LineString)
-  \item \fn{Public Transport Vehicles Flow.json} (5{,}592 rows, LineString)
-  \item \fn{Public Transport Commercial Speeds 2.json} (26{,}154 rows, LineString)
-  \item \fn{Population \& Employment Access.json} (1{,}525 rows, Polygon H3 hex)
+ \item \fn{Cairo Daily Boarding.json} (1{,}302 rows, Point)
+ \item \fn{Public Transport Routes.json} (1{,}784 rows, LineString)
+ \item \fn{Public Transport Terminals.json} (280 rows, Point)
+ \item \fn{Public Transport Passenger Flow.json} (9{,}258 rows, LineString)
+ \item \fn{Public Transport Vehicles Flow.json} (5{,}592 rows, LineString)
+ \item \fn{Public Transport Commercial Speeds 2.json} (26{,}154 rows, LineString)
+ \item \fn{Population \& Employment Access.json} (1{,}525 rows, Polygon H3 hex)
 \end{itemize}
 
 \subsection{Phase 1 cleaned outputs}
 
-\fn{CleanedData/} — 21 CSV files, $\sim$41 MB total.
+\fn{CleanedData/}, 21 CSV files, $\sim$41 MB total.
 
 \textbf{Cleaned individual datasets:}
 \fn{cleaned\_boarding.csv}, \fn{cleaned\_population.csv},
@@ -51,7 +51,7 @@ these files.
 
 \subsection{Phase 1 exports}
 
-\fn{Exports/} — 40 standalone Plotly HTML files (Q1a, Q1b, Q2a, \ldots,
+\fn{Exports/}, 40 standalone Plotly HTML files (Q1a, Q1b, Q2a, \ldots,
 Q12e). Every one has a static PNG render in
 \fn{Report/figures/phase1/}.
 
@@ -59,54 +59,54 @@ Q12e). Every one has a static PNG render in
 
 \fn{Phase2/RawData/}
 \begin{itemize}\setlength{\itemsep}{0pt}
-  \item \fn{gtfs\_bus\_metro.zip} + \fn{gtfs\_bus\_metro/} (S1)
-  \item \fn{wiki\_metro\_masterlist.html} (S3)
-  \item \fn{wiki\_lrt.html} (S4)
-  \item \fn{gmaps\_brt\_brt\_en.html} + \fn{gmaps\_brt\_trd\_ar.html} (S5)
-  \item \fn{citypop\_egypt\_admin.html} + \fn{nominatim\_districts.json} (S6)
-  \item \fn{wiki\_vehicles\_per\_capita.html} +
-        \fn{wb\_motor\_vehicles\_per\_1k.json} +
-        \fn{wb\_passenger\_cars\_per\_1k.json} (S7)
-  \item \fn{osm\_overpass.json} + \fn{osm\_lrt\_per\_station.json} (S8)
+ \item \fn{gtfs\_bus\_metro.zip} + \fn{gtfs\_bus\_metro/} (S1)
+ \item \fn{wiki\_metro\_masterlist.html} (S3)
+ \item \fn{wiki\_lrt.html} (S4)
+ \item \fn{gmaps\_brt\_brt\_en.html} + \fn{gmaps\_brt\_trd\_ar.html} (S5)
+ \item \fn{citypop\_egypt\_admin.html} + \fn{nominatim\_districts.json} (S6)
+ \item \fn{wiki\_vehicles\_per\_capita.html} +
+ \fn{wb\_motor\_vehicles\_per\_1k.json} +
+ \fn{wb\_passenger\_cars\_per\_1k.json} (S7)
+ \item \fn{osm\_overpass.json} + \fn{osm\_lrt\_per\_station.json} (S8)
 \end{itemize}
 
 \subsection{Phase 2 cleaned outputs}
 
 \fn{Phase2/CleanedData/}
 \begin{itemize}\setlength{\itemsep}{0pt}
-  \item GTFS: \fn{gtfs\_stops.csv}, \fn{gtfs\_routes.csv},
-        \fn{gtfs\_trips.csv}, \fn{gtfs\_shapes.csv},
-        \fn{gtfs\_fare\_attributes.csv}.
-  \item \fn{metro\_stations.csv} (89 rows, S3).
-  \item \fn{lrt\_stations.csv} (20 rows, S4 with backfill).
-  \item \fn{brt\_stations.csv} (21 rows, S5 deduplicated).
-  \item \fn{districts.csv} (long), \fn{districts\_wide.csv} (S6).
-  \item \fn{vehicles\_by\_governorate.csv} (S7).
-  \item \fn{osm\_features.geojson} (S8).
-  \item \fn{null\_audit\_before.csv}, \fn{null\_audit\_after.csv}.
-  \item \fn{q17\_dense\_underserved\_hexes.csv}.
+ \item GTFS: \fn{gtfs\_stops.csv}, \fn{gtfs\_routes.csv},
+ \fn{gtfs\_trips.csv}, \fn{gtfs\_shapes.csv},
+ \fn{gtfs\_fare\_attributes.csv}.
+ \item \fn{metro\_stations.csv} (89 rows, S3).
+ \item \fn{lrt\_stations.csv} (20 rows, S4 with backfill).
+ \item \fn{brt\_stations.csv} (21 rows, S5 deduplicated).
+ \item \fn{districts.csv} (long), \fn{districts\_wide.csv} (S6).
+ \item \fn{vehicles\_by\_governorate.csv} (S7).
+ \item \fn{osm\_features.geojson} (S8).
+ \item \fn{null\_audit\_before.csv}, \fn{null\_audit\_after.csv}.
+ \item \fn{q17\_dense\_underserved\_hexes.csv}.
 \end{itemize}
 
 \subsection{Phase 2 integrated}
 
 \fn{Phase2/Integrated/}
 \begin{itemize}\setlength{\itemsep}{0pt}
-  \item \fn{matched\_pairs.csv} — every Phase 1 $\to$ Phase 2 station
-        pair with stage of origin, similarity, discrepancy distance.
-  \item \fn{Phase2\_integrated.geoparquet} — the merged spatial layer.
+ \item \fn{matched\_pairs.csv}, every Phase 1 $\to$ Phase 2 station
+ pair with stage of origin, similarity, discrepancy distance.
+ \item \fn{Phase2\_integrated.geoparquet}, the merged spatial layer.
 \end{itemize}
 
 \subsection{Phase 2 exports}
 
-\fn{Phase2/Exports/} — 117+ standalone HTML files across three layers:
+\fn{Phase2/Exports/}, 117+ standalone HTML files across three layers:
 
 \begin{itemize}
-  \item Root level (45 files) — Q13--Q25, H1--H3, hero-map components,
-        market-sizing visuals.
-  \item \fn{Phase2/Exports/notebook\_visuals/} (71 files) — granular
-        per-chart exports.
-  \item \fn{Phase2/Exports/notebook\_sections/} (13 files) — bundled
-        per-question aggregations.
+ \item Root level (45 files), Q13--Q25, H1--H3, hero-map components,
+ market-sizing visuals.
+ \item \fn{Phase2/Exports/notebook\_visuals/} (71 files), granular
+ per-chart exports.
+ \item \fn{Phase2/Exports/notebook\_sections/} (13 files), bundled
+ per-question aggregations.
 \end{itemize}
 
 \subsection{Phase 2 hero maps}
@@ -114,36 +114,36 @@ Q12e). Every one has a static PNG render in
 Three standalone Folium maps at \fn{Phase2/} root:
 
 \begin{itemize}
-  \item \fn{two\_cairos\_map.html} — formal vs informal overlay.
-  \item \fn{headline\_coverage\_need\_map.html} — coverage-need
-        synthesis.
-  \item \fn{adly\_mansour\_zoom.html} — convergence-node case study.
+ \item \fn{two\_cairos\_map.html}, formal vs informal overlay.
+ \item \fn{headline\_coverage\_need\_map.html}, coverage-need
+ synthesis.
+ \item \fn{adly\_mansour\_zoom.html}, convergence-node case study.
 \end{itemize}
 
 \subsection{Report assets}
 
 \fn{Report/}
 \begin{itemize}\setlength{\itemsep}{0pt}
-  \item \fn{main.tex}, \fn{preamble.tex}, \fn{build.sh},
-        \fn{README.md}.
-  \item \fn{sections/00\_titlepage.tex} \ldots
-        \fn{sections/18\_appendix\_glossary.tex} (19 .tex files).
-  \item \fn{figures/phase1/} (37 PNGs) +
-        \fn{figures/phase2/} (45 PNGs) +
-        \fn{figures/phase2/notebook/} (48 PNGs) +
-        \fn{figures/hero/} (3 PNGs) = \stat{133 figures total}.
-  \item \fn{scripts/htmls\_to\_pngs.py} — selenium-based universal
-        HTML$\to$PNG renderer.
+ \item \fn{main.tex}, \fn{preamble.tex}, \fn{build.sh},
+ \fn{README.md}.
+ \item \fn{sections/00\_titlepage.tex} \ldots
+ \fn{sections/18\_appendix\_glossary.tex} (19.tex files).
+ \item \fn{figures/phase1/} (37 PNGs) +
+ \fn{figures/phase2/} (45 PNGs) +
+ \fn{figures/phase2/notebook/} (48 PNGs) +
+ \fn{figures/hero/} (3 PNGs) = \stat{133 figures total}.
+ \item \fn{scripts/htmls\_to\_pngs.py}, selenium-based universal
+ HTML$\to$PNG renderer.
 \end{itemize}
 
 \subsection{Story-app source (referenced for the Layla narrative)}
 
 \fn{cairo\_story\_app/}
 \begin{itemize}\setlength{\itemsep}{0pt}
-  \item \fn{data/findings.py} — single source of truth for every
-        statistic the report cites.
-  \item \fn{chapters/chapters\_config.py} — 14-chapter narrative arc;
-        Layla story chapters 0--3 + 7 are quoted in
-        \S\ref{sec:layla}.
-  \item \fn{findings.md} — markdown copy of \fn{findings.py}.
+ \item \fn{data/findings.py}, single source of truth for every
+ statistic the report cites.
+ \item \fn{chapters/chapters\_config.py}, 14-chapter narrative arc;
+ Layla story chapters 0--3 + 7 are quoted in
+ \S\ref{sec:layla}.
+ \item \fn{findings.md}, markdown copy of \fn{findings.py}.
 \end{itemize}

@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 01 — Layla's Story (Act I) and the Problem Statement
+%  Section 01 — Layla's Story (verbatim user paraphrase)
 % =====================================================================
 \makesectioncover{Layla's Cairo}
 
@@ -8,56 +8,46 @@
 
 \subsection{6:15 AM, Imbaba}
 
-It is six fifteen in the morning. The neighbourhood is already loud.
+It is early in the morning (6:15) and Layla, who lives in Imbaba, is
+already up and her neighbourhood is already loud. Imbaba, which is on
+the west of the Nile, is considered the densest neighbourhood in Egypt
+and some argue it has one of the highest densities in the entire world
+(\stat{63k people per square kilometre}), which is much larger than
+Manhattan for example (27k) and some other places in Cairo such as New
+Cairo (3k).
 
-Layla — \ar{ليلى} — lives in Imbaba on the west bank of the Nile, in
-one of the densest neighbourhoods on Earth: \stat{63{,}000 people per
-square kilometre}. To put that in perspective, the average density of
-Manhattan is about 27{,}000. New Cairo, the satellite city forty
-kilometres east, has fewer than 3{,}000 — a \stat{21$\times$ ratio}
-between where Cairenes already live and where the state has been
-building.
-
-No metro line ran through Imbaba until 2024. None runs at a useful
-walking distance from Layla's apartment today.
+It is important to note that no metro line existed in Imbaba until
+2024, and no metro station exists in an acceptable walking distance
+from Layla's house.
 
 \begin{callout}
-\textbf{\color{plotblue}A note on Layla.}\quad Layla is a \emph{composite
-persona} — a fictional commuter who stands in for the
-\stat{1.4 million Cairenes} whose commutes the state's formal
-transport map does not describe. Every number in her story is real and
-notebook-verified: Imbaba's density figure is from \texttt{citypopulation.de}
-(Phase 2 source S6, 408 admin rows filtered to Greater Cairo); the
-\stat{83-minute} round-trip averages \texttt{explorecity.life}
-crowdsourced data and the World Bank Cairo Traffic Congestion Study;
-the route polyline is fourteen hand-digitised waypoints across 26th of
-July Street and the Corniche.
+\textbf{\color{plotblue}Note.}\quad Layla is a fictional character that
+represents the \stat{1.4 million Cairenes} that don't have formal
+transport access. All the data used in this story is from notebooks,
+datasets, and websites scraped: e.g. \texttt{citypopulation.de} for
+the density of Imbaba, the \stat{83-minute trip time} is from
+\texttt{explorecity.life}.
 \end{callout}
 
-\subsection{The office is in Maadi, eleven kilometres away}
+\subsection{The office is in Maadi}
 
-Across the city. South of the Nile. \ar{المعادي · ١١ كيلومتر} — eleven
-kilometres on paper. The haversine crow-flies distance from Imbaba's
-centroid (31.2083\textdegree, 30.0866\textdegree) to her office in
-Maadi (31.2581\textdegree, 29.9601\textdegree) is exactly that — eleven
-kilometres, computed great-circle with Earth radius \mbox{6{,}371 km}.
-
-But Layla cannot fly. To get to work she must cross two transport
-systems that were never designed to connect:
+Layla's office is in Maadi (31.2581, 29.9601) which is 11 km away (on
+paper) from where she lives (31.2083, 30.0866). Unfortunately, Layla
+can't fly and has to use two transport systems that are not even
+designed to be connected:
 
 \begin{itemize}
-  \item \kw{System A} — the formal, state-built network. Cairo Metro,
-        Transport-for-Cairo's published bus routes, the new LRT to the
-        New Administrative Capital, the Ring-Road BRT.
-  \item \kw{System B} — the lived, informal network. A web of 1{,}302
-        microbus stops, 280 \emph{mawaqif} (terminals), and the
-        rider-knowledge that every Cairene carries in their head.
+  \item \kw{System A} (formal): the system built by the state, which
+        is Cairo Metro, the new LRT, and the Ring-Road BRT.
+  \item \kw{System B} (informal): the informal network including
+        \stat{1{,}302} microbus stops, \stat{280} terminals (mawkf),
+        and the knowledge every Cairene has in their head.
 \end{itemize}
 
-\subsection{The real route is 83 minutes each way}
+\subsection{The route is 83 minutes one way}
 
-\ar{الرحلة الحقيقية · ٨٣ دقيقة}. Three vehicles. Two transfers. No single
-app that can plan the trip end-to-end.
+Layla has to take three vehicles, two transfers, and no one can plan
+the trip for her end-to-end.
 
 \begin{table}[H]
 \centering\small
@@ -77,97 +67,106 @@ Metro Line 2 to Maadi  & formal metro             & 30 \\
 \textbf{Total one-way} &                          & \stat{83} \\
 \bottomrule
 \end{tabular}
-\caption{One morning leg of Layla's commute. Round-trip $\approx$ 166 minutes.
-At 260 commuting days per year, Layla loses \stat{720 hours} — about
-\stat{30 working days} — to a city that cannot route her.}
+\caption{Table 1. Layla spends around 166 minutes every day, which
+results in Layla losing \stat{720 hours} every year just in
+transportation.}
 \end{table}
 
-\subsection{At 6:15 the mawfaq decides for her}
+\subsection{At 6:15 it is not her choice, the mawfaq decides for her}
 
-\ar{الموقف · الساعة ٦:١٥}. The \emph{mawfaq} (Arabic plural \emph{mawaqif})
-is the physical expression of System B. Five microbuses are loading at
-once, five destinations written in Arabic on taped cardboard, drivers
-shouting competing routes.
+Five microbuses are loading customers at the same time, five
+destinations written on cardboard, and drivers shouting route names.
+Clearly there is no schedule, no app, and no driver cares about her
+specific trip.
 
-\begin{itemize}
-  \item There is no schedule.
-  \item There is no app.
-  \item No driver knows her specific trip.
-\end{itemize}
+She then decides to choose a microbus. We can confirm that the mawfaq
+she is at is not linked to any post-2014 metro stations. In short, the
+investment of the last decade did not help Layla this morning.
 
-She picks a microbus by guessing which direction it starts in. On Phase
-1's integrated dataset (cleaning notebook, 280 terminals + Stage-4
-SBERT multilingual reconciliation) we can confirm that this specific
-mawfaq is not linked to any post-2014 metro station within its 2 km
-walkshed. The infrastructure investment of the last decade simply did
-not reach her morning.
+\subsection{What is the problem?}
 
-\subsection{The problem this report is documenting}
+Cairo has two parallel transport systems and since 2014 more than
+\stat{\$10 billion} were spent expanding System A (formal), which
+includes Metro Line 3 (Ataba to Adly Mansour), the Cairo LRT to the
+new administrative capital, and the Ring-Road BRT. However, the daily
+experience of over \stat{1 million Cairenes} (Layla) has not changed
+and did not become better.
 
 \begin{callout}
-Cairo runs on \kw{two parallel transport systems}. Since 2014 the state
-has spent more than \stat{\$10 billion} expanding System A — Metro Line 3
-(Ataba to Adly Mansour, then westwards to Kit Kat), the Cairo LRT to the
-New Administrative Capital, and the Ring-Road BRT. Yet the daily reality
-of the \stat{1.4 million Cairenes who commute like Layla} has not
-materially changed.
+\textbf{\color{plotblue}The big question: WHY?}\quad That is due to
+the fact that System A was built where people \emph{will} live based
+on state plans, however System B (informal) is carrying people where
+they already live. In geography we will find both systems
+overlapping, but in functionality? Not as much. Neither the formal
+nor the informal has a timetable that references the other (no
+formal transportation guide tells me what informal transportation I
+should use, and vice versa), making it up to the poor Cairene who
+has to plan his every-day route.
+\end{callout}
 
-Why? Because System A was largely built where people \emph{will} live
-according to state plans, while System B continues to carry people
-where they \emph{already} live. The two systems overlap geographically
-but not functionally — neither has a published timetable that
-references the other; neither can route the rider through the other.
+Our report studies this disconnection with data. In Phase 1 we cleaned
+\stat{7 GeoJSON datasets} which described the current reality of
+transportation (\stat{1{,}302} stops, \stat{1{,}784} routes, \stat{280}
+terminals, \stat{9{,}258} road segments, \stat{1{,}525} population
+hexagons). We also answered \stat{12 research questions} about these
+seven datasets and most importantly we found four structural gaps:
+\stat{115 ghost terminals}, \stat{19 empty-return terminals}, vehicle
+mismatch on \stat{75\% of long routes}, and also \stat{70 underserved
+population hexagons}.
 
-This report investigates that disconnect with data. \kw{Phase 1} cleans
-seven raw GeoJSON datasets that describe the \emph{existing} transport
-reality (1{,}302 stops, 1{,}784 routes, 280 terminals, 9{,}258 road
-segments, 1{,}525 population hexagons), answers twelve research
-questions about it, and produces \kw{four structural gaps} —
-115 ghost terminals, 19 empty-return terminals, vehicle-route mismatch
-on 75\% of long routes, and 79 underserved population hexagons.
+In Phase 2 we scraped \stat{eight new sources} which helped us
+identify what the state has built since 2014 (\stat{89} metro
+stations, \stat{20} LRT stations, \stat{21} BRT stations, \stat{68}
+districts population, vehicle ownership, GTFS, OSM). We integrated
+these scraped data with Phase 1 data by making a \stat{4-stage
+pipeline} that goes as follows:
 
-\kw{Phase 2} then scrapes eight new sources to describe what the state
-\emph{has built} since 2014 (89 metro stations, 20 LRT stations,
-21 BRT stations, 68 districts of Greater Cairo population, vehicle
-ownership, GTFS, OpenStreetMap), integrates it with the Phase 1 reality
-through a four-stage pipeline (KNN spatial $\to$ OSM cross-verification
-$\to$ RapidFuzz fuzzy text $\to$ \kw{SBERT multilingual semantic
-matching}), then asks thirteen research questions and tests
-\kw{three formal hypotheses} about whether the new infrastructure
-closes the four gaps.
+\begin{center}
+KNN spatial $\to$ OSM verification $\to$ RapidFuzz fuzzy text
+$\to$ SBERT multilingual matching
+\end{center}
 
-The answer — derived from a \stat{\$10B} investment cross-tabulated against
-four gaps and three modes — is that \stat{no cell of the resulting
-3$\times$4 matrix sits above 25\%}. Most are below 16\%. The
-infrastructure did not reach Layla. \kw{The data shows why, and the
-report walks through every step of how we know.}
+and then we asked \stat{13 questions} followed by testing
+\stat{3 hypotheses} on whether the new infrastructure helped close
+the gaps output in Phase 1 or not.
+
+\begin{callout}
+\textbf{\color{plotblue}What we found?}\quad We made a
+\stat{3$\times$4} matrix that describes the percentage of how much we
+closed the gaps after spending \stat{10 billion}, and the results were
+not the best: \stat{no cell resulted in a fixing of above 25\%} and
+most are below \stat{16\%}. In short, the new infrastructure did not
+help Layla. The data showed us why and the report will walk us
+through every step of how we came to that conclusion.
 \end{callout}
 
 \subsection{How this report is organised}
 
-Reading order:
-
 \begin{enumerate}
-  \item \textbf{Phase 1} — what Cairo's existing transport system looks like.
-        Data sources, pre-clean nulls, KNN imputation, seven spatial
-        merges, twelve research questions, four structural gaps.
-        (Sections 2--8.)
-  \item \textbf{Phase 2} — what the state built since 2014. Eight scraped
-        sources, the four-stage integration pipeline, thirteen
-        research questions. (Sections 9--13.)
-  \item \textbf{AI techniques} — three explicit AI methods used in the
-        project (SBERT, K-Means, Moran's~I), each chosen because a
-        classical method could not solve the same problem. (Section 14.)
-  \item \textbf{Hypothesis tests} — a standalone methods reference for
-        every statistical test used (Spearman, Kruskal-Wallis,
-        Mann-Whitney, Cliff's $\delta$, $\varepsilon^2$, permutation,
-        Moran's~I, K-Means), then a deep walkthrough of \kw{H1}
-        coverage-need mismatch, \kw{H2} LRT catchment deficit, and
-        \kw{H3} BRT corridor match. (Section 15.)
-  \item \textbf{Synthesis} — what the evidence collectively says, the
-        gap-closure matrix that is the single most important result,
-        and the resolution stat (\stat{83 $\to$ 40 minutes}) that ends
-        Layla's story. (Section 16.)
-  \item \textbf{Appendices} — file manifest and a glossary of every
-        abbreviation. (Sections 17--18.)
+  \item \textbf{Phase 1:} what Cairo's existing transport system looks
+        like. The data sources, data exploration, cleaning, KNN
+        imputation, spatial merges, 12 research exploratory questions
+        with their appropriate visualisation, and most importantly
+        output 4 structural gaps.
+  \item \textbf{Phase 2:} what did our state build after 2014. We
+        scraped 8 sources and made a four-stage integration pipeline,
+        and we also discussed 13 research questions with their
+        appropriate visualisation.
+  \item \textbf{Machine learning (AI) techniques:} we used 3 methods
+        to assist us in this project (SBERT, K-Means, Moran's I); we
+        chose them due to the fact that classical methods can't solve
+        the same problem.
+  \item \textbf{Hypothesis tests:} an explanation of all statistical
+        tests used (Spearman, Kruskal, Mann-Whitney, Cliff's, epsilon
+        squared, Moran's I, K-Means), then a clear walkthrough of
+        \kw{H1} coverage-need mismatch, \kw{H2} which is LRT
+        catchment deficit, and \kw{H3} which is BRT corridor match.
+  \item \textbf{Synthesis:} a very important section on what all the
+        evidence integrated together says, including the gap-closure
+        matrix which is the most important result of this project,
+        and the resolution set (how we reduced the time Layla
+        consumes in transportation every day by half, from
+        \stat{83 minutes} to \stat{40 minutes}), delivering a happy
+        ending to Layla's sad story.
+  \item \textbf{Appendices:} simple file manifest and glossary.
 \end{enumerate}

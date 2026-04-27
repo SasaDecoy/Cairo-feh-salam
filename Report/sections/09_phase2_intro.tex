@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 09 — Phase 2 introduction
+% Section 09, Phase 2 introduction
 % =====================================================================
 \makesectioncover{Phase 2 \textbullet\ The State's Answer}
 
@@ -15,15 +15,15 @@ since 2014 closed any of them.
 The state-built infrastructure of the last decade is, in three pieces:
 
 \begin{itemize}
-  \item \kw{Cairo Metro Line 3} — Ataba to Adly Mansour in the east,
-        then westwards to Kit Kat. The largest single piece of urban-rail
-        investment in Egyptian history.
-  \item \kw{Cairo LRT} — a light-rail line from Adly Mansour to the
-        New Administrative Capital. Designed to anchor the eastward
-        expansion of the city.
-  \item \kw{Ring-Road BRT} — a bus-rapid-transit corridor along the
-        Cairo Ring Road. The most recent and least-publicised of the
-        three.
+ \item \kw{Cairo Metro Line 3}, Ataba to Adly Mansour in the east,
+ then westwards to Kit Kat. The largest single piece of urban-rail
+ investment in Egyptian history.
+ \item \kw{Cairo LRT}, a light-rail line from Adly Mansour to the
+ New Administrative Capital. Designed to anchor the eastward
+ expansion of the city.
+ \item \kw{Ring-Road BRT}, a bus-rapid-transit corridor along the
+ Cairo Ring Road. The most recent and least-publicised of the
+ three.
 \end{itemize}
 
 Phase 2 collects each of those three networks as data, integrates
@@ -36,18 +36,18 @@ actually live and travel.
 Phase 2 also splits across two notebooks:
 
 \begin{itemize}
-  \item \fn{Phase2/Phase2\_Scraping\_Cleaning.ipynb} —
-        scrapes \kw{eight sources} (S1, S3--S8) from Wikipedia, Google
-        Maps, OpenStreetMap, citypopulation.de, the GTFS feed, and the
-        World Bank API; cleans each source independently; integrates
-        them through a four-stage matching pipeline that uses
-        \kw{KNN spatial}, \kw{OSM cross-verification}, \kw{RapidFuzz
-        fuzzy text} and \kw{SBERT multilingual semantic} matching.
-  \item \fn{Phase2/Phase2\_Analysis\_Hypothesis.ipynb} — answers
-        \kw{thirteen research questions} (Q13--Q25) and tests
-        \kw{three formal hypotheses} (H1, H2, H3). Produces 117+
-        Plotly visualisations, three hero maps, and a final
-        K-Means market segmentation.
+ \item \fn{Phase2/Phase2\_Scraping\_Cleaning.ipynb}, 
+ scrapes \kw{eight sources} (S1, S3--S8) from Wikipedia, Google
+ Maps, OpenStreetMap, citypopulation.de, the GTFS feed, and the
+ World Bank API; cleans each source independently; integrates
+ them through a four-stage matching pipeline that uses
+ \kw{KNN spatial}, \kw{OSM cross-verification}, \kw{RapidFuzz
+ fuzzy text} and \kw{SBERT multilingual semantic} matching.
+ \item \fn{Phase2/Phase2\_Analysis\_Hypothesis.ipynb}, answers
+ \kw{thirteen research questions} (Q13--Q25) and tests
+ \kw{three formal hypotheses} (H1, H2, H3). Produces 117+
+ Plotly visualisations, three hero maps, and a final
+ K-Means market segmentation.
 \end{itemize}
 
 \subsection{The two hero maps}
@@ -64,7 +64,7 @@ overlapping but operationally disconnected systems.}{fig:hero-twocairos}
 \figitem{hero/headline_coverage_need_map.png}{1.0}{Hero map: the
 coverage-need synthesis. Districts coloured by the residual
 under-coverage from Q22, with new-mode infrastructure layered on
-top. The coral cluster — Imbaba, Shubra, Matariyya — is the
+top. The coral cluster, Imbaba, Shubra, Matariyya, is the
 demand the new infrastructure does not visit.}{fig:hero-coverageneed}
 
 These two figures are the visual TL;DR of the entire project. Every

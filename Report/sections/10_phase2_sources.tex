@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 10 — Phase 2 scraped sources S1–S8
+% Section 10, Phase 2 scraped sources S1–S8
 % =====================================================================
 
 \section{Phase 2 \textbullet\ The Eight Scraped Sources}
@@ -12,6 +12,28 @@ story. None is decorative. We document each as: \emph{What it is},
 \fn{Phase2/RawData/} so the pipeline is reproducible without hitting
 the network again.
 
+\subsection*{Exploration pass that runs after every source}
+
+Each source block in \fn{Phase2\_Scraping\_Cleaning.ipynb} ends with a
+short call to \fn{explore\_scraped\_data(label, path, key\_cols,
+coord\_cols)}. This helper does the same five things every time, so
+the audit is consistent across all eight sources:
+
+\begin{itemize}
+  \item prints row count and column types,
+  \item flags any column whose null percentage is above zero,
+  \item bounds the coordinate spread (lat/lon min, median, max) and
+        compares it against the Cairo bbox,
+  \item runs a numeric IQR pass to surface outlier candidates,
+  \item shows the first three rows so we can eyeball the records.
+\end{itemize}
+
+The HTML for every audit chart is saved under
+\fn{Phase2/Exports/scraping\_notebook\_visuals/} (file pattern
+\fn{p2-s\textit{N}\_NN\_*.html}). Section 10 below quotes the most
+important finding from each source's exploration. The full chart set
+is the reproducible record.
+
 \subsection{S1 \textbullet\ Transport-for-Cairo GTFS feed}
 
 \textbf{What it is.} The GTFS (General Transit Feed Specification) feed
@@ -20,7 +42,7 @@ routes, trips, shapes, and fare attributes used by transit agencies
 worldwide.
 
 \textbf{Why we used it.} GTFS is the single most defensible
-representation of the \emph{officially published} formal network — what
+representation of the \emph{officially published} formal network, what
 a Google-Maps user would see if they tapped ``transit''. We use it to:
 (i) compare the formal published reach against Phase 1's measured
 informal reach (Q19); (ii) compute formal fare-per-km for the
@@ -29,11 +51,11 @@ in the K-Means segmentation (Q24).
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefact: \fn{RawData/gtfs\_bus\_metro.zip} (1.3 MB) —
-        unzipped into \fn{RawData/gtfs\_bus\_metro/}.
-  \item Each \fn{*.txt} file is read with pandas; headers normalised;
-        rows filtered to the Cairo bounding box; coordinates reprojected
-        to EPSG:32636 for downstream spatial work.
+ \item Raw artefact: \fn{RawData/gtfs\_bus\_metro.zip} (1.3 MB), 
+ unzipped into \fn{RawData/gtfs\_bus\_metro/}.
+ \item Each \fn{*.txt} file is read with pandas; headers normalised;
+ rows filtered to the Cairo bounding box; coordinates reprojected
+ to EPSG:32636 for downstream spatial work.
 \end{itemize}
 
 \textbf{Outputs.} \fn{gtfs\_stops.csv}, \fn{gtfs\_routes.csv},
@@ -49,23 +71,23 @@ coordinates for every operational station.
 
 \textbf{Why we used it.} It is the only source that simultaneously
 provides \emph{all} four fields: name, line, opening year, and
-geocoordinates. The opening year is critical — every Phase 2 question
+geocoordinates. The opening year is critical, every Phase 2 question
 that compares pre/post-2014 (Q14, Q15, H2) depends on it. Wikipedia
 is more complete and more current than the official ENR list.
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefact: \fn{RawData/wiki\_metro\_masterlist.html} (196 KB).
-  \item BeautifulSoup parses the station-list table.
-  \item Coordinates arrive in DMS format (e.g. \strval{30°02'34"N
-        31°15'07"E}). A small parser converts to decimal degrees.
-  \item Opening phase derived from year thresholds:
-        $\le$1996 = Phase~1, 1996--2012 = Phase~2,
-        $>$2012 = Phase~3 (the \kw{post-2014} cohort used by every
-        downstream comparison).
+ \item Raw artefact: \fn{RawData/wiki\_metro\_masterlist.html} (196 KB).
+ \item BeautifulSoup parses the station-list table.
+ \item Coordinates arrive in DMS format (e.g. \strval{30°02'34"N
+ 31°15'07"E}). A small parser converts to decimal degrees.
+ \item Opening phase derived from year thresholds:
+ $\le$1996 = Phase~1, 1996--2012 = Phase~2,
+ $>$2012 = Phase~3 (the \kw{post-2014} cohort used by every
+ downstream comparison).
 \end{itemize}
 
-\textbf{Output.} \fn{metro\_stations.csv} — \stat{89 rows}, 100\%
+\textbf{Output.} \fn{metro\_stations.csv}, \stat{89 rows}, 100\%
 geocoordinates.
 
 \subsection{S4 \textbullet\ Wikipedia Cairo LRT}
@@ -73,23 +95,23 @@ geocoordinates.
 \textbf{What it is.} The Wikipedia page \fn{Cairo\_Light\_Rail\_Transit}
 with operational and planned-only LRT stations.
 
-\textbf{Why we used it.} The LRT is the most ridership-controversial
-piece of post-2014 infrastructure — it serves the New Administrative
+\textbf{Why we used it.} The LRT is the most discussed
+piece of post-2014 infrastructure, it serves the New Administrative
 Capital and was built ahead of population. Q14, Q22, and the entire
 H2 hypothesis depend on having every operational LRT station's location
 to compute its catchment.
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefact: \fn{RawData/wiki\_lrt.html} (117 KB).
-  \item The Wikipedia table provides station names but \stat{0\%
-        of coordinates on the page} — they are footnoted to external
-        databases.
-  \item Coordinate backfill is a two-stage rescue: first a per-station
-        \stat{Overpass API query} for OSM nodes named after the station
-        (rescued 9 of 20); then a Google-Maps fallback (rescued 7
-        more). Net: 12 of 20 stations have valid lat/lon for analysis;
-        the remaining 8 are still planned-only.
+ \item Raw artefact: \fn{RawData/wiki\_lrt.html} (117 KB).
+ \item The Wikipedia table provides station names but \stat{0\%
+ of coordinates on the page}, they are footnoted to external
+ databases.
+ \item Coordinate backfill is a two-stage rescue: first a per-station
+ \stat{Overpass API query} for OSM nodes named after the station
+ (rescued 9 of 20); then a Google-Maps fallback (rescued 7
+ more). Net: 12 of 20 stations have valid lat/lon for analysis;
+ the remaining 8 are still planned-only.
 \end{itemize}
 
 \textbf{Output.} \fn{lrt\_stations.csv} (20 rows), with the backfill
@@ -104,33 +126,33 @@ documented in the cleaning notebook's
 no Wikidata entry; the only structured representation is on Google Maps.
 
 \textbf{Why we used it.} The \kw{H3 hypothesis} (BRT corridor match) is
-the single most narratively important contrast point in Phase 2 —
+the single most narratively important contrast point in Phase 2, 
 it is the case where state planning aligns with demand, and we cannot
 test it without BRT station coordinates.
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefact: \fn{RawData/gmaps\_brt\_brt\_en.html} (426 KB)
-        + \fn{gmaps\_brt\_trd\_ar.html} (494 KB) — playwright-rendered
-        search-result snapshots in English and Arabic.
-  \item \stat{10 viewport queries} along the Ring Road.
-  \item Regex pulls coordinates out of the JavaScript URL fragments
-        (\fn{!3d.../!4d...}).
-  \item \kw{Arabic transliteration} via \fn{uroman} (franko) — phonetic,
-        not semantic. We tried MarianMT first; it semantically translates
-        \ar{المرج} (al-Marg) to ``lawn'' instead of phonetically to
-        \strval{almrj}, which broke deduplication.
-  \item \kw{Three-tier deduplication}: spatial (within 50\,m), name
-        (RapidFuzz token-sort $\geq$ 88), and source-cluster.
+ \item Raw artefact: \fn{RawData/gmaps\_brt\_brt\_en.html} (426 KB)
+ + \fn{gmaps\_brt\_trd\_ar.html} (494 KB), playwright-rendered
+ search-result snapshots in English and Arabic.
+ \item \stat{10 viewport queries} along the Ring Road.
+ \item Regex pulls coordinates out of the JavaScript URL fragments
+ (\fn{!3d.../!4d...}).
+ \item \kw{Arabic transliteration} via \fn{uroman} (franko), phonetic,
+ not semantic. We tried MarianMT first; it semantically translates
+ \ar{المرج} (al-Marg) to ``lawn'' instead of phonetically to
+ \strval{almrj}, which broke deduplication.
+ \item \kw{Three-tier deduplication}: spatial (within 50\,m), name
+ (RapidFuzz token-sort $\geq$ 88), and source-cluster.
 \end{itemize}
 
-\textbf{Output.} \fn{brt\_stations.csv} — \stat{21 stations}, all with
+\textbf{Output.} \fn{brt\_stations.csv}, \stat{21 stations}, all with
 coordinates. The BRT scrape grew from an original 12 to the current 21
 after S5 was rerun against fresh Google Maps tiles.
 
-\figitem{phase2/brt_scrape_diagnostic.png}{1.0}{S5 \textbullet\ BRT scrape diagnostic — counts before and after the three deduplication tiers.}{fig:brt-scrape}
+\figitem{phase2/brt_scrape_diagnostic.png}{1.0}{S5 \textbullet\ BRT scrape diagnostic, counts before and after the three deduplication tiers.}{fig:brt-scrape}
 
-\subsection{S6 \textbullet\ citypopulation.de — Greater Cairo districts}
+\subsection{S6 \textbullet\ citypopulation.de, Greater Cairo districts}
 
 \textbf{What it is.} \fn{citypopulation.de} publishes administrative
 population data for every country across multiple census years. The
@@ -140,33 +162,33 @@ covering 27 governorates.
 \textbf{Why we used it.} Population is the demand denominator of every
 Phase 2 question. Without it we cannot:
 \begin{itemize}
-  \item compute station-per-100k-residents ratios (the H1 metric),
-  \item compute 2-km catchment populations (the H2 metric),
-  \item identify the fastest-growing districts (Q16),
-  \item segment districts in K-Means (Q24).
+ \item compute station-per-100k-residents ratios (the H1 metric),
+ \item compute 2-km catchment populations (the H2 metric),
+ \item identify the fastest-growing districts (Q16),
+ \item segment districts in K-Means (Q24).
 \end{itemize}
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefact: \fn{RawData/citypop\_egypt\_admin.html} (282 KB).
-  \item HTML table parsing with BeautifulSoup; year columns reshaped
-        from wide to long.
-  \item Filtered to Greater Cairo (Cairo, Giza, Qalyubia governorates)
-        — 68 districts.
-  \item \kw{CAGR} (compound annual growth rate) computed per district
-        across 2006$\to$2017 census windows.
-  \item District centroids fetched via OSM Nominatim — cached in
-        \fn{RawData/nominatim\_districts.json} (5.5 KB). The Nominatim
-        centroids replace the earlier draft's three-governorate-centroid
-        proxy and are what turned the H1 effect size from medium into
-        huge (see~\S\ref{sec:phase2-hypotheses}).
+ \item Raw artefact: \fn{RawData/citypop\_egypt\_admin.html} (282 KB).
+ \item HTML table parsing with BeautifulSoup; year columns reshaped
+ from wide to long.
+ \item Filtered to Greater Cairo (Cairo, Giza, Qalyubia governorates)
+, 68 districts.
+ \item \kw{CAGR} (compound annual growth rate) computed per district
+ across 2006$\to$2017 census windows.
+ \item District centroids fetched via OSM Nominatim, cached in
+ \fn{RawData/nominatim\_districts.json} (5.5 KB). The Nominatim
+ centroids replace the earlier draft's three-governorate-centroid
+ proxy and are what turned the H1 effect size from medium into
+ huge (see~\S\ref{sec:phase2-hypotheses}).
 \end{itemize}
 
 \textbf{Outputs.}
 \begin{itemize}
-  \item \fn{districts.csv} (long: district-year rows, 480+ rows).
-  \item \fn{districts\_wide.csv} (wide: one row per district, years
-        across columns).
+ \item \fn{districts.csv} (long: district-year rows, 480+ rows).
+ \item \fn{districts\_wide.csv} (wide: one row per district, years
+ across columns).
 \end{itemize}
 
 \figitem{phase2/districts_cagr_distribution.png}{0.95}{S6 \textbullet\ District-level CAGR distribution (2006$\to$2017). The right tail are the New Administrative Capital and the satellite cities; this is the demand context for Q16 and Q22.}{fig:districts-cagr}
@@ -185,10 +207,10 @@ population share.
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefacts: \fn{RawData/wiki\_vehicles\_per\_capita.html}
-        (353 KB), \fn{wb\_motor\_vehicles\_per\_1k.json},
-        \fn{wb\_passenger\_cars\_per\_1k.json}.
-  \item Greater Cairo apportionment by 2017 population share.
+ \item Raw artefacts: \fn{RawData/wiki\_vehicles\_per\_capita.html}
+ (353 KB), \fn{wb\_motor\_vehicles\_per\_1k.json},
+ \fn{wb\_passenger\_cars\_per\_1k.json}.
+ \item Greater Cairo apportionment by 2017 population share.
 \end{itemize}
 
 \textbf{Output.} \fn{vehicles\_by\_governorate.csv}.
@@ -206,12 +228,12 @@ LRT coordinate backfill (S4).
 
 \textbf{How we scraped \& cleaned.}
 \begin{itemize}
-  \item Raw artefact: \fn{RawData/osm\_overpass.json} (114 KB) +
-        per-station \fn{osm\_lrt\_per\_station.json} (20 KB) for the
-        backfill.
-  \item Overpass QL filtered on \fn{amenity}, \fn{public\_transport},
-        \fn{highway=bus\_stop}, \fn{railway=station}.
-  \item Reprojected to EPSG:32636 and saved as GeoJSON.
+ \item Raw artefact: \fn{RawData/osm\_overpass.json} (114 KB) +
+ per-station \fn{osm\_lrt\_per\_station.json} (20 KB) for the
+ backfill.
+ \item Overpass QL filtered on \fn{amenity}, \fn{public\_transport},
+ \fn{highway=bus\_stop}, \fn{railway=station}.
+ \item Reprojected to EPSG:32636 and saved as GeoJSON.
 \end{itemize}
 
 \textbf{Output.} \fn{osm\_features.geojson} (92 KB, 1{,}000+ points).
@@ -225,19 +247,19 @@ LRT coordinate backfill (S4).
 \centering\small
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{} >{\color{plotorange}\bfseries}l
-                    >{\color{bodytext}}l
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{bodytext}}p{4.5cm} @{}}
+ >{\color{bodytext}}l
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{bodytext}}p{4.5cm} @{}}
 \toprule
 \color{plotblue}\# & \color{plotblue}Origin & \color{plotblue}Rows & \color{plotblue}Method shorthand \\
 \midrule
-S1 & Transport-for-Cairo GTFS                     & 50k+ & GTFS spec, bbox filter \\
-S3 & Wikipedia metro master list                  & 89   & DMS$\to$decimal, year-threshold phase \\
-S4 & Wikipedia LRT                                & 20   & 9 Overpass + 7 GMaps backfill \\
-S5 & Google Maps BRT                              & 21   & 10 viewport queries, regex aria-labels, uroman, 3-tier dedup \\
-S6 & citypopulation.de                            & 408  & HTML table, Nominatim centroids, CAGR \\
-S7 & Wikipedia + World Bank                       &  5   & per-capita apportionment \\
-S8 & OpenStreetMap Overpass                       & 1k+  & Overpass QL, GeoJSON \\
+S1 & Transport-for-Cairo GTFS & 50k+ & GTFS spec, bbox filter \\
+S3 & Wikipedia metro master list & 89 & DMS$\to$decimal, year-threshold phase \\
+S4 & Wikipedia LRT & 20 & 9 Overpass + 7 GMaps backfill \\
+S5 & Google Maps BRT & 21 & 10 viewport queries, regex aria-labels, uroman, 3-tier dedup \\
+S6 & citypopulation.de & 408 & HTML table, Nominatim centroids, CAGR \\
+S7 & Wikipedia + World Bank & 5 & per-capita apportionment \\
+S8 & OpenStreetMap Overpass & 1k+ & Overpass QL, GeoJSON \\
 \bottomrule
 \end{tabular}
 \caption{The eight Phase 2 sources at a glance. The two ``missing'' rows (S2, the public-transport route GTFS, was merged into S1; the original draft also reserved an S9 slot) reflect the project's notebook history rather than a data gap.}

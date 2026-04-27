@@ -1,9 +1,33 @@
 % =====================================================================
-%  Section 04 — Phase 1 null audit and pre-cleaning statistics
+% Section 04, Phase 1 null audit and pre-cleaning statistics
 % =====================================================================
 
-\section{Phase 1 \textbullet\ Pre-Cleaning Audit}
+\section{Phase 1 \textbullet\ Data Exploration and Pre-Cleaning Audit}
 \label{sec:phase1-nulls}
+
+\subsection{What we did before touching any value}
+
+Before any cleaning logic runs the cleaning notebook walks through a
+short exploration pass that surfaces three things for every one of the
+seven datasets: \textbf{shape} (row count, dtype mix, geometry type),
+\textbf{nulls per column}, and a \textbf{sanity-check summary} of the
+numeric ranges. The point is to find the few fields that need attention
+and to leave everything else alone. The full pre-clean audit lives in
+Section 06 of \fn{Cleaning Data.ipynb}.
+
+\textbf{How we ran it.} For every dataset we loaded the GeoDataFrame,
+inspected \fn{df.dtypes} and \fn{df.geometry.geom\_type.unique()},
+counted nulls per non-geometry column, and printed an HTML summary
+table. The same pass captured numeric means for the headline columns
+(boarding, population, fare, route length) so we could verify the
+fields were not all zeros or all NaN before cleaning ran.
+
+\textbf{What it surfaced.} Three fields needed attention: the
+twelve numeric counts on the boarding dataset (sparse but spatially
+clustered), the routes \fn{Fare} field (\stat{45.9\%} null), and the
+\fn{Passengers\_Per\_Hour} column on passenger-flow segments. Every
+other numeric field came in clean. Nothing else was modified at this
+stage.
 
 \subsection{Why we audit before we clean}
 
@@ -24,21 +48,21 @@ runs is \stat{2{,}409 null cells} concentrated in three numeric fields:
 \centering\small
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{} >{\color{plotorange}\bfseries}l
-                    >{\color{bodytext}}l
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{bodytext}}l @{}}
+ >{\color{bodytext}}l
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{bodytext}}l @{}}
 \toprule
 \color{plotblue}Dataset & \color{plotblue}Column & \color{plotblue}Nulls & \color{plotblue}\% & \color{plotblue}Strategy \\
 \midrule
 Boarding & 12 numeric counts (across rows) & 250 & 1.6\% avg & KNN spatial \\
-Routes   & \fn{Fare}                 & 819 & \stat{45.9\%} & KNN attribute \\
-Routes   & \fn{Vehicle\_Capacity}    & 0   & 0\%  & — \\
+Routes & \fn{Fare} & 819 & \stat{45.9\%} & KNN attribute \\
+Routes & \fn{Vehicle\_Capacity} & 0 & 0\% &, \\
 Pax Flow & \fn{Passengers\_Per\_Hour} & 500 & 5.4\% & KNN segment \\
-Veh Flow & \fn{Vehicles\_Per\_Hour}  & 0   & 0\%  & — \\
-Speeds   & \fn{Distance\_m}, \fn{Duration\_s}, \fn{Speed\_kmh}    & 0   & 0\%  & — \\
-Population & all numeric                & 0   & 0\%  & — \\
-Terminals  & \fn{Terminal\_Name\_AR}    & 0   & 0\%  & — \\
+Veh Flow & \fn{Vehicles\_Per\_Hour} & 0 & 0\% &, \\
+Speeds & \fn{Distance\_m}, \fn{Duration\_s}, \fn{Speed\_kmh} & 0 & 0\% &, \\
+Population & all numeric & 0 & 0\% &, \\
+Terminals & \fn{Terminal\_Name\_AR} & 0 & 0\% &, \\
 \bottomrule
 \end{tabular}
 \caption{Null counts per dataset \emph{before} imputation. The Routes
@@ -49,32 +73,32 @@ the reason the cleaning notebook devotes a dedicated KNN block to it.}
 
 \subsection{Statistical profile of the raw datasets}
 
-A short numeric profile of the dataset most affected by cleaning —
-Routes — gives the reader a sense of \emph{what} we are imputing.
+A short numeric profile of the dataset most affected by cleaning, 
+Routes, gives the reader a sense of \emph{what} we are imputing.
 
 \rowcolors{2}{darkpanel}{darkbg}
 \begin{table}[H]
 \centering\small
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{} >{\color{plotorange}\bfseries}l
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r @{}}
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r @{}}
 \toprule
 \color{plotblue}Field & \color{plotblue}min & \color{plotblue}q25 & \color{plotblue}median & \color{plotblue}q75 & \color{plotblue}max \\
 \midrule
-\fn{Route\_Length\_km} (km)        & 0.4   & 6.2   & 12.8  & 26.4  & 162.7 \\
-\fn{Vehicle\_Capacity} (seats)     & 4     & 14    & 14    & 35    & 80    \\
-\fn{Fare} (LE)                     & 0.5   & 3.0   & 5.0   & 10.0  & 60.0  \\
-\fn{Direction}                     & 0     & 0     & 1     & 1     & 1     \\
+\fn{Route\_Length\_km} (km) & 0.4 & 6.2 & 12.8 & 26.4 & 162.7 \\
+\fn{Vehicle\_Capacity} (seats) & 4 & 14 & 14 & 35 & 80 \\
+\fn{Fare} (LE) & 0.5 & 3.0 & 5.0 & 10.0 & 60.0 \\
+\fn{Direction} & 0 & 0 & 1 & 1 & 1 \\
 \bottomrule
 \end{tabular}
-\caption{Routes — five-number summary of the four numeric fields. The
+\caption{Routes, five-number summary of the four numeric fields. The
 \stat{0.4--162.7 km} range and the \stat{4--80 seat} capacity range are
 both wide; KNN imputation on \fn{Fare} therefore needs more than one
-feature to discriminate similar routes — see Section~\ref{sec:phase1-cleaning}.}
+feature to discriminate similar routes, see Section~\ref{sec:phase1-cleaning}.}
 \end{table}
 \rowcolors{0}{}{}
 
@@ -88,22 +112,22 @@ underwrites the entire formal-vs-informal narrative:
 \centering\small
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{@{} >{\color{plotorange}\bfseries}l
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r @{}}
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r @{}}
 \toprule
 \color{plotblue}Vehicle type & \color{plotblue}Routes & \color{plotblue}\% \\
 \midrule
-\fn{Microbus}  & 861 & 48.3\% \\
-\fn{Bus}       & 503 & 28.2\% \\
-\fn{Minibus}   & 287 & 16.1\% \\
-\fn{Tomnaya}   & 115 &  6.5\% \\
-\fn{Box}       &  18 &  1.0\% \\
+\fn{Microbus} & 861 & 48.3\% \\
+\fn{Bus} & 503 & 28.2\% \\
+\fn{Minibus} & 287 & 16.1\% \\
+\fn{Tomnaya} & 115 & 6.5\% \\
+\fn{Box} & 18 & 1.0\% \\
 \midrule
 \textbf{Total} & \stat{1{,}784} & 100\% \\
 \bottomrule
 \end{tabular}
 \caption{Routes by vehicle type. Microbus is the modal mode in every
-sense of the word — it is the most common vehicle, it carries the
+sense of the word, it is the most common vehicle, it carries the
 highest informal mode-share, and it dominates the long-route tail
 that drives Gap G3.}
 \end{table}

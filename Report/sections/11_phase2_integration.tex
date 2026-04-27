@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 11 — Phase 2 four-stage integration pipeline
+% Section 11, Phase 2 four-stage integration pipeline
 % =====================================================================
 
 \section{Phase 2 \textbullet\ The Four-Stage Integration Pipeline}
@@ -25,29 +25,29 @@ weakness in the previous one.
 \subsection{The four stages}
 
 \begin{enumerate}
-  \item \kw{Stage 1 — KNN spatial.} For each Phase 2 station, find the
-        $k=5$ nearest Phase 1 terminals using the projected
-        (EPSG:32636) coordinates. The nearest one becomes the
-        candidate match. \emph{Solves: spatial proximity.}
-  \item \kw{Stage 2 — OSM cross-verification.} Each candidate match is
-        validated against an independent OSM node within a 100-m
-        buffer. If the OSM node agrees with both points, mark the
-        candidate \emph{verified}. \emph{Solves: scrape-coordinate
-        accuracy.}
-  \item \kw{Stage 3 — RapidFuzz token-sort.} For pairs that survived
-        Stage 1+2 but might still be the wrong terminal, compute a
-        token-sort fuzzy similarity on the romanised station names.
-        Threshold $\tau = 88$. \emph{Solves: name variations within
-        the same script.}
-  \item \kw{Stage 4 — SBERT multilingual semantic matching.}
-        \emph{This is AI Technique 1.} Embed both names with
-        \fn{sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
-        (384-dim) and compute cosine similarity. Threshold
-        $\tau = 0.65$. \emph{Solves: cross-script (Arabic $\leftrightarrow$
-        English) matches that fuzzy text cannot do.}
+ \item \kw{Stage 1, KNN spatial.} For each Phase 2 station, find the
+ $k=5$ nearest Phase 1 terminals using the projected
+ (EPSG:32636) coordinates. The nearest one becomes the
+ candidate match. \emph{Solves: spatial proximity.}
+ \item \kw{Stage 2, OSM cross-verification.} Each candidate match is
+ validated against an independent OSM node within a 100-m
+ buffer. If the OSM node agrees with both points, mark the
+ candidate \emph{verified}. \emph{Solves: scrape-coordinate
+ accuracy.}
+ \item \kw{Stage 3, RapidFuzz token-sort.} For pairs that survived
+ Stage 1+2 but might still be the wrong terminal, compute a
+ token-sort fuzzy similarity on the romanised station names.
+ Threshold $\tau = 88$. \emph{Solves: name variations within
+ the same script.}
+ \item \kw{Stage 4, SBERT multilingual semantic matching.}
+ \emph{This is AI Technique 1.} Embed both names with
+ \fn{sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+ (384-dim) and compute cosine similarity. Threshold
+ $\tau = 0.65$. \emph{Solves: cross-script (Arabic $\leftrightarrow$
+ English) matches that fuzzy text cannot do.}
 \end{enumerate}
 
-Each stage is monotonically additive — every match it produces is
+Each stage is monotonically additive, every match it produces is
 preserved into the next stage's candidate pool, and every stage adds
 only matches that the earlier stages did not catch.
 
@@ -61,17 +61,17 @@ earlier stages missed.}{fig:integration-sankey}
 \subsection{Why each stage is necessary}
 
 \begin{itemize}
-  \item \kw{Stage 1 alone fails} when a Phase 1 terminal centroid sits
-        100\,m off the Phase 2 station because the source coordinates
-        rounded differently.
-  \item \kw{Stage 2 alone fails} when both sources have wrong
-        coordinates and OSM agrees with one of them — but at least
-        the discrepancy is flagged.
-  \item \kw{Stage 3 alone fails} on \ar{عدلي منصور} ↔ \strval{Adly Mansour}
-        because token-sort needs shared characters.
-  \item \kw{Stage 4 alone is overkill} on simple cases like
-        \strval{Demerdash} ↔ \strval{Demerdach}. SBERT is the most
-        expensive stage; running it on every pair would not scale.
+ \item \kw{Stage 1 alone fails} when a Phase 1 terminal centroid sits
+ 100\,m off the Phase 2 station because the source coordinates
+ rounded differently.
+ \item \kw{Stage 2 alone fails} when both sources have wrong
+ coordinates and OSM agrees with one of them, but at least
+ the discrepancy is flagged.
+ \item \kw{Stage 3 alone fails} on \ar{عدلي منصور} ↔ \strval{Adly Mansour}
+ because token-sort needs shared characters.
+ \item \kw{Stage 4 alone is overkill} on simple cases like
+ \strval{Demerdash} ↔ \strval{Demerdach}. SBERT is the most
+ expensive stage; running it on every pair would not scale.
 \end{itemize}
 
 The cascade structure means we use the cheapest sufficient method on
@@ -80,11 +80,11 @@ each pair.
 \subsection{Outputs of integration}
 
 \begin{itemize}
-  \item \fn{Phase2/Integrated/matched\_pairs.csv} — every Phase 1$\to$Phase 2
-        pair with stage of origin, similarity score, and discrepancy
-        distance.
-  \item \fn{Phase2/Integrated/Phase2\_integrated.geoparquet} — the
-        merged spatial GeoDataFrame used by every downstream question.
+ \item \fn{Phase2/Integrated/matched\_pairs.csv}, every Phase 1$\to$Phase 2
+ pair with stage of origin, similarity score, and discrepancy
+ distance.
+ \item \fn{Phase2/Integrated/Phase2\_integrated.geoparquet}, the
+ merged spatial GeoDataFrame used by every downstream question.
 \end{itemize}
 
 \subsection{The honesty section}
@@ -96,7 +96,7 @@ That is small. The cleaning notebook reports the threshold at $\tau=0.65$
 because lower values surface unrelated station names; higher values
 miss legitimate cross-script pairs. We treat the SBERT matches as
 \emph{strong candidates}, not as ground truth. Every Phase 2 hypothesis
-is robust to dropping the SBERT-only matches — H2 in particular uses
+is solid to dropping the SBERT-only matches, H2 in particular uses
 only the operational LRT stations whose coordinates are independently
 geocoded.
 \end{warningbox}

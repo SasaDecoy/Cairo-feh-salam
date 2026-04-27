@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 08 — The four structural gaps
+% Section 08, The four structural gaps
 % =====================================================================
 
 \section{Phase 1 \textbullet\ The Four Structural Gaps}
@@ -20,11 +20,11 @@ where \fn{Boarding\_Near\_Terminal} sums daily boardings within a
 
 \textbf{Counts.}
 \begin{itemize}
-  \item \stat{115} ghost terminals at the 100-m baseline.
-  \item \stat{69} \kw{near-miss} (100--500 m) — fix by relocating the stop.
-  \item \stat{17} \kw{stop-too-far} (500 m--1 km) — fix by improving
-        walkability.
-  \item \stat{29} \kw{truly isolated} ($>$1 km) — audit and decommission.
+ \item \stat{115} ghost terminals at the 100-m baseline.
+ \item \stat{69} \kw{near-miss} (100--500 m), fix by relocating the stop.
+ \item \stat{17} \kw{stop-too-far} (500 m--1 km), fix by improving
+ walkability.
+ \item \stat{29} \kw{truly isolated} ($>$1 km), audit and decommission.
 \end{itemize}
 
 \textbf{Recovery.} \stat{60\%} of ghosts disappear at a 500-m radius
@@ -44,7 +44,7 @@ Critical threshold: \stat{$\geq 0.60$}.
 
 \textbf{Counts.} \stat{19} terminals above the threshold. \stat{208} are healthy
 (index = 0.0, every vehicle carries at least one passenger). The
-distribution is essentially binary — see Q10.
+distribution is  binary, see Q10.
 
 \textbf{Magnitude.} The 19 critical terminals run \stat{193 empty
 vehicle-trips per hour} between them. Zero passengers. Every day.
@@ -62,9 +62,9 @@ running a small vehicle on a long route.
 
 \textbf{Counts.}
 \begin{itemize}
-  \item \stat{75\%} of routes $>$50 km use microbus.
-  \item \stat{44} specific long-route violations identified.
-  \item Vehicle mix: 861 microbus, 503 bus, 287 minibus, 115 tomnaya, 18 box.
+ \item \stat{75\%} of routes $>$50 km use microbus.
+ \item \stat{44} specific long-route violations identified.
+ \item Vehicle mix: 861 microbus, 503 bus, 287 minibus, 115 tomnaya, 18 box.
 \end{itemize}
 
 \textbf{Cost manifestation.} The fare/km comparison from Q12 is the
@@ -85,7 +85,7 @@ $\text{Underserved\_Score} = \text{pct\_rank}(\text{Population}_{2018}) - \text{
 hexagons sit in the top quartile of the score (used by Phase 2 for
 market sizing).
 
-\textbf{Geography.} Imbaba, Shubra, Matariyya — the dense
+\textbf{Geography.} Imbaba, Shubra, Matariyya, the dense
 informal-housing belt on the west and north of central Cairo. Layla
 lives in this cluster.
 
@@ -103,16 +103,16 @@ walkshed). Anticipating Section~\ref{sec:phase2-questions} (Q18b):
 \centering\small
 \renewcommand{\arraystretch}{1.4}
 \begin{tabular}{@{} >{\color{plotorange}\bfseries}l
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r
-                    >{\color{plotyellow}\ttfamily}r @{}}
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r
+ >{\color{plotyellow}\ttfamily}r @{}}
 \toprule
 \color{plotblue}Gap & \color{plotblue}Metro L3 & \color{plotblue}LRT & \color{plotblue}BRT \\
 \midrule
-G1 \ Ghosts          & 15.7\% &  2.6\% &  7.8\% \\
-G2 \ Empty-return    &  5.3\% &  5.3\% & 10.5\% \\
-G3 \ Vehicle mismatch &  0.0\% & 25.0\% & \stat{25.0\%} \\
-G4 \ Underserved     &  6.0\% &  1.6\% & 13.1\% \\
+G1 \ Ghosts & 15.7\% & 2.6\% & 7.8\% \\
+G2 \ Empty-return & 5.3\% & 5.3\% & 10.5\% \\
+G3 \ Vehicle mismatch & 0.0\% & 25.0\% & \stat{25.0\%} \\
+G4 \ Underserved & 6.0\% & 1.6\% & 13.1\% \\
 \bottomrule
 \end{tabular}
 \caption{Q18b \textbullet\ \% of Phase-1 gap sites within 2 km of a

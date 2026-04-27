@@ -1,5 +1,5 @@
 % =====================================================================
-%  Section 05 — Phase 1 cleaning pipeline
+% Section 05, Phase 1 cleaning pipeline
 % =====================================================================
 
 \section{Phase 1 \textbullet\ Cleaning Pipeline}
@@ -19,15 +19,15 @@ import pandas as pd
 import plotly.graph_objects as go
 from sklearn.impute import KNNImputer
 
-CRS_METERS = "EPSG:32636"  # UTM Zone 36N — metres for Cairo
+CRS_METERS = "EPSG:32636" # UTM Zone 36N, metres for Cairo
 
-boarding   = boarding_raw.to_crs(CRS_METERS)
+boarding = boarding_raw.to_crs(CRS_METERS)
 population = population_raw.to_crs(CRS_METERS)
-speeds     = speeds_raw.to_crs(CRS_METERS)
-pax_flow   = pax_flow_raw.to_crs(CRS_METERS)
-routes     = routes_raw.to_crs(CRS_METERS)
-terminals  = terminals_raw.to_crs(CRS_METERS)
-veh_flow   = veh_flow_raw.to_crs(CRS_METERS)
+speeds = speeds_raw.to_crs(CRS_METERS)
+pax_flow = pax_flow_raw.to_crs(CRS_METERS)
+routes = routes_raw.to_crs(CRS_METERS)
+terminals = terminals_raw.to_crs(CRS_METERS)
+veh_flow = veh_flow_raw.to_crs(CRS_METERS)
 \end{lstlisting}
 
 \subsection{Renaming and type casting}
@@ -41,7 +41,7 @@ errors="coerce")} so any unparseable strings become \fn{NaN} (rather
 than crashing the pipeline). Nullable integer IDs use the pandas
 \fn{Int64} dtype.
 
-\subsection{KNN imputation — three targeted blocks}
+\subsection{KNN imputation, three targeted blocks}
 
 \begin{callout}
 \textbf{\color{plotblue}Why KNN, not simple imputation.}\quad The three
@@ -62,27 +62,27 @@ For each row with at least one missing numeric, the imputer asks
 ``what do the five nearest stops in $(x, y, \text{numeric})$-space
 look like?'' and fills with their distance-weighted average:
 
-\begin{lstlisting}[caption={KNN imputation on Boarding stops — XY appended as features.}]
+\begin{lstlisting}[caption={KNN imputation on Boarding stops, XY appended as features.}]
 boarding["_x"] = boarding.geometry.x
 boarding["_y"] = boarding.geometry.y
 knn_features = boarding_num_cols + ["_x", "_y"]
 
 imputer_boarding = KNNImputer(
-    n_neighbors=5,
-    weights="distance",
-    metric="nan_euclidean",
+ n_neighbors=5,
+ weights="distance",
+ metric="nan_euclidean",
 )
 X_imputed = imputer_boarding.fit_transform(
-    boarding[knn_features].values
+ boarding[knn_features].values
 )
 
 # write back only the cells that were null (clip to non-negative)
 for col in boarding_num_cols:
-    null_rows = boarding_null_mask[col]
-    if null_rows.any():
-        boarding.loc[null_rows, col] = (
-            imputed_df.loc[null_rows, col].clip(lower=0)
-        )
+ null_rows = boarding_null_mask[col]
+ if null_rows.any():
+ boarding.loc[null_rows, col] = (
+ imputed_df.loc[null_rows, col].clip(lower=0)
+ )
 boarding.drop(columns=["_x", "_y"], inplace=True)
 \end{lstlisting}
 
@@ -92,16 +92,16 @@ The \stat{45.9\%}-null fare field is filled using route-attribute
 features rather than spatial ones, because fare is governed by trip
 length and vehicle type, not by where the route line happens to lie:
 
-\begin{lstlisting}[caption={KNN imputation on Routes Fare — five attribute features.}]
+\begin{lstlisting}[caption={KNN imputation on Routes Fare, five attribute features.}]
 fare_features = [
-    "Fare", "Route_Length_km", "Vehicle_Capacity",
-    "Direction", "_vehicle_code"  # label-encoded vehicle type
+ "Fare", "Route_Length_km", "Vehicle_Capacity",
+ "Direction", "_vehicle_code" # label-encoded vehicle type
 ]
 imputer_fare = KNNImputer(n_neighbors=5, weights="distance",
-                          metric="nan_euclidean")
+ metric="nan_euclidean")
 X_fare_imputed = imputer_fare.fit_transform(routes[fare_features].values)
 routes.loc[fare_null_mask, "Fare"] = (
-    fare_imp_df.loc[fare_null_mask, "Fare"].clip(lower=0).round(1)
+ fare_imp_df.loc[fare_null_mask, "Fare"].clip(lower=0).round(1)
 )
 \end{lstlisting}
 
@@ -111,17 +111,17 @@ For passenger flow, the imputer uses each segment's centroid plus its
 length, on the assumption that geometrically similar segments carry
 similar throughput:
 
-\begin{lstlisting}[caption={KNN imputation on Passenger Flow — centroid + length.}]
-pax_flow["_cx"]         = pax_flow.geometry.centroid.x
-pax_flow["_cy"]         = pax_flow.geometry.centroid.y
+\begin{lstlisting}[caption={KNN imputation on Passenger Flow, centroid + length.}]
+pax_flow["_cx"] = pax_flow.geometry.centroid.x
+pax_flow["_cy"] = pax_flow.geometry.centroid.y
 pax_flow["_seg_length"] = pax_flow.geometry.length
 pax_features = ["Passengers_Per_Hour", "_cx", "_cy", "_seg_length"]
 
 imputer_pax = KNNImputer(n_neighbors=5, weights="distance",
-                         metric="nan_euclidean")
+ metric="nan_euclidean")
 X_pax_imputed = imputer_pax.fit_transform(pax_flow[pax_features].values)
 pax_flow.loc[pax_null_mask, "Passengers_Per_Hour"] = (
-    pax_imp_df.loc[pax_null_mask, "Passengers_Per_Hour"].clip(lower=0)
+ pax_imp_df.loc[pax_null_mask, "Passengers_Per_Hour"].clip(lower=0)
 )
 \end{lstlisting}
 
@@ -133,24 +133,46 @@ null-free} (CLEAN) and \stat{zero rows were dropped} during the entire
 process. This is the core property that lets us defend the merges and
 the analysis: nothing was hidden, nothing was discarded.
 
+\subsection{Post-cleaning exploration (sanity check)}
+
+After all three KNN passes the notebook re-explores the cleaned data
+to make sure nothing weird happened. The post-clean pass prints:
+
+\begin{itemize}
+  \item a per-dataset null count (every numeric column is now CLEAN);
+  \item the imputed-fields distribution \emph{before vs after} as a
+        side-by-side histogram, so we can confirm the imputed values
+        sit inside the existing distribution rather than tail-stretching
+        it;
+  \item a one-row sanity-check summary per dataset: mean daily
+        boarding (around \stat{1.4k}), mean population per hex
+        (around \stat{4.9k}), mean route length (around \stat{17 km}),
+        mean fare (around \stat{4.7 LE}).
+\end{itemize}
+
+Nothing in this pass modifies a value. It is the second checkpoint
+that keeps the cleaning honest: if the imputed boarding distribution
+shifted noticeably to the right, or if a new dataset suddenly
+contained NaN, this pass would catch it.
+
 \subsection{Engineered features}
 
 Two computed columns are added to support downstream questions:
 
 \begin{itemize}
-  \item Boarding gets \fn{Total\_Morning\_Boarding},
-        \fn{Total\_Evening\_Boarding}, and \fn{Total\_Routes\_At\_Stop}
-        — sums across the time-of-day breakouts.
-  \item Routes gets a single classification field
-        \fn{Transport\_Class} $\in$ \{\strval{Formal}, \strval{Informal}\}
-        derived from vehicle type and capacity:
+ \item Boarding gets \fn{Total\_Morning\_Boarding},
+ \fn{Total\_Evening\_Boarding}, and \fn{Total\_Routes\_At\_Stop}
+, sums across the time-of-day breakouts.
+ \item Routes gets a single classification field
+ \fn{Transport\_Class} $\in$ \{\strval{Formal}, \strval{Informal}\}
+ derived from vehicle type and capacity:
 \end{itemize}
 
 \begin{lstlisting}[caption={Formal/Informal classification on Routes.}]
 is_informal = (
-    routes["Vehicle_Type"].str.lower()
-        .str.contains("micro|coop|7-seat|7 seat", na=False)
-    | (routes["Vehicle_Capacity"] <= 17)
+ routes["Vehicle_Type"].str.lower()
+.str.contains("micro|coop|7-seat|7 seat", na=False)
+ | (routes["Vehicle_Capacity"] <= 17)
 )
 routes["Transport_Class"] = np.where(is_informal, "Informal", "Formal")
 \end{lstlisting}
