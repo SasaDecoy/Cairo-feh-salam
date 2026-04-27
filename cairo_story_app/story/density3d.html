@@ -58,10 +58,12 @@
   }
   .vignette {
     position: fixed; inset: 0;
-    background: radial-gradient(ellipse at center,
-                transparent 50%,
-                rgba(7,9,12,0.35) 88%,
-                rgba(7,9,12,0.7) 100%);
+    background:
+      radial-gradient(ellipse at center,
+                transparent 42%,
+                rgba(7,9,12,0.46) 78%,
+                rgba(7,9,12,0.82) 100%),
+      linear-gradient(180deg, rgba(7,9,12,0.12), rgba(7,9,12,0.35));
     pointer-events: none; z-index: 5;
   }
 
@@ -261,8 +263,8 @@
     width: 8px; height: 170px; border-radius: 4px;
     /* Heat ramp built from the project palette  */
     background: linear-gradient(to bottom,
-      #FFD8C0 0%,        /* peak */
-      #FF6B6B 12%,       /* pink */
+      #F4A261 0%,        /* peak */
+      #D95F4A 12%,       /* muted red */
       #E86F51 28%,       /* coral / warn */
       #E9C46A 45%,       /* gold */
       #2A9D8F 62%,       /* teal / ok */
@@ -666,6 +668,133 @@ function generateDensityTexture() {
 /* ════════════════════════════════════════════════════════════════
    THREE.JS SCENE
    ════════════════════════════════════════════════════════════════ */
+/* Basemap texture: real CARTO/OSM tiles drawn into the same lon/lat bounds
+   as the density surface, so streets and the Nile sit under the peaks. */
+const MAP_TILE_Z = 11;
+const MAP_TEX_SIZE = 1024;
+
+function lonLatToTilePixel(lon, lat, z = MAP_TILE_Z) {
+  const n = 2 ** z;
+  const sinLat = Math.sin(lat * Math.PI / 180);
+  return {
+    x: ((lon + 180) / 360) * n * 256,
+    y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * n * 256,
+  };
+}
+
+function drawFallbackBasemap(ctx, S) {
+  ctx.fillStyle = '#07090C';
+  ctx.fillRect(0, 0, S, S);
+
+  ctx.save();
+  ctx.globalAlpha = 0.75;
+  ctx.strokeStyle = 'rgba(88,166,255,0.11)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 14; i++) {
+    const p = (i / 14) * S;
+    ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, S); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(S, p); ctx.stroke();
+  }
+  ctx.restore();
+
+  const nileLon = 31.225;
+  const nileX = ((nileLon - LON_MIN) / (LON_MAX - LON_MIN)) * S;
+  ctx.strokeStyle = 'rgba(31,88,130,0.95)';
+  ctx.lineWidth = 18;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(nileX, 0);
+  ctx.bezierCurveTo(nileX - 15, S * 0.30, nileX + 8, S * 0.56, nileX - 5, S);
+  ctx.stroke();
+
+  SPOTS.forEach(s => {
+    ctx.fillStyle = `rgba(88,166,255,${(0.10 + s.intensity * 0.18).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.arc(s.u * S, s.v * S, 2 + s.intensity * 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function loadTile(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+function generateBasemapTexture(texture) {
+  const S = MAP_TEX_SIZE;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = S;
+  const ctx = canvas.getContext('2d');
+  drawFallbackBasemap(ctx, S);
+
+  const nw = lonLatToTilePixel(LON_MIN, LAT_MAX);
+  const se = lonLatToTilePixel(LON_MAX, LAT_MIN);
+  const minTileX = Math.floor(nw.x / 256);
+  const maxTileX = Math.floor(se.x / 256);
+  const minTileY = Math.floor(nw.y / 256);
+  const maxTileY = Math.floor(se.y / 256);
+  const worldW = se.x - nw.x;
+  const worldH = se.y - nw.y;
+  const hosts = ['a', 'b', 'c', 'd'];
+  const jobs = [];
+
+  for (let tx = minTileX; tx <= maxTileX; tx++) {
+    for (let ty = minTileY; ty <= maxTileY; ty++) {
+      const host = hosts[Math.abs(tx + ty) % hosts.length];
+      const url = `https://${host}.basemaps.cartocdn.com/dark_all/${MAP_TILE_Z}/${tx}/${ty}@2x.png`;
+      jobs.push(loadTile(url).then(img => ({ img, tx, ty })));
+    }
+  }
+
+  Promise.all(jobs).then(tiles => {
+    const okTiles = tiles.filter(t => t.img);
+    if (!okTiles.length) {
+      texture.needsUpdate = true;
+      return;
+    }
+
+    ctx.clearRect(0, 0, S, S);
+    ctx.fillStyle = '#07090C';
+    ctx.fillRect(0, 0, S, S);
+
+    okTiles.forEach(({ img, tx, ty }) => {
+      const px = tx * 256;
+      const py = ty * 256;
+      const dx = ((px - nw.x) / worldW) * S;
+      const dy = ((py - nw.y) / worldH) * S;
+      const dw = (256 / worldW) * S;
+      const dh = (256 / worldH) * S;
+      ctx.drawImage(img, dx, dy, dw, dh);
+    });
+
+    // Grade the live basemap into the Masari dark cinematic palette.
+    ctx.fillStyle = 'rgba(7,9,12,0.46)';
+    ctx.fillRect(0, 0, S, S);
+    ctx.globalCompositeOperation = 'screen';
+    ctx.fillStyle = 'rgba(20,74,110,0.18)';
+    ctx.fillRect(0, 0, S, S);
+    ctx.globalCompositeOperation = 'source-over';
+
+    SPOTS.forEach(s => {
+      ctx.fillStyle = `rgba(233,196,106,${(0.07 + s.intensity * 0.13).toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(s.u * S, s.v * S, 2.5 + s.intensity * 3.0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    texture.needsUpdate = true;
+  }).catch(() => {
+    texture.needsUpdate = true;
+  });
+
+  return canvas;
+}
+
 const container = document.getElementById('canvas-container');
 
 const scene = new THREE.Scene();
@@ -682,7 +811,7 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.18;
+renderer.toneMappingExposure = 0.72;
 container.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -697,20 +826,20 @@ controls.autoRotateSpeed = 0.25;
 controls.target.set(0, 0, 0);
 
 /* ── Lighting rig (project palette) ─────────────────────────── */
-scene.add(new THREE.AmbientLight('#1A1F28', 0.65));
-const sun = new THREE.DirectionalLight('#FFE5C0', 0.45);
+scene.add(new THREE.AmbientLight('#111820', 0.30));
+const sun = new THREE.DirectionalLight('#9FCFFF', 0.16);
 sun.position.set(5, 12, 4);
 scene.add(sun);
-const rim = new THREE.DirectionalLight('#88BBFF', 0.30);
+const rim = new THREE.DirectionalLight('#58A6FF', 0.18);
 rim.position.set(-4, 9, -3);
 scene.add(rim);
 
 /* Two coloured point lights — accent (blue) + warn (coral) — to
    give the surface subtle two-tone emphasis from below */
-const ptAccent = new THREE.PointLight('#58A6FF', 0.40, 14);
+const ptAccent = new THREE.PointLight('#58A6FF', 0.22, 14);
 ptAccent.position.set(-1.5, -0.6, 1.0);
 scene.add(ptAccent);
-const ptWarn = new THREE.PointLight('#E86F51', 0.35, 14);
+const ptWarn = new THREE.PointLight('#E86F51', 0.16, 14);
 ptWarn.position.set(1.5, -0.6, -0.5);
 scene.add(ptWarn);
 
@@ -721,10 +850,18 @@ const densityCanvas  = generateDensityTexture();
 const densityTexture = new THREE.CanvasTexture(densityCanvas);
 densityTexture.minFilter = THREE.LinearFilter;
 densityTexture.magFilter = THREE.LinearFilter;
+densityTexture.colorSpace = THREE.NoColorSpace;
 
 const SIZE = 10;     // plane edge in world units
 const SEG  = 220;    // tessellation
 const DISP = 2.4;    // peak displacement
+
+const basemapTexture = new THREE.CanvasTexture(document.createElement('canvas'));
+basemapTexture.colorSpace = THREE.SRGBColorSpace;
+basemapTexture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+const basemapCanvas = generateBasemapTexture(basemapTexture);
+basemapTexture.image = basemapCanvas;
+basemapTexture.needsUpdate = true;
 
 const vertSrc = `
   uniform sampler2D uDensityMap;
@@ -782,10 +919,10 @@ const fragSrc = `
     vec3 c2 = vec3(0.180, 0.380, 0.700);  // mid blue
     vec3 c3 = vec3(0.345, 0.651, 1.000);  // var(--accent)    #58A6FF
     vec3 c4 = vec3(0.165, 0.616, 0.561);  // var(--ok)        #2A9D8F
-    vec3 c5 = vec3(0.914, 0.769, 0.416);  // var(--gold)      #E9C46A
-    vec3 c6 = vec3(0.910, 0.435, 0.318);  // var(--warn)      #E86F51
-    vec3 c7 = vec3(1.000, 0.420, 0.420);  // var(--pink)      #FF6B6B
-    vec3 c8 = vec3(1.000, 0.850, 0.760);  // hot peak — almost incandescent
+    vec3 c5 = vec3(0.760, 0.630, 0.300);  // muted gold
+    vec3 c6 = vec3(0.760, 0.320, 0.240);  // muted coral
+    vec3 c7 = vec3(0.900, 0.330, 0.330);  // restrained peak red
+    vec3 c8 = vec3(0.960, 0.650, 0.500);  // warm peak, not white-hot
     float s = clamp(t, 0.0, 1.0) * 8.0;
     if (s < 1.0) return mix(c0, c1, s);
     if (s < 2.0) return mix(c1, c2, s - 1.0);
@@ -805,21 +942,21 @@ const fragSrc = `
     vec2 g = abs(fract(vUv * 48.0 - 0.5) - 0.5);
     float gl = min(g.x, g.y);
     float gm = 1.0 - smoothstep(0.0, 0.025, gl);
-    col = mix(col, col * 1.5, gm * 0.07 * smoothstep(0.04, 0.25, vDensity));
+    col = mix(col, col * 1.35, gm * 0.05 * smoothstep(0.04, 0.25, vDensity));
 
     vec2 mg = abs(fract(vUv * 6.0 - 0.5) - 0.5);
     float mgl = min(mg.x, mg.y);
     float mgm = 1.0 - smoothstep(0.0, 0.018, mgl);
-    col = mix(col, col * 1.7, mgm * 0.06 * smoothstep(0.03, 0.20, vDensity));
+    col = mix(col, col * 1.45, mgm * 0.045 * smoothstep(0.03, 0.20, vDensity));
 
     /* Fresnel rim — edges of every mountain glow accent-blue */
     vec3 vd = normalize(cameraPosition - vWorldPos);
     float fr = pow(1.0 - max(dot(vd, vViewNormal), 0.0), 4.5);
-    col += fr * vDensity * vec3(0.20, 0.43, 0.78);
+    col += fr * vDensity * vec3(0.12, 0.30, 0.58);
 
     /* Emissive peak — drives the bloom pass */
-    float em = pow(vDensity, 2.8) * 2.1;
-    col += em * heat(min(vDensity * 1.20, 1.0));
+    float em = pow(vDensity, 2.8) * 0.78;
+    col += em * heat(min(vDensity * 1.12, 1.0));
 
     /* Tiny noise grain — kills banding on the dark-end gradient */
     float n = fract(sin(dot(vUv * 900.0 + uTime * 0.005, vec2(12.9898, 78.233))) * 43758.5453);
@@ -841,22 +978,38 @@ const heatMat = new THREE.ShaderMaterial({
   },
   transparent: true,
   side:        THREE.DoubleSide,
-  depthWrite:  true,
+  depthWrite:  false,
 });
+
+/* Dark stage below the real map, used as a cinematic matte. */
+const baseMat  = new THREE.MeshBasicMaterial({ color: '#05070B' });
+const baseMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(SIZE * 1.45, SIZE * 1.45), baseMat,
+);
+baseMesh.rotation.x = -Math.PI / 2;
+baseMesh.position.y = -0.075;
+baseMesh.renderOrder = -1;
+scene.add(baseMesh);
+
+/* Actual Cairo/Giza basemap, aligned to the same lon/lat bounds as the peaks. */
+const mapMat = new THREE.MeshBasicMaterial({
+  map: basemapTexture,
+  color: '#88A9C8',
+  transparent: true,
+  opacity: 0.62,
+  depthWrite: false,
+});
+const mapMesh = new THREE.Mesh(new THREE.PlaneGeometry(SIZE, SIZE), mapMat);
+mapMesh.rotation.x = -Math.PI / 2;
+mapMesh.position.y = -0.045;
+mapMesh.renderOrder = 0;
+scene.add(mapMesh);
 
 const planeGeo = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
 planeGeo.rotateX(-Math.PI / 2);
 const heatMesh = new THREE.Mesh(planeGeo, heatMat);
+heatMesh.renderOrder = 2;
 scene.add(heatMesh);
-
-/* Dark base plane underneath so empty cells don't render the sky */
-const baseMat  = new THREE.MeshBasicMaterial({ color: '#06080C' });
-const baseMesh = new THREE.Mesh(
-  new THREE.PlaneGeometry(SIZE * 1.4, SIZE * 1.4), baseMat,
-);
-baseMesh.rotation.x = -Math.PI / 2;
-baseMesh.position.y = -0.03;
-scene.add(baseMesh);
 
 /* ════════════════════════════════════════════════════════════════
    PEAK INDICATOR · pulsing rings on the highest-density cell
@@ -929,13 +1082,13 @@ pc.width = pc.height = 64;
 }
 const pMat = new THREE.PointsMaterial({
   map: new THREE.CanvasTexture(pc),
-  size: 0.14,
+  size: 0.10,
   transparent: true,
-  opacity: 0.55,
+  opacity: 0.32,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
   sizeAttenuation: true,
-  color: '#FFB17A',
+  color: '#D9975D',
 });
 const particles = new THREE.Points(pGeo, pMat);
 scene.add(particles);
@@ -992,9 +1145,9 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(
   new THREE.Vector2(innerWidth, innerHeight),
-  0.70,   // strength
-  0.50,   // radius
-  0.40,   // threshold
+  0.26,   // strength
+  0.36,   // radius
+  0.62,   // threshold
 );
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
@@ -1003,9 +1156,9 @@ composer.addPass(new OutputPass());
    CAMERA · intro tween + view-mode buttons
    ════════════════════════════════════════════════════════════════ */
 const VIEWS = {
-  overview:  { x:  6.5, y: 6.5, z:  6.5, bloom: 0.70 },
-  core:      { x:  3.0, y: 4.5, z:  3.0, bloom: 0.95 },
-  periphery: { x:  9.0, y: 4.0, z:  9.0, bloom: 0.50 },
+  overview:  { x:  6.5, y: 6.5, z:  6.5, bloom: 0.26 },
+  core:      { x:  3.0, y: 4.5, z:  3.0, bloom: 0.34 },
+  periphery: { x:  9.0, y: 4.0, z:  9.0, bloom: 0.20 },
 };
 
 function flyTo(target, dur = 1400) {
@@ -1055,7 +1208,7 @@ const clock = new THREE.Clock();
 const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (prefersReduced) {
   controls.autoRotate = false;
-  pMat.opacity = 0.3;
+  pMat.opacity = 0.18;
 }
 
 function animate() {
@@ -1084,8 +1237,8 @@ function animate() {
     }
   }
   pGeo.attributes.position.needsUpdate = true;
-  pMat.opacity = prefersReduced ? 0.3
-               : (0.42 + Math.sin(t * 0.4) * 0.08);
+  pMat.opacity = prefersReduced ? 0.18
+               : (0.24 + Math.sin(t * 0.4) * 0.05);
 
   /* Pulsing peak rings */
   const r1s = 1 + Math.sin(t * 2.0)        * 0.20;
@@ -1096,8 +1249,8 @@ function animate() {
   ring2.mat.opacity = 0.14 + Math.sin(t * 2.0 + 1.5) * 0.10;
 
   /* Subtle light flicker — accent + warn out of phase */
-  ptAccent.intensity = 0.36 + Math.sin(t * 1.1)     * 0.10;
-  ptWarn.intensity   = 0.30 + Math.sin(t * 0.7 + 2) * 0.08;
+  ptAccent.intensity = 0.20 + Math.sin(t * 1.1)     * 0.04;
+  ptWarn.intensity   = 0.14 + Math.sin(t * 0.7 + 2) * 0.035;
 
   controls.update();
   updateLabels();

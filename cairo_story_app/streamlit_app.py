@@ -76,6 +76,7 @@ STORY_STATIC_URL = "app/static/story_assets/index.html?returnTo=/"
 def _ensure_story_static_assets() -> bool:
     """Expose the standalone story through Streamlit static serving."""
     source_dir = APP_ROOT / "story"
+    assets_dir = APP_ROOT / "assets"
     if not STORY_HTML_PATH.exists():
         return False
 
@@ -97,6 +98,14 @@ def _ensure_story_static_assets() -> bool:
             dst = target_dir / filename
             if not dst.exists() or src.stat().st_mtime > dst.stat().st_mtime:
                 shutil.copy2(src, dst)
+        if assets_dir.exists():
+            for src in assets_dir.rglob("*"):
+                if not src.is_file():
+                    continue
+                dst = target_dir / "assets" / src.relative_to(assets_dir)
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                if not dst.exists() or src.stat().st_mtime > dst.stat().st_mtime:
+                    shutil.copy2(src, dst)
     return True
 
 

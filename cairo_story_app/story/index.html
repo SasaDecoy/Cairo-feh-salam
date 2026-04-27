@@ -591,6 +591,123 @@
     background: var(--bg);
     animation: fade-in 700ms cubic-bezier(0.22,0.61,0.36,1) both;
   }
+  @keyframes scene-media-in {
+    from { opacity: 0; transform: translate(-50%, 14px) scale(0.985); filter: blur(8px); }
+    to   { opacity: 1; transform: translate(-50%, 0) scale(1); filter: blur(0); }
+  }
+  @keyframes scene-media-out {
+    from { opacity: 1; transform: translate(-50%, 0) scale(1); filter: blur(0); }
+    to   { opacity: 0; transform: translate(-50%, -10px) scale(0.985); filter: blur(8px); }
+  }
+  @keyframes scene-media-in-corner {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(8px); }
+    to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  @keyframes scene-media-out-corner {
+    from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    to   { opacity: 0; transform: translateY(-10px) scale(0.985); filter: blur(8px); }
+  }
+  @keyframes scene-media-in-bottom-left {
+    from { opacity: 0; transform: translateY(14px) scale(0.985); filter: blur(8px); }
+    to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  @keyframes scene-media-out-bottom-left {
+    from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    to   { opacity: 0; transform: translateY(-10px) scale(0.985); filter: blur(8px); }
+  }
+  @keyframes scene-shot-in {
+    from { opacity: 0; transform: scale(1.018); filter: blur(10px) saturate(0.7); }
+    to   { opacity: 1; transform: scale(1); filter: blur(0) saturate(0.9); }
+  }
+  .scene-media-frame {
+    position: fixed;
+    right: 28px;
+    bottom: 92px;
+    width: min(30vw, 500px);
+    min-width: 320px;
+    aspect-ratio: 1.85 / 1;
+    z-index: 21;
+    pointer-events: none;
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(7,9,12,0.72);
+    border: 1px solid rgba(88,166,255,0.22);
+    box-shadow:
+      0 28px 90px rgba(0,0,0,0.55),
+      0 0 34px rgba(88,166,255,0.16),
+      inset 0 0 38px rgba(7,9,12,0.35);
+    animation: scene-media-in-corner 1200ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .scene-media-frame.is-fading-out {
+    animation: scene-media-out-corner 950ms cubic-bezier(0.55,0.06,0.68,0.19) forwards;
+  }
+  .scene-media-frame.is-center {
+    top: clamp(88px, 11vh, 128px);
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: min(50vw, 860px);
+    min-width: 0;
+    z-index: 16;
+    animation-name: scene-media-in;
+  }
+  .scene-media-frame.is-center.is-fading-out {
+    animation-name: scene-media-out;
+  }
+  .scene-media-frame.is-bottom-left {
+    top: auto;
+    left: 28px;
+    right: auto;
+    bottom: 92px;
+    width: min(30vw, 500px);
+    min-width: 320px;
+    z-index: 21;
+    animation-name: scene-media-in-bottom-left;
+  }
+  .scene-media-frame.is-bottom-left.is-fading-out {
+    animation-name: scene-media-out-bottom-left;
+  }
+  .scene-media-frame::before {
+    content: '';
+    position: absolute; inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(7,9,12,0.05), rgba(7,9,12,0.22)),
+      radial-gradient(ellipse at center, transparent 58%, rgba(7,9,12,0.42) 100%);
+    mix-blend-mode: multiply;
+  }
+  .scene-media-frame::after {
+    content: '';
+    position: absolute; inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    border: 1px solid rgba(233,196,106,0.12);
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .scene-media {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    filter: saturate(0.9) contrast(1.04) brightness(0.88);
+  }
+  .scene-media.is-shot {
+    animation: scene-shot-in 520ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .scene-media-caption {
+    position: absolute;
+    left: 16px;
+    bottom: 13px;
+    z-index: 4;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8.5px;
+    letter-spacing: 0.32em;
+    color: rgba(230,237,243,0.72);
+    text-transform: uppercase;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.9);
+  }
   /* ─── Top-right colour legend (replaces the dev debug HUD) ────────────── */
   .legend-card {
     position: fixed; top: 44px; right: 14px;
@@ -638,6 +755,27 @@
     .panel { width: 88vw; left: 6vw; right: 6vw; max-width: none; }
     .chart-card { width: 88vw; right: 6vw; left: 6vw; max-width: none; bottom: 120px; }
     .headline { font-size: 1.6rem; }
+    .scene-media-frame {
+      right: 6vw;
+      bottom: 112px;
+      width: 44vw;
+      min-width: 240px;
+    }
+    .scene-media-frame.is-center {
+      top: 92px;
+      left: 50%;
+      right: auto;
+      bottom: auto;
+      width: 86vw;
+      min-width: 0;
+    }
+    .scene-media-frame.is-bottom-left {
+      left: 6vw;
+      right: auto;
+      bottom: 112px;
+      width: 44vw;
+      min-width: 240px;
+    }
     .streamlit-return {
       top: 58px;
       right: 14px;
@@ -1029,6 +1167,11 @@ const MASARI_LEGS = [
   },
 ];
 
+const MASARI_ROUTE_DURATION_MS = MASARI_LEGS.reduce(
+  (sum, leg) => sum + leg.durationMs + leg.pauseMs,
+  0
+);
+
 const MASARI_ROUTE = MASARI_LEGS.flatMap((leg, idx) =>
   idx === 0 ? leg.route : leg.route.slice(1)
 );
@@ -1090,6 +1233,11 @@ const LAYLA_TRIP_LEGS = [
   },
 ];
 
+const LAYLA_TRIP_DURATION_MS = LAYLA_TRIP_LEGS.reduce(
+  (sum, leg) => sum + leg.durationMs + leg.pauseMs,
+  0
+);
+
 const LAYLA_TRIP_ROUTE = LAYLA_TRIP_LEGS.flatMap((leg, idx) =>
   idx === 0 ? leg.route : leg.route.slice(1)
 );
@@ -1106,7 +1254,7 @@ const LAYLA_TRIP_STOPS = [
 // ═══════════════════════════════════════════════════════════════════════
 const LAYERS = {
   crowLine:    ['crow-line-layer'],
-  metro:       ['metro-line-layer', 'metro-dot-halo', 'metro-dots'],
+  metro:       ['metro-dot-halo', 'metro-dots'],
   lrt:         ['lrt-line-layer', 'lrt-dot-halo', 'lrt-dots'],
   brt:         ['brt-demand-halo', 'brt-dots'],
   // informal-layer / informal-halo are now 3D Three.js markers (no MapLibre
@@ -1789,6 +1937,142 @@ function makeGhostMarker(category) {
   return group;
 }
 
+// Cinematic replacement for ghost terminals: a large floating 3D ghost, not a
+// flat map point. It keeps the same userData fields the animation loop expects
+// (`orb`, `halo`, `ring`, `beam`) and adds body/skirt/wisps for a clearer shape.
+function makeGhostTerminalMarker(category) {
+  const isStranded = category === 'stranded';
+  const isReached  = category === 'reached';
+  const colorHex = isReached ? 0x2A9D8F : isStranded ? 0xE86F51 : 0xE9C46A;
+  const baseAlpha = isReached ? 0.92 : isStranded ? 0.72 : 0.82;
+
+  const group = new THREE.Group();
+  const HEAD_R = 34;
+  const BODY_H = 76;
+  const BODY_R = 38;
+  const BASE_Y = 16;
+  const ORB_Y = BASE_Y + BODY_H + HEAD_R * 0.35;
+  const HALO_R = 86;
+
+  const ghostMat = new THREE.MeshPhysicalMaterial({
+    color: colorHex,
+    emissive: colorHex,
+    emissiveIntensity: isReached ? 1.25 : 0.95,
+    metalness: 0.02,
+    roughness: 0.22,
+    clearcoat: 0.7,
+    clearcoatRoughness: 0.18,
+    transparent: true,
+    opacity: baseAlpha,
+    side: THREE.DoubleSide,
+  });
+  applyFresnelRim(ghostMat, { power: 1.65, strength: 3.2 });
+
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(HEAD_R * 0.76, BODY_R, BODY_H, 36, 1, true),
+    ghostMat
+  );
+  body.position.y = BASE_Y + BODY_H / 2;
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(HEAD_R, 36, 24), ghostMat);
+  head.position.y = ORB_Y;
+
+  const skirt = new THREE.Group();
+  const scallopGeo = new THREE.SphereGeometry(9.5, 16, 10);
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const scallop = new THREE.Mesh(scallopGeo, ghostMat);
+    scallop.scale.set(1.15, 0.55, 1.15);
+    scallop.position.set(
+      Math.cos(a) * (BODY_R - 7),
+      BASE_Y,
+      Math.sin(a) * (BODY_R - 7)
+    );
+    skirt.add(scallop);
+  }
+
+  const eyeMat = new THREE.MeshBasicMaterial({
+    color: 0x071015,
+    transparent: true,
+    opacity: isStranded ? 0.78 : 0.9,
+  });
+  const eyeGeo = new THREE.SphereGeometry(4.8, 12, 8);
+  const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+  const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+  eyeL.position.set(-11, ORB_Y + 5, HEAD_R * 0.84);
+  eyeR.position.set( 11, ORB_Y + 5, HEAD_R * 0.84);
+  const mouth = new THREE.Mesh(new THREE.SphereGeometry(4.2, 12, 8), eyeMat);
+  mouth.scale.set(0.9, 1.45, 0.45);
+  mouth.position.set(0, ORB_Y - 8, HEAD_R * 0.88);
+
+  const wispGeo = new THREE.SphereGeometry(11, 16, 10);
+  const wispL = new THREE.Mesh(wispGeo, ghostMat);
+  const wispR = new THREE.Mesh(wispGeo, ghostMat);
+  wispL.scale.set(1.55, 0.7, 0.9);
+  wispR.scale.set(1.55, 0.7, 0.9);
+  wispL.position.set(-BODY_R * 0.88, BASE_Y + BODY_H * 0.58, 0);
+  wispR.position.set( BODY_R * 0.88, BASE_Y + BODY_H * 0.58, 0);
+
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(HALO_R, 22, 16),
+    new THREE.MeshBasicMaterial({
+      color: colorHex,
+      transparent: true,
+      opacity: 0.26,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    })
+  );
+  halo.position.y = ORB_Y;
+
+  const beamGeo = new THREE.CylinderGeometry(2.8, 8, 230, 18, 1, true);
+  beamGeo.translate(0, 115, 0);
+  const beam = new THREE.Mesh(
+    beamGeo,
+    new THREE.MeshBasicMaterial({
+      color: colorHex,
+      transparent: true,
+      opacity: 0.20,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    })
+  );
+  beam.position.y = ORB_Y + 46;
+
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(52, 96, 48),
+    new THREE.MeshBasicMaterial({
+      color: colorHex,
+      transparent: true,
+      opacity: 0.62,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.5;
+
+  group.add(ring, halo, beam, body, head, skirt, wispL, wispR, eyeL, eyeR, mouth);
+  group.userData = {
+    body,
+    head,
+    orb: head,
+    halo,
+    ring,
+    beam,
+    skirt,
+    wisps: [wispL, wispR],
+    eyes: [eyeL, eyeR, mouth],
+    color: colorHex,
+    category,
+    baseScale: 1.0,
+    baseAlpha,
+    orbY: ORB_Y,
+  };
+  return group;
+}
+
 // 3D route tube — extrudes a lng/lat path into a glowing raised ribbon
 // with a time-scrolling emissive dash pattern (GPU-side, no per-frame
 // geometry rebuilds). `coords` is an array of [lng, lat] pairs.
@@ -2003,7 +2287,7 @@ function buildCairoThreeLayer() {
       this.ghostsGroup = new THREE.Group();
       this.ghostsGroup.visible = false;
       INFORMAL_TERMINALS.forEach(([lng, lat, dist_m, cat]) => {
-        const m = makeGhostMarker(cat);
+        const m = makeGhostTerminalMarker(cat);
         m.position.copy(lngLatToWorld([lng, lat]));
         m.userData.dist_m = dist_m;
         this.ghostsGroup.add(m);
@@ -2258,10 +2542,9 @@ function buildCairoThreeLayer() {
       if (this.ghostsGroup.visible) {
         const spawnedAt = this._ghostSpawnAt || 0;
         const sinceSpawn = nowMs - spawnedAt;
-        // Ghost markers themselves are smaller-scale than station pins, so
-        // they get their own baseline multiplier (1.6×) on top of the global
-        // zoom LOD — visible from zoom 9, never overpowering the bigger pins.
-        const ghostBase = 1.6;
+        // Ghost terminals are the emotional evidence layer, so they use their
+        // own larger baseline multiplier on top of the global zoom LOD.
+        const ghostBase = 2.15;
         for (let i = 0; i < this.ghosts.length; i++) {
           const g = this.ghosts[i];
           const ud = g.userData;
@@ -2273,8 +2556,15 @@ function buildCairoThreeLayer() {
           const ease = 1 - Math.pow(1 - sp, 3);
           const phase = t * (isReached ? 2.4 : 1.5) + i * 0.27;
           const bob = Math.sin(phase) * (isReached ? 4 : 2.2);
-          ud.orb.position.y  = ud.orbY + bob;
-          ud.halo.position.y = ud.orbY + bob;
+          g.position.y = bob;
+          ud.orb.position.y  = ud.orbY + Math.sin(phase * 1.7) * 2.0;
+          ud.halo.position.y = ud.orbY + Math.sin(phase * 1.7) * 2.0;
+          if (ud.body) ud.body.rotation.y = Math.sin(phase * 0.35) * 0.16;
+          if (ud.skirt) ud.skirt.rotation.y = t * 0.26 + i * 0.08;
+          if (ud.wisps) {
+            ud.wisps[0].position.y = 16 + 76 * 0.58 + Math.sin(phase * 1.3) * 3.0;
+            ud.wisps[1].position.y = 16 + 76 * 0.58 + Math.cos(phase * 1.3) * 3.0;
+          }
           // Emissive breath — reached ghosts breathe stronger
           const breath = 0.5 + 0.5 * Math.sin(phase);
           ud.orb.material.emissiveIntensity =
@@ -2347,7 +2637,7 @@ const SCENES = [
     body: 'Every morning 1.4 million Cairenes commute by bus or microbus. Most make trips the state\'s $10 billion post-2014 transport programme was never designed to serve. This is one of those stories.',
     metric: { label: 'COMMUTERS LIKE LAYLA', value: 1400000, unit: 'DAILY', format: 'k' },
     hint: 'Click next · or press →',
-    center: [31.30, 30.05], zoom: 10.1, pitch: 20, bearing: 0,
+    center: [31.34, 18.00], zoom: 1.25, pitch: 0, bearing: 0,
     // Prologue is a clean opening — no ghost-terminal swarm yet. The 115
     // ghosts come on stage in Scene 5 where they're explicitly named.
     visible: [], dim: [],
@@ -2360,6 +2650,7 @@ const SCENES = [
     arabic: 'ليلى · إمبابة · ٦:١٥ صباحاً',
     body: 'One of the densest neighborhoods on Earth — 63,000 people per square kilometer. No metro ran through Imbaba until 2024. None run at a useful walking distance from her apartment today.',
     metric: { label: 'DENSITY · IMBABA', value: 63000, unit: 'PEOPLE / KM²' },
+    media: { type: 'video', src: 'Videos/Scene1.mp4', caption: 'Scene 01 · Imbaba Dawn' },
     center: LOCATIONS.imbaba, zoom: 13.6, pitch: 55, bearing: -18,
     visible: ['layla-home-glow', 'layla-home-dot', 'layla-home-icon', 'informal-halo'], dim: [],
     transition: { speed: 0.7, curve: 1.4 },
@@ -2371,6 +2662,7 @@ const SCENES = [
     arabic: 'المعادي · ١١ كيلومتر',
     body: 'Across the city. South of the Nile. On paper, a short trip. In reality, Layla must cross two transport systems that were never designed to connect.',
     metric: { label: 'AS THE CROW FLIES', value: 11, unit: 'KM' },
+    media: { type: 'video', src: 'Videos/Scene2.mp4', caption: 'Scene 02 · Maadi Across the City' },
     center: [31.23, 30.03], zoom: 12.0, pitch: 50, bearing: -18,
     visible: ['layla-home-glow', 'layla-home-dot', 'layla-home-icon', 'office-glow', 'office-icon', 'crow-line-layer'],
     dim: [],
@@ -2384,9 +2676,22 @@ const SCENES = [
     body: 'Three vehicles. Two transfers. No single app that can plan the trip end to end. Layla does this twice a day — over 720 hours a year sitting in transit.',
     metric: { label: 'TYPICAL TRIP', value: 83, unit: 'MIN · EACH WAY' },
     tripPlan: LAYLA_TRIP_LEGS,
+    media: {
+      type: 'video',
+      src: 'Videos/Scene3.mp4',
+      caption: 'Scene 03 · The Real Journey',
+      totalDurationMs: LAYLA_TRIP_DURATION_MS,
+      shots: [
+        'Shots/Scene4_Shot1.png',
+        'Shots/Scene4_Shot2.png',
+        'Shots/Scene4_Shot3.png',
+        'Shots/Scene4_Shot4.png',
+        'Shots/Scene4_Shot5.png',
+      ],
+    },
     // Open on Imbaba so the microbus leaving the mawfaq is visible immediately.
     center: [31.215, 30.082], zoom: 12.6, pitch: 50, bearing: -5,
-    visible: ['layla-home-icon', 'office-icon', 'informal-layer', 'informal-halo', 'layla-trip-glow', 'layla-trip-inner', 'layla-trip-progress', 'layla-trip-car', 'layla-trip-stops', 'layla-trip-transfer-pulse'], dim: ['metro-line-layer', 'metro-icons'],
+    visible: ['layla-home-icon', 'office-icon', 'informal-layer', 'informal-halo', 'layla-trip-glow', 'layla-trip-inner', 'layla-trip-progress', 'layla-trip-car', 'layla-trip-stops', 'layla-trip-transfer-pulse'], dim: ['metro-icons'],
     animate: 'layla-trip',
     transition: { speed: 0.55, curve: 1.4 },
   },
@@ -2398,7 +2703,7 @@ const SCENES = [
     body: 'Metro Line 3 extensions — Ataba to Adly Mansour, then Kit Kat westward. The Cairo LRT to the New Administrative Capital. The Ring Road BRT. Ten billion dollars of rail, bus-rapid, and light-rail infrastructure.',
     metric: { label: 'INVESTMENT · 2014–2026', value: 10, unit: 'BILLION USD', format: 'billion' },
     center: [31.32, 30.09], zoom: 10.9, pitch: 52, bearing: -8,
-    visible: ['metro-line-layer', 'metro-dot-halo', 'metro-dots', 'metro-icons',
+    visible: ['metro-dot-halo', 'metro-dots', 'metro-icons',
               'lrt-line-layer', 'lrt-dot-halo', 'lrt-dots', 'lrt-icons',
               'brt-dots', 'brt-icons', 'brt-demand-halo'],
     dim: ['layla-home-icon'],
@@ -2418,7 +2723,7 @@ const SCENES = [
     center: [31.27, 30.06], zoom: 11.0, pitch: 50, bearing: -8,
     visible: [
       // Full metro network — bright cyan = post-2014, slate = pre-2014
-      'metro-icons', 'metro-pre-icons', 'metro-dot-halo', 'metro-dots', 'metro-line-layer',
+      'metro-icons', 'metro-pre-icons', 'metro-dot-halo', 'metro-dots',
       // Phase-1 ghost-terminal swarm (3D) and the long gap-line annotations
       'informal-layer', 'informal-halo', 'gap-lines-layer',
       // Layla anchor for orientation
@@ -2510,12 +2815,34 @@ const SCENES = [
   },
   {
     id: 12, chapter: 'Masari', chapterIdx: 4,
-    kicker: 'STAGE 12 · THE SOFTWARE ANSWER',
+    kicker: 'STAGE 12 · SHE FINDS MASARI',
+    headline: 'Layla finds the missing layer',
+    arabic: 'مَسَارِي · الخريطة التي كانت ناقصة',
+    body: 'After years of memorizing routes by trial and error, Layla opens Masari. For the first time, the informal microbus she actually uses and the formal metro she has to reach appear as one readable journey. The city did not change overnight. The interface did.',
+    metric: { label: 'WHAT CHANGED', value: 'ONE ROUTE', unit: 'FORMAL + INFORMAL', isText: true },
+    media: { type: 'video', src: 'Videos/Scene5.mp4', caption: 'Scene 05 · Layla Opens Masari' },
+    center: [31.225, 30.055], zoom: 11.9, pitch: 52, bearing: -12,
+    visible: ['layla-home-glow', 'layla-home-icon', 'office-icon', 'crow-line-layer',
+              'metro-icons', 'metro-dots', 'informal-layer', 'informal-halo'],
+    dim: ['lrt-icons', 'lrt-dots', 'brt-icons', 'brt-dots'],
+    transition: { speed: 0.58, curve: 1.45 },
+  },
+  {
+    id: 13, chapter: 'Masari', chapterIdx: 4,
+    kicker: 'STAGE 13 · THE SOFTWARE ANSWER',
     headline: 'Masari · one route planner for both systems',
     arabic: 'مَسَارِي · تطبيق واحد',
     body: 'Masari does not invent a new railway. It stitches the commute into one readable chain: microbus out of Imbaba, Metro Line 3 into the core, a transfer at Sadat, then the final connection into Maadi. The route becomes one journey instead of three guesses.',
     metric: { label: 'ADDRESSABLE MARKET', value: 18.9, unit: 'MILLION · FORMAL CORE + PERIPHERAL + MIXED', decimals: 1 },
     tripPlan: MASARI_LEGS,
+    media: {
+      caption: 'Masari · Live Route Guidance',
+      totalDurationMs: MASARI_ROUTE_DURATION_MS,
+      videos: [
+        { src: 'Videos/Scene6.mp4', caption: 'Scene 06 · Masari Builds the Route' },
+        { src: 'Videos/Scene7.mp4', caption: 'Scene 07 · The Journey Becomes Legible' },
+      ],
+    },
     // Open on Imbaba then chase the microbus south. The full transit network
     // (metro + BRT pins) is visible as Masari's "guide" — the formal stops it
     // stitches together. The cinematic chase camera tightens on the vehicle
@@ -2523,7 +2850,7 @@ const SCENES = [
     // with the network pins around it.
     center: [31.215, 30.082], zoom: 12.6, pitch: 56, bearing: -5,
     visible: ['masari-glow', 'masari-inner', 'masari-progress', 'masari-car', 'masari-transfer-pulse',
-              'metro-icons', 'metro-dots', 'metro-line-layer',
+              'metro-icons', 'metro-dots',
               'brt-icons', 'brt-dots', 'brt-demand-halo',
               'layla-home-icon', 'office-icon'],
     dim: ['lrt-icons', 'lrt-dots'],
@@ -2531,12 +2858,13 @@ const SCENES = [
     transition: { speed: 0.6, curve: 1.5 },
   },
   {
-    id: 13, chapter: 'Masari', chapterIdx: 4,
-    kicker: 'STAGE 13 · ARRIVAL',
+    id: 14, chapter: 'Masari', chapterIdx: 4,
+    kicker: 'STAGE 14 · ARRIVAL',
     headline: '08:55 — she arrives on time',
     arabic: 'وصلت في الموعد',
     body: 'The commute now has named legs, known transfers, and one route Layla can trust. Forty-five minutes instead of eighty-three. The infrastructure did not reach her as one system. The software can make it behave like one.',
     metric: { label: 'LAYLA · MORNING', value: '08:55', unit: 'ARRIVED ON TIME', isText: true },
+    media: { type: 'video', src: 'Videos/Scene8.mp4', caption: 'Scene 08 · Arrival' },
     center: LOCATIONS.maadi, zoom: 14.0, pitch: 58, bearing: 24,
     visible: ['office-glow', 'office-icon', 'layla-mobile-icon', 'layla-mobile-pulse'],
     dim: ['lrt-icons', 'lrt-dots', 'brt-icons', 'brt-dots', 'informal-layer'],
@@ -2943,6 +3271,7 @@ function useMasariAnimation(map, active) {
   const rafRef = useRef(null);
   const startedAtRef = useRef(0);
   const bearingRef = useRef(null);
+  const [startupRetry, setStartupRetry] = useState(0);
 
   useEffect(() => {
     if (!map || !active) {
@@ -2951,12 +3280,30 @@ function useMasariAnimation(map, active) {
       if (transferSource) {
         transferSource.setData({ type: 'FeatureCollection', features: [] });
       }
+      if (startupRetry !== 0) setStartupRetry(0);
       return;
     }
+    const shouldHaveThree = typeof THREE !== 'undefined';
+    const threeReady = !shouldHaveThree || (
+      map._threeLayer?.microbus &&
+      map._threeLayer?.metroTrain &&
+      typeof map._threeLayer.setVehicle === 'function'
+    );
+    const sourcesReady =
+      map.getSource('masari-progress-src') &&
+      map.getSource('masari-transfer-src') &&
+      map.getLayer('masari-progress') &&
+      map.getLayer('masari-transfer-pulse');
+
+    if ((!sourcesReady || !threeReady) && startupRetry < 20) {
+      const retryTimer = setTimeout(() => setStartupRetry((n) => n + 1), 80);
+      return () => clearTimeout(retryTimer);
+    }
+
     // FRESH-START RESET — see comments in useLaylaTripAnimation. Re-entering
     // the scene (next → prev) leaves stale state in the 3D layer that can
     // suppress the vehicle on the second activation; reset before scheduling.
-    if (map._threeLayer) {
+    if (threeReady && map._threeLayer) {
       map._threeLayer.hideVehicles();
       const tr = map._threeLayer._trail;
       if (tr) {
@@ -2999,7 +3346,7 @@ function useMasariAnimation(map, active) {
 
     // Place the 3D vehicle at the start before the first RAF so the user
     // sees it immediately when the scene opens.
-    if (map._threeLayer) {
+    if (threeReady && map._threeLayer) {
       const startPt = MASARI_LEGS[0].route[0];
       const nextPt  = MASARI_LEGS[0].route[1] || startPt;
       const initBearing = turf.bearing(turf.point(startPt), turf.point(nextPt));
@@ -3111,9 +3458,9 @@ function useMasariAnimation(map, active) {
       cancelAnimationFrame(rafRef.current);
       transferSource.setData({ type: 'FeatureCollection', features: [] });
       map.setPaintProperty('masari-transfer-pulse', 'circle-opacity', 0);
-      map._threeLayer?.hideVehicles();
+      if (threeReady && map._threeLayer) map._threeLayer.hideVehicles();
     };
-  }, [map, active]);
+  }, [map, active, startupRetry]);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -3124,18 +3471,37 @@ function useLaylaTripAnimation(map, active) {
   const rafRef = useRef(null);
   const startedAtRef = useRef(0);
   const bearingRef = useRef(null);
+  const [startupRetry, setStartupRetry] = useState(0);
 
   useEffect(() => {
     if (!map || !active) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       const transferSource = map?.getSource?.('layla-trip-transfer-src');
       if (transferSource) transferSource.setData({ type: 'FeatureCollection', features: [] });
+      if (startupRetry !== 0) setStartupRetry(0);
       return;
     }
+    const shouldHaveThree = typeof THREE !== 'undefined';
+    const threeReady = !shouldHaveThree || (
+      map._threeLayer?.microbus &&
+      map._threeLayer?.metroTrain &&
+      typeof map._threeLayer.setVehicle === 'function'
+    );
+    const sourcesReady =
+      map.getSource('layla-trip-progress-src') &&
+      map.getSource('layla-trip-transfer-src') &&
+      map.getLayer('layla-trip-progress') &&
+      map.getLayer('layla-trip-transfer-pulse');
+
+    if ((!sourcesReady || !threeReady) && startupRetry < 20) {
+      const retryTimer = setTimeout(() => setStartupRetry((n) => n + 1), 80);
+      return () => clearTimeout(retryTimer);
+    }
+
     // FRESH-START RESET — when re-entering the scene (next → prev nav), the
     // 3D layer can hold stale state from the previous run that prevents the
     // vehicle from re-appearing. Force a clean slate before scheduling RAF.
-    if (map._threeLayer) {
+    if (threeReady && map._threeLayer) {
       map._threeLayer.hideVehicles();
       // Also blank the trail buffer so it doesn't draw a long ghost stretch
       // from the last vehicle parking spot to the new starting point.
@@ -3181,7 +3547,7 @@ function useLaylaTripAnimation(map, active) {
     // RAF — guarantees the user sees it the instant the scene opens, not
     // only after the first animation frame fires (which can be delayed if
     // the tab was backgrounded or RAFs were throttled).
-    if (map._threeLayer) {
+    if (threeReady && map._threeLayer) {
       const startPt = LAYLA_TRIP_LEGS[0].route[0];
       const nextPt  = LAYLA_TRIP_LEGS[0].route[1] || startPt;
       const initBearing = turf.bearing(turf.point(startPt), turf.point(nextPt));
@@ -3228,7 +3594,7 @@ function useLaylaTripAnimation(map, active) {
       map.setPaintProperty('layla-trip-progress', 'line-color', activeLeg.color);
 
       // Drive the 3D vehicle (swaps between metro train ↔ microbus per leg)
-      if (map._threeLayer) {
+      if (threeReady && map._threeLayer) {
         map._threeLayer.setVehicle(
           activeLeg.mode === 'METRO' ? 'metro' : 'microbus',
           { lngLat: point.geometry.coordinates, bearing },
@@ -3281,9 +3647,9 @@ function useLaylaTripAnimation(map, active) {
       cancelAnimationFrame(rafRef.current);
       transferSource.setData({ type: 'FeatureCollection', features: [] });
       map.setPaintProperty('layla-trip-transfer-pulse', 'circle-opacity', 0);
-      map._threeLayer?.hideVehicles();
+      if (threeReady && map._threeLayer) map._threeLayer.hideVehicles();
     };
-  }, [map, active]);
+  }, [map, active, startupRetry]);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -3324,22 +3690,9 @@ async function setupMapLayers(map) {
     },
   });
 
-  // ── Metro line + icons ──
-  map.addSource('metro-line', {
-    type: 'geojson',
-    data: { type: 'Feature', geometry: { type: 'LineString',
-      coordinates: METRO_POST_2014.map(s => s.coords) }, properties: {} },
-  });
-  map.addLayer({
-    id: 'metro-line-layer', type: 'line', source: 'metro-line',
-    paint: {
-      'line-color': '#58A6FF',
-      'line-width': ['interpolate', ['linear'], ['zoom'], 9, 5, 12, 8, 15, 12],
-      'line-opacity': 0,
-      'line-blur': 1.2,
-    },
-    layout: { 'line-cap': 'round', 'line-join': 'round' },
-  });
+  // ── Metro station icons ──
+  // Metro station dots/icons only. The old 2D blue connector line was removed
+  // so the map reads as station evidence instead of an artificial route trace.
   map.addSource('metro', {
     type: 'geojson',
     data: { type: 'FeatureCollection', features: METRO_POST_2014.map(s => ({
@@ -3656,12 +4009,125 @@ const LEGEND_GHOSTS = [
   { color: '#2A9D8F', glyph: '•', label: `Reached · <1 km (${GHOST_STATS.reached_under_1km})` },
 ];
 
+const DENSITY_3D_SRC = './density3d.html?embed=1&v=masari-density-dark-map-v2';
+const STORY_ASSET_BASE = (() => {
+  const path = window.location.pathname.replace(/\\/g, '/');
+  return path.includes('/story/') ? '../assets' : './assets';
+})();
+
+function storyAssetUrl(assetPath) {
+  return `${STORY_ASSET_BASE}/${String(assetPath || '').replace(/^assets\//, '')}`;
+}
+
 function LegendRow({ color, glyph, label }) {
   return (
     <div className="legend-row">
       <span className="legend-swatch" style={{ background: color, color }} />
       <span className="legend-glyph" style={{ color }}>{glyph}</span>
       <span className="legend-label">{label}</span>
+    </div>
+  );
+}
+
+function SceneMedia({ media }) {
+  const videoItems = media?.videos?.length
+    ? media.videos
+    : (media?.src ? [{ src: media.src, type: media.type, caption: media.caption }] : []);
+  const shots = media?.shots || [];
+  const [phase, setPhase] = useState('video');
+  const [activeVideoIdx, setActiveVideoIdx] = useState(0);
+  const [activeShotIdx, setActiveShotIdx] = useState(0);
+  const [videoDurationMs, setVideoDurationMs] = useState(Number(media?.videoDurationMs) || 0);
+  const [isFadingOut, setIsFadingOut] = useState(false);
+
+  const totalDurationMs = Number(media?.totalDurationMs) || 0;
+  const isTimedPlaylist = videoItems.length > 1 && totalDurationMs > 0;
+  const playlistSlotMs = isTimedPlaylist
+    ? Math.max(700, totalDurationMs / videoItems.length)
+    : 0;
+  const fallbackShotDurationMs = Number(media?.shotDurationMs) || 1400;
+  const remainingTripMs = Math.max(0, totalDurationMs - videoDurationMs);
+  const shotDurationMs = shots.length
+    ? Math.max(450, totalDurationMs ? remainingTripMs / shots.length : fallbackShotDurationMs)
+    : fallbackShotDurationMs;
+
+  useEffect(() => {
+    if (!isTimedPlaylist || phase !== 'video' || isFadingOut) return;
+    const t = setTimeout(() => {
+      if (activeVideoIdx < videoItems.length - 1) {
+        setActiveVideoIdx((idx) => idx + 1);
+      } else {
+        setIsFadingOut(true);
+      }
+    }, playlistSlotMs);
+    return () => clearTimeout(t);
+  }, [isTimedPlaylist, phase, activeVideoIdx, videoItems.length, playlistSlotMs, isFadingOut]);
+
+  useEffect(() => {
+    if (phase !== 'shots' || !shots.length || isFadingOut) return;
+    const t = setTimeout(() => {
+      if (activeShotIdx < shots.length - 1) {
+        setActiveShotIdx((idx) => idx + 1);
+      } else {
+        setIsFadingOut(true);
+      }
+    }, shotDurationMs);
+    return () => clearTimeout(t);
+  }, [phase, activeShotIdx, shots.length, shotDurationMs, isFadingOut]);
+
+  if (!videoItems.length) return null;
+
+  const activeVideo = videoItems[Math.min(activeVideoIdx, Math.max(0, videoItems.length - 1))];
+  const src = storyAssetUrl(activeVideo.src);
+  const caption = activeVideo.caption || media.caption || '';
+  const currentShot = shots[Math.min(activeShotIdx, Math.max(0, shots.length - 1))];
+
+  const handleVideoEnded = (event) => {
+    if (isTimedPlaylist) return;
+    const durationMs = Number.isFinite(event.currentTarget.duration)
+      ? event.currentTarget.duration * 1000
+      : videoDurationMs;
+    setVideoDurationMs(durationMs);
+    if (shots.length) {
+      setPhase('shots');
+      setActiveShotIdx(0);
+    } else {
+      setIsFadingOut(true);
+    }
+  };
+
+  const placementClass = media.center ? ' is-center' : (media.bottomLeft ? ' is-bottom-left' : '');
+
+  return (
+    <div className={`scene-media-frame${placementClass}${isFadingOut ? ' is-fading-out' : ''}`} aria-label={caption || 'Scene media'}>
+      {phase === 'shots' && currentShot ? (
+        <img
+          key={currentShot}
+          className="scene-media is-shot"
+          src={storyAssetUrl(currentShot)}
+          alt={caption}
+        />
+      ) : activeVideo.type === 'image' ? (
+        <img className="scene-media" src={src} alt={caption} />
+      ) : (
+        <video
+          key={activeVideo.src}
+          className="scene-media"
+          src={src}
+          autoPlay
+          muted
+          loop={isTimedPlaylist}
+          playsInline
+          preload="auto"
+          onLoadedMetadata={(event) => {
+            if (!isTimedPlaylist && Number.isFinite(event.currentTarget.duration)) {
+              setVideoDurationMs(event.currentTarget.duration * 1000);
+            }
+          }}
+          onEnded={handleVideoEnded}
+        />
+      )}
+      {caption && <div className="scene-media-caption">{caption}</div>}
     </div>
   );
 }
@@ -3772,7 +4238,7 @@ function App() {
     setDiagnostics(d => ({ ...d, visibleNow: liveVis.length }));
   }, [sceneIdx, mapReady]);
 
-  // Masari animated route on scene 12
+  // Masari animated route scene
   useMasariAnimation(mapRef.current, mapReady && SCENES[sceneIdx].animate === 'masari-route');
   // Layla chaos trip on scene 3
   useLaylaTripAnimation(mapRef.current, mapReady && SCENES[sceneIdx].animate === 'layla-trip');
@@ -3801,8 +4267,8 @@ function App() {
     if (!autoPlay) return;
     const animate = SCENES[sceneIdx].animate;
     let dwell = 8500;
-    if (animate === 'masari-route') dwell = 11500;
-    if (animate === 'layla-trip')   dwell = 13500;   // chaos trip is longer (4 legs + transfers)
+    if (animate === 'masari-route') dwell = MASARI_ROUTE_DURATION_MS + 1600;
+    if (animate === 'layla-trip')   dwell = LAYLA_TRIP_DURATION_MS + 1600;   // video + shots finish with the car
     const t = setTimeout(() => {
       setSceneIdx(i => i < SCENES.length - 1 ? i + 1 : i);
     }, dwell);
@@ -3810,6 +4276,7 @@ function App() {
   }, [autoPlay, sceneIdx]);
 
   const scene = SCENES[sceneIdx];
+  const isDensityScene = sceneIdx === 6;
 
   // CTA: post a message to the parent Streamlit page
   const postMode = (mode) => {
@@ -3828,13 +4295,19 @@ function App() {
       {sceneIdx === 6 && (
         <iframe
           key="density-iframe"
-          src="density3d.html?embed=1"
+          src={DENSITY_3D_SRC}
           className="density-iframe"
           title="Cairo · Density 3D Heatmap"
         />
       )}
-      <div className="version-tag">BUILD · V23 · FULL METRO NETWORK</div>
-      <ColorLegend />
+      {scene.media && (
+        <SceneMedia
+          key={`${scene.id}-${scene.media.src || scene.media.videos?.map((v) => v.src).join('|') || 'media'}`}
+          media={scene.media}
+        />
+      )}
+      {!isDensityScene && <div className="version-tag">BUILD · V23 · FULL METRO NETWORK</div>}
+      {!isDensityScene && <ColorLegend />}
       {mapReady && <TopBar scene={scene} sceneIdx={sceneIdx} total={SCENES.length} />}
       {mapReady && (
         <NarrativePanel
