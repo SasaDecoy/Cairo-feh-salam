@@ -1,0 +1,132 @@
+% =====================================================================
+%  Section 08 — The four structural gaps
+% =====================================================================
+
+\section{Phase 1 \textbullet\ The Four Structural Gaps}
+\label{sec:phase1-gaps}
+
+The twelve research questions converge on \kw{four structural gaps}.
+Each one is defined operationally (one formula), counted on the cleaned
+data, and visualised in a specific Q-chart. They are the bridge between
+Phase 1 (audit) and Phase 2 (verdict on new infrastructure): every Phase
+2 hypothesis is an attempt to test whether the gap got smaller.
+
+\subsection{G1 \textbullet\ Ghost Terminals · 115}
+
+\textbf{Definition.}
+\fn{Underused = (Total\_Routes > 0) AND (Boarding\_Near\_Terminal == 0)}
+where \fn{Boarding\_Near\_Terminal} sums daily boardings within a
+\stat{100 m} buffer of the terminal centroid.
+
+\textbf{Counts.}
+\begin{itemize}
+  \item \stat{115} ghost terminals at the 100-m baseline.
+  \item \stat{69} \kw{near-miss} (100--500 m) — fix by relocating the stop.
+  \item \stat{17} \kw{stop-too-far} (500 m--1 km) — fix by improving
+        walkability.
+  \item \stat{29} \kw{truly isolated} ($>$1 km) — audit and decommission.
+\end{itemize}
+
+\textbf{Recovery.} \stat{60\%} of ghosts disappear at a 500-m radius
+(see Q11 recovery curve). The remaining 40\% are the genuine spatial
+problem.
+
+\textbf{Implication.} The ghost-terminal phenomenon is partly a
+walkability problem (fixable) and partly a wasted-infrastructure
+problem. The 29 truly isolated terminals are running zero passengers
+yet still consuming routes that could be redirected.
+
+\subsection{G2 \textbullet\ Empty-Return Terminals · 19}
+
+\textbf{Definition.}
+$\text{Empty Return Index} = 1 - \dfrac{\text{passengers}}{\text{vehicles}}$ within the terminal's 50-m flow buffer.
+Critical threshold: \stat{$\geq 0.60$}.
+
+\textbf{Counts.} \stat{19} terminals above the threshold. \stat{208} are healthy
+(index = 0.0, every vehicle carries at least one passenger). The
+distribution is essentially binary — see Q10.
+
+\textbf{Magnitude.} The 19 critical terminals run \stat{193 empty
+vehicle-trips per hour} between them. Zero passengers. Every day.
+
+\textbf{Implication.} G2 is the operational-discipline gap. Routes are
+being dispatched without demand on the return leg. Software-side
+scheduling could close most of it; physical-infrastructure changes
+cannot.
+
+\subsection{G3 \textbullet\ Vehicle-Route Mismatch · 75\%}
+
+\textbf{Definition.} Routes longer than 50 km whose assigned vehicle is
+microbus (14 seats). Captures the systematic operational waste of
+running a small vehicle on a long route.
+
+\textbf{Counts.}
+\begin{itemize}
+  \item \stat{75\%} of routes $>$50 km use microbus.
+  \item \stat{44} specific long-route violations identified.
+  \item Vehicle mix: 861 microbus, 503 bus, 287 minibus, 115 tomnaya, 18 box.
+\end{itemize}
+
+\textbf{Cost manifestation.} The fare/km comparison from Q12 is the
+direct reading: microbus = \stat{0.62 LE/km}, tomnaya = \stat{1.30 LE/km},
+formal bus / metro = \stat{0.22--0.25 LE/km}. Riders pay the smaller
+vehicle's price premium for trips that should have been served by a bus.
+
+\textbf{Implication.} G3 is the procurement-and-allocation gap. Cost
+minimisation drives the dispatch (microbuses are cheaper to run) at
+the expense of service design.
+
+\subsection{G4 \textbullet\ Underserved Hexagons · 79}
+
+\textbf{Definition.}
+$\text{Underserved\_Score} = \text{pct\_rank}(\text{Population}_{2018}) - \text{pct\_rank}(\text{Boarding total})$, clipped to $[0, 1]$. Threshold for ``underserved'': \stat{$> 0.5$}.
+
+\textbf{Counts.} \stat{79 hexagons} cross the 0.5 threshold. \stat{381}
+hexagons sit in the top quartile of the score (used by Phase 2 for
+market sizing).
+
+\textbf{Geography.} Imbaba, Shubra, Matariyya — the dense
+informal-housing belt on the west and north of central Cairo. Layla
+lives in this cluster.
+
+\textbf{Implication.} G4 is the supply gap that everything else points
+to. It is the demand the formal network does not visit.
+
+\subsection{The Phase-1 \texttimes\ Phase-2 gap-closure matrix}
+
+The four gaps are the rows of the synthesis matrix that Phase 2 will
+fill with measured closure percentages (per-mode, within a 2-km
+walkshed). Anticipating Section~\ref{sec:phase2-questions} (Q18b):
+
+\rowcolors{2}{darkpanel}{darkbg}
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{} >{\color{plotorange}\bfseries}l
+                    >{\color{plotyellow}\ttfamily}r
+                    >{\color{plotyellow}\ttfamily}r
+                    >{\color{plotyellow}\ttfamily}r @{}}
+\toprule
+\color{plotblue}Gap & \color{plotblue}Metro L3 & \color{plotblue}LRT & \color{plotblue}BRT \\
+\midrule
+G1 \ Ghosts          & 15.7\% &  2.6\% &  7.8\% \\
+G2 \ Empty-return    &  5.3\% &  5.3\% & 10.5\% \\
+G3 \ Vehicle mismatch &  0.0\% & 25.0\% & \stat{25.0\%} \\
+G4 \ Underserved     &  6.0\% &  1.6\% & 13.1\% \\
+\bottomrule
+\end{tabular}
+\caption{Q18b \textbullet\ \% of Phase-1 gap sites within 2 km of a
+post-2014 station. \stat{No cell above 25\%}, most below 16\%. The
+single best cell (BRT $\times$ G3) reaches 25\%. The Cairo Monorail
+would be a fourth column but it is not yet operational.}
+\label{tab:gap-matrix}
+\end{table}
+\rowcolors{0}{}{}
+
+\begin{callout}
+\textbf{\color{plotblue}One sentence summary.}\quad The four gaps from
+Phase 1 are real, measurable, and concentrated in specific districts;
+the post-2014 infrastructure built since closes \emph{a quarter or
+less} of any single gap. That single observation is what motivates
+every hypothesis in Phase 2 and the product story in Section 16.
+\end{callout}

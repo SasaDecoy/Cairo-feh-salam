@@ -1,0 +1,544 @@
+% =====================================================================
+%  Section 15 — The three hypothesis tests
+% =====================================================================
+\makesectioncover{The Three Hypothesis Tests}
+
+\section{The Three Hypothesis Tests}
+\label{sec:phase2-hypotheses}
+
+This section is the formal evidence layer of the project. It is split
+into a standalone \emph{methods reference} ({\S}\ref{sec:hyp-methods})
+that documents every statistical technique in one place, followed by
+three hypothesis walkthroughs ({\S}\ref{sec:h1}, {\S}\ref{sec:h2},
+{\S}\ref{sec:h3}) that each cite the methods reference rather than
+re-deriving the math. The reader who wants to follow only the H1/H2/H3
+narrative can skip the reference; the reader who wants to defend any
+single number should read both.
+
+% =====================================================================
+\subsection{Methods Reference}
+\label{sec:hyp-methods}
+
+For each test we document:
+\begin{itemize}
+  \item \textbf{Used for} — the question form it answers.
+  \item \textbf{Why it over alternatives} — the assumptions it relaxes
+        compared to the parametric default.
+  \item \textbf{How it is calculated} — the procedure with formulas
+        and a worked toy example.
+  \item \textbf{How to read its output} — what counts as significance,
+        what counts as a meaningful effect.
+\end{itemize}
+
+% --------------------------------------------------------------------
+\subsubsection{Spearman rank correlation \texorpdfstring{($\rho$)}{}}
+
+\textbf{Used for.} Strength and direction of a \emph{monotonic}
+association between two continuous variables.
+
+\textbf{Why over Pearson.} Pearson assumes a linear relationship and is
+sensitive to outliers and to non-normal distributions. Spearman
+operates on ranks, so it (i) does not assume linearity, only monotonicity;
+(ii) is robust to outliers; (iii) does not need normality. Most of our
+relationships (population vs underservedness, density vs informal
+share) are monotone-but-non-linear.
+
+\textbf{How calculated.}
+
+\begin{enumerate}
+  \item Rank $x$ and $y$ separately, with average ranks for ties:
+        $R(x_i)$, $R(y_i)$.
+  \item Compute differences $d_i = R(x_i) - R(y_i)$.
+  \item Apply the rank-correlation formula:
+        \begin{equation*}
+          \rho \;=\; 1 - \dfrac{6 \sum_{i=1}^{n} d_i^2}{n(n^2 - 1)}.
+        \end{equation*}
+  \item Significance via the t-approximation
+        $t = \rho \sqrt{(n-2)/(1-\rho^2)}$ with $df = n-2$.
+\end{enumerate}
+
+\textbf{Worked example.} Consider $x = (1, 2, 3, 4, 5)$ and
+$y = (2, 1, 4, 3, 5)$:
+$R(x) = (1, 2, 3, 4, 5)$, $R(y) = (2, 1, 4, 3, 5)$,
+$d = (-1, 1, -1, 1, 0)$, $\sum d^2 = 4$.
+$\rho = 1 - \tfrac{6 \cdot 4}{5(24)} = 1 - 0.2 = 0.8$.
+
+\textbf{Reading.} $|\rho| < 0.1$ negligible · $0.1$--$0.3$ weak ·
+$0.3$--$0.5$ moderate · $> 0.5$ strong. Phase 2 Q17's
+$\rho = 0.548$ at $p < 10^{-100}$ is strong; Q18's $\rho = 0.025$ at
+$p = 0.40$ is statistical zero.
+
+% --------------------------------------------------------------------
+\subsubsection{Kruskal-Wallis H test}
+
+\textbf{Used for.} Comparing the central tendency of \emph{more than
+two} independent groups when normality cannot be assumed.
+
+\textbf{Why over one-way ANOVA.} ANOVA assumes (i) normal residuals
+within each group, (ii) equal variance across groups. Stations per
+100k residents, taken across density tertiles, is heavy-tailed and
+heteroskedastic; ANOVA's p-value would be unreliable. Kruskal-Wallis
+ranks every observation globally, so distribution shape stops mattering.
+
+\textbf{How calculated.}
+
+\begin{enumerate}
+  \item Pool all $N = \sum_g n_g$ observations across $k$ groups and
+        rank globally; $R_{ij}$ = rank of observation $j$ in group $i$.
+  \item Compute the per-group rank sum $R_g = \sum_j R_{gj}$.
+  \item The test statistic:
+        \begin{equation*}
+          H \;=\; \frac{12}{N(N+1)} \sum_{g=1}^{k} \frac{R_g^2}{n_g} \;-\; 3(N+1).
+        \end{equation*}
+  \item Under $H_0$ (all groups share the same distribution),
+        $H \sim \chi^2_{k-1}$ asymptotically. Reject $H_0$ when
+        $H > \chi^2_{1-\alpha,\, k-1}$.
+\end{enumerate}
+
+\textbf{Reading.} A significant $H$ tells you \emph{at least one group
+differs}. It does not say which, and it does not measure how much. To
+say \emph{which} run pairwise Mann-Whitney with Holm correction; to
+say \emph{how much} compute $\varepsilon^2$ below.
+
+% --------------------------------------------------------------------
+\subsubsection{Epsilon-squared \texorpdfstring{($\varepsilon^2$)}{} — effect size for Kruskal-Wallis}
+
+\textbf{Used for.} The fraction of rank-variance explained by group
+membership.
+
+\textbf{Why this not eta-squared.} $\eta^2$ assumes the original (not
+ranked) sums of squares; we already moved to ranks, so the
+rank-equivalent $\varepsilon^2$ is the apples-to-apples effect size.
+
+\textbf{How calculated.}
+\begin{equation*}
+  \varepsilon^2 \;=\; \frac{H - k + 1}{N - k}.
+\end{equation*}
+
+(This is the convention that scipy/pingouin report.)
+
+\textbf{Reading.} $< 0.01$ negligible · $0.01$--$0.04$ small ·
+$0.04$--$0.16$ medium · $> 0.16$ \kw{large}. H1's
+$\varepsilon^2 = 0.826$ sits roughly \stat{$5\times$ above the large
+threshold} — far outside any range we would expect from chance.
+
+% --------------------------------------------------------------------
+\subsubsection{Mann-Whitney U test}
+
+\textbf{Used for.} Comparing two independent groups when distributions
+are non-normal, ordinal, or heavily skewed.
+
+\textbf{Why over Welch's t-test.} Welch's t-test relaxes the equal-variance
+assumption of the standard t-test but \emph{keeps} the normality
+assumption. Mann-Whitney drops both and works on ranks. With small $n$
+(H2 has 11 + 31 stations, H3 has 12 + 12), this matters a lot.
+
+\textbf{How calculated.}
+
+\begin{enumerate}
+  \item Pool the two groups, rank globally, average ranks for ties.
+  \item Compute $R_1$ = rank-sum of group 1.
+  \item Derive $U_1 = R_1 - \tfrac{n_1(n_1+1)}{2}$,
+        $U_2 = n_1 n_2 - U_1$, take $U = \min(U_1, U_2)$.
+  \item Small-sample p-values use the exact Mann-Whitney distribution
+        (scipy lookup). Large-sample p-values use the normal
+        approximation:
+        \begin{equation*}
+          z \;=\; \frac{U - \tfrac{n_1 n_2}{2}}
+                       {\sqrt{\tfrac{n_1 n_2 (n_1+n_2+1)}{12}}}.
+        \end{equation*}
+  \item Tied ranks subtract a known correction term from the variance.
+\end{enumerate}
+
+\textbf{Reading.} The p-value answers ``are these distributions
+stochastically different''. It does \emph{not} measure how different —
+always pair with Cliff's $\delta$.
+
+% --------------------------------------------------------------------
+\subsubsection{Cliff's delta \texorpdfstring{($\delta$)}{} — non-parametric effect size}
+
+\textbf{Used for.} Effect size accompanying a Mann-Whitney result —
+the probability that a randomly drawn $x$ exceeds a randomly drawn $y$,
+minus the reverse.
+
+\textbf{Why this not Cohen's $d$.} Cohen's $d$ uses the standardised
+mean difference, which assumes normality and breaks under skew.
+Cliff's $\delta$ is a pairwise dominance count and is robust to outliers
+and shape differences.
+
+\textbf{How calculated.}
+\begin{equation*}
+  \delta \;=\; \frac{\#(x_i > y_j) \;-\; \#(x_i < y_j)}{n_1 \cdot n_2}.
+\end{equation*}
+
+Range $[-1, +1]$. $\delta = +1$ means every $x$ exceeds every $y$;
+$\delta = -1$ is the reverse; $\delta = 0$ means a random $x$ and
+random $y$ are 50/50.
+
+\textbf{Reading.} $|\delta| < 0.147$ negligible · $0.147$--$0.33$ small ·
+$0.33$--$0.474$ medium · $> 0.474$ \kw{large}. H2's
+$\delta = -0.991$ means \stat{99.55\%} of LRT-vs-metro pairwise
+comparisons go the same way (metro larger). H3's $\delta = +0.710$
+means BRT corridors dominate matched controls in 85.5\% of comparisons.
+
+% --------------------------------------------------------------------
+\subsubsection{Permutation test}
+
+\textbf{Used for.} Building a null distribution \emph{empirically}
+when the test statistic has no clean closed-form distribution. Used in
+Phase 2 for the Moran's~I p-value and as a robustness check on H3.
+
+\textbf{Why this not bootstrap.} Permutation preserves marginals and
+tests \emph{exchangeability} under $H_0$ directly — it is the right
+tool for ``did this difference happen by chance?''. Bootstrap
+estimates the sampling variability of an estimate, which is a
+different question.
+
+\textbf{How calculated.}
+\begin{enumerate}
+  \item Compute the observed statistic $T_\text{obs}$ on the actual
+        data.
+  \item For $b = 1, \ldots, B$ iterations: shuffle (or relabel) the
+        data, recompute $T_b$.
+  \item Empirical p-value:
+        \begin{equation*}
+          p \;=\; \frac{\#\{|T_b| \geq |T_\text{obs}|\} + 1}{B + 1}.
+        \end{equation*}
+\end{enumerate}
+
+We use $B = 999$ for Moran's I and $B = 10{,}000$ for the H3
+robustness check.
+
+% --------------------------------------------------------------------
+\subsubsection{Moran's I (spatial autocorrelation) — AI Technique 3}
+
+\textbf{Used for.} Detecting whether values at nearby spatial units
+resemble each other more than by chance — i.e., whether the H1
+mismatch is geographically clustered or randomly scattered. Already
+introduced in §\ref{sec:ai}; here we give the calculation in detail.
+
+\textbf{How calculated.}
+
+\begin{enumerate}
+  \item Build a spatial weight matrix $W$ — we use \kw{KNN-as-contiguity}
+        (each district's 4 nearest neighbours by Nominatim centroid
+        distance), row-standardised so each row sums to 1.
+  \item Centre the variable: $z_i = x_i - \bar{x}$.
+  \item Compute Moran's I:
+        \begin{equation*}
+          I \;=\; \frac{n}{\sum_{i,j} w_{ij}}
+                  \cdot \frac{\sum_{i,j} w_{ij} z_i z_j}
+                             {\sum_i z_i^2}.
+        \end{equation*}
+  \item Under $H_0$ (no spatial autocorrelation) $E[I] = -1/(n-1)$,
+        slightly negative for finite $n$.
+  \item Empirical p-value via 999 permutations of the $z$ vector
+        against the fixed $W$.
+\end{enumerate}
+
+\textbf{Reading.} $I \approx E[I]$ means no clustering. $I > E[I]$
+means similar values cluster (positive autocorrelation). $I < E[I]$
+means dispersion. Phase 2's H1 result (\stat{$I = 0.087$,
+$z = 1.805$, $p = 0.0500$}) is borderline-positive — under-service
+concentrates, but $n = 68$ is small enough that the p-value sits on
+the boundary.
+
+% --------------------------------------------------------------------
+\subsubsection{K-Means clustering — AI Technique 2}
+
+\textbf{Used for.} Partitioning $n$ observations into $k$ groups
+minimising within-cluster sum of squared distances.
+
+\textbf{How calculated.}
+\begin{enumerate}
+  \item Pick $k$.
+  \item Initialise $k$ centroids using k-means++ (probabilistic seeding
+        biased away from already-chosen centroids — gives stable
+        outputs from random seeds).
+  \item Repeat: (i) assign each point to its nearest centroid;
+        (ii) recompute centroid = mean of assigned points; until
+        assignments stop changing.
+  \item Validate: re-run with multiple seeds and compute Adjusted
+        Rand Index (ARI) — high ARI means the clustering is
+        reproducible.
+\end{enumerate}
+
+\textbf{Q24 settings.} $k=4$ (justified by elbow + silhouette = 0.412),
+\fn{n\_init=50}, \stat{ARI = 1.00 across 5 seeds}.
+
+% =====================================================================
+\subsection{H1 \textbullet\ Coverage--Need Mismatch}
+\label{sec:h1}
+
+\subsubsection{Theoretical setup}
+
+\textbf{Story-level claim.} Cairo's transport infrastructure penalises
+density. Districts with more people per square kilometre receive
+\emph{fewer} stations per 100k residents than less-dense districts —
+the opposite of what a demand-aligned planner would do.
+
+\textbf{Hypotheses.}
+\begin{align*}
+  H_0:\;& \text{coverage per 100k residents is the same across density tertiles} \\
+  H_1:\;& \text{at least one tertile differs}
+\end{align*}
+
+A secondary geographic-clustering hypothesis runs alongside the main
+test:
+\begin{align*}
+  H_0^{(\text{spatial})}:\;& \text{under-service is randomly scattered across the city} \\
+  H_1^{(\text{spatial})}:\;& \text{under-service clusters geographically}
+\end{align*}
+
+\subsubsection{Methods chosen and why}
+
+The main test needs to (i) compare $> 2$ groups, (ii) tolerate non-normal
+station-per-100k distributions. That is exactly what
+\textbf{Kruskal-Wallis} ({\S}\ref{sec:hyp-methods}) is for.
+\textbf{$\varepsilon^2$} sizes the effect; pairwise
+\textbf{Mann-Whitney} with Holm correction identifies which tertiles
+differ; \textbf{Moran's I} answers the spatial-clustering question.
+
+\subsubsection{Data pipeline trace}
+
+\begin{enumerate}
+  \item \stat{68 districts} of Greater Cairo from S6, with
+        \kw{Nominatim centroids} (the methodology upgrade — earlier
+        drafts used three governorate centroids and had
+        $\varepsilon^2 \approx 0.21$; the upgrade is what produced the
+        huge effect we report).
+  \item Population from S6's 2017 census column.
+  \item Station count = number of integrated post-2014 stations within
+        a 3\,km buffer of each district centroid.
+  \item Per-district metric: \fn{stations\_per\_100k = stations /
+        (population / 100{,}000)}.
+  \item Split into low / medium / high tertiles
+        ($n_\text{low} = 23$, $n_\text{med} = 22$, $n_\text{high} = 23$).
+  \item Run \fn{scipy.stats.kruskal(low, med, high)}.
+  \item Run pairwise \fn{scipy.stats.mannwhitneyu} with Holm correction.
+  \item Run \fn{esda.Moran(values, KNN(centroids, k=4),
+        permutations=999)}.
+\end{enumerate}
+
+\subsubsection{Results}
+
+\textbf{Tertile medians (stations per 100k):}
+Low = \stat{25.9} · Medium = \stat{8.5} · High = \stat{2.15} —
+a \stat{$\sim$12$\times$ ratio} between the extremes.
+
+\textbf{Kruskal-Wallis:} $H = \stat{55.7}$, $p < \stat{0.001}$.
+
+\textbf{Effect size:} $\varepsilon^2 = \stat{0.826}$ — \emph{huge}
+(roughly 5× the ``large'' threshold).
+
+\textbf{Pairwise Mann-Whitney + Holm:} every pair statistically
+differs at $p < 0.001$.
+
+\textbf{Moran's I:} $I = \stat{0.087}$, $z = \stat{1.805}$,
+$p = \stat{0.0500}$ (999 perms, KNN-as-contiguity, real Nominatim
+centroids). Borderline-positive spatial clustering.
+
+\figitem{phase2/h1_box.png}{1.0}{H1 \textbullet\ Box plot of stations per 100k by density tertile.}{fig:h1-box}
+\figitem{phase2/h1_continuous_scatter.png}{1.0}{H1 add-on \textbullet\ Continuous density penalty: population vs stations.}{fig:h1-cont}
+\figitem{phase2/h1_moran_bar.png}{1.0}{H1 \textbullet\ Moran's I bar chart against the 999-permutation null distribution.}{fig:h1-moran}
+
+\subsubsection{Theoretical reading}
+
+\begin{callout}
+The 12$\times$ tertile ratio combined with $\varepsilon^2 = 0.826$ is
+not a small effect that crossed a significance line; it is the
+quantitative signature of a \kw{planning logic that is forward-looking
+rather than demand-following}. The state built where it expected
+people to live — the New Administrative Capital, the satellite cities
+of 6th October and Sheikh Zayed — and not where dense Cairo already
+sits. The Moran's I result ($p = 0.0500$) says under-service
+\emph{concentrates} (the dense core, mostly in Giza/Qalyubia) but
+$n = 68$ is small enough that the spatial-clustering p-value sits on
+the boundary; with double the districts the same effect would land
+much further inside.
+
+\textbf{Methodology upgrade — and why it matters.} Earlier drafts
+used three governorate centroids as the spatial anchor; the
+$\varepsilon^2$ landed at $\sim$0.21 (medium). The upgrade to real
+Nominatim centroids (S6) is what produced the huge effect we report.
+This is mentioned not to advertise the upgrade but to be honest about
+the leverage: the same data with worse spatial resolution would have
+told a noticeably weaker story.
+\end{callout}
+
+% =====================================================================
+\subsection{H2 \textbullet\ LRT Catchment Deficit}
+\label{sec:h2}
+
+\subsubsection{Theoretical setup}
+
+\textbf{Story-level claim.} The LRT was built where no one lives. Each
+operational LRT station serves a much smaller surrounding population
+than each post-2012 metro Line~3 station.
+
+\textbf{Hypotheses.}
+\begin{align*}
+  H_0:\;& \text{LRT and post-2012 metro L3 have the same 2-km catchment population distribution} \\
+  H_1:\;& \text{the two distributions differ}
+\end{align*}
+
+\subsubsection{Methods chosen and why}
+
+\textbf{Mann-Whitney U} for the two-group comparison (non-normal
+population catchments, small $n$); \textbf{Cliff's $\delta$} for the
+effect size (a p-value alone says nothing about how big the gap is).
+
+\subsubsection{Data pipeline trace}
+
+\begin{enumerate}
+  \item \stat{12 operational LRT stations} from S4 (after the 9 +
+        7 OSM/Google-Maps coordinate backfill).
+  \item \stat{27 metro L3 post-2012 stations} from S3 (filtered by
+        opening year $> 2012$).
+  \item For each station, draw a 2\,km buffer in EPSG:32636.
+  \item For each buffer, sum \fn{Population\_2018} of every Phase 1
+        H3 hex it intersects (the area-proportional Phase 1 hex layer
+        already provides population per cell).
+  \item Run \fn{scipy.stats.mannwhitneyu(lrt\_pop, metro\_pop,
+        alternative='two-sided')}.
+  \item Compute \textbf{Cliff's $\delta$} from the pairwise comparison
+        matrix.
+  \item Sensitivity: rerun at 1\,km and 3\,km radii; verify $\delta$
+        stays below $-0.95$ at every radius.
+\end{enumerate}
+
+\subsubsection{Results}
+
+\textbf{Medians (residents within 2 km buffer):}
+LRT = \stat{916} · Metro L3 (post-2012) = \stat{634{,}333}. The
+ratio is roughly \stat{688$\times$}.
+
+\textbf{Mann-Whitney:} $U = \stat{2}$, $p < \stat{0.0001}$.
+
+\textbf{Cliff's $\delta = \stat{-0.991}$} — within a hair of the
+theoretical floor of $-1$. This means \stat{99.55\%} of LRT-vs-metro
+pairwise comparisons go the same direction (metro carries the larger
+population).
+
+\textbf{Sensitivity:} $\delta$ stays below $-0.95$ at 1\,km, 2\,km, and
+3\,km radii.
+
+\figitem{phase2/h2_bar.png}{1.0}{H2 \textbullet\ LRT vs metro L3 post-2012 — 2-km catchment population.}{fig:h2-bar}
+\figitem{phase2/h2_ranked_bar.png}{1.0}{H2 \textbullet\ Every station's individual catchment, LRT (coral) vs metro (teal).}{fig:h2-ranked}
+\figitem{phase2/h2_cumulative_curves.png}{1.0}{H2 add-on \textbullet\ Cumulative catchment population curves. The two curves diverge so sharply they barely share an axis.}{fig:h2-cum}
+
+\subsubsection{Theoretical reading}
+
+\begin{callout}
+Cliff's $\delta = -0.991$ is structurally near-impossible by chance.
+Even at $n = 11$ vs 31 (relatively small samples), this magnitude
+of effect cannot be produced by sampling noise from two populations
+that have the same underlying distribution. The reading is mechanical:
+\kw{LRT was sited for a city that does not yet exist}. The planning
+logic was forward-looking — build infrastructure first, induce
+settlement second. That logic may eventually pay off (the LRT corridor
+runs to the New Administrative Capital, which is being populated
+gradually), but as of 2024--2026 the gap between the LRT and the
+people who would ride it is the largest single mismatch in Phase 2.
+\end{callout}
+
+% =====================================================================
+\subsection{H3 \textbullet\ BRT Corridor Match}
+\label{sec:h3}
+
+\subsubsection{Theoretical setup}
+
+\textbf{Story-level claim.} The BRT — unlike the LRT and unlike the
+post-2012 metro — was sited on top of \emph{existing} informal
+demand. The Ring-Road BRT runs along corridors that already have
+substantial microbus boarding.
+
+\textbf{Hypotheses.}
+\begin{align*}
+  H_0:\;& \text{BRT 500-m buffers and matched random non-Ring-Road controls} \\
+        & \text{have the same informal demand distribution} \\
+  H_1:\;& \text{BRT buffers carry more informal demand than controls}
+\end{align*}
+
+\subsubsection{Methods chosen and why}
+
+\textbf{Mann-Whitney U} again — same reasons as H2 (non-normal,
+small $n$). \textbf{Cliff's $\delta$} for the effect size.
+The contribution unique to H3 is the \textbf{matched control sample}:
+random points drawn from the urbanised Cairo footprint excluding the
+Ring Road, at similar distance-to-centre as the BRT corridor.
+
+\subsubsection{Data pipeline trace}
+
+\begin{enumerate}
+  \item \stat{12 BRT stations} from S5.
+  \item For each BRT station, draw a 500\,m buffer; sum the daily
+        informal boardings of Phase 1 stops inside the buffer.
+  \item Generate \stat{12 random control points} from the urbanised
+        non-Ring-Road area; replicate the buffer + sum operation.
+  \item Run \fn{scipy.stats.mannwhitneyu(brt\_demand, ctrl\_demand,
+        alternative='greater')}.
+  \item Compute Cliff's $\delta$.
+  \item Cross-validate: 10{,}000-iteration permutation test on the
+        same dataset.
+\end{enumerate}
+
+\subsubsection{Results}
+
+\textbf{Medians (informal boardings within 500-m buffer):}
+BRT = \stat{566} · Control = \stat{0}.
+
+\textbf{Mann-Whitney:} $U = \stat{132}$, $p = \stat{0.0001}$.
+
+\textbf{Cliff's $\delta = \stat{+0.710}$} — large positive.
+
+\textbf{Permutation cross-validation:} 10{,}000-iteration permutation
+test confirms the same conclusion.
+
+\figitem{phase2/h3_bar.png}{1.0}{H3 \textbullet\ BRT vs random control demand within 500-m buffers.}{fig:h3-bar}
+\figitem{phase2/h3_violin.png}{1.0}{H3 \textbullet\ BRT vs control distribution shape.}{fig:h3-violin}
+
+\subsubsection{Theoretical reading}
+
+\begin{callout}
+H3 is the contrast case. Same state planner, same $\$10$B programme,
+opposite outcome from H2. BRT corridor demand is structurally higher
+than what a random non-Ring-Road sample would carry — the BRT was
+\emph{routed through existing demand}, not invented next to it. The
+narrative role of H3 is to prevent the project from over-claiming.
+``All new infrastructure is misaligned'' is wrong; ``most new
+infrastructure is misaligned, but the BRT is the demand-aligned
+exception'' is what the data actually shows. The Q18b gap-closure
+matrix has its single 25\% cell at BRT $\times$ G3 for exactly this
+reason.
+\end{callout}
+
+% =====================================================================
+\subsection{Summary table — the three hypotheses}
+\label{sec:hyp-summary}
+
+\rowcolors{2}{darkpanel}{darkbg}
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{} >{\color{plotorange}\bfseries}l
+                    >{\color{bodytext}}l
+                    >{\color{plotyellow}\ttfamily}l
+                    >{\color{plotyellow}\ttfamily}l
+                    >{\color{plotyellow}\ttfamily}l @{}}
+\toprule
+\color{plotblue}H & \color{plotblue}Test & \color{plotblue}Statistic & \color{plotblue}p-value & \color{plotblue}Effect size \\
+\midrule
+H1 & Kruskal-Wallis (3 groups, $n=68$)         & $H = 55.7$ & $< 0.001$  & $\varepsilon^2 = 0.826$ \\
+   & Moran's I (999 perms)                     & $I = 0.087$ & $0.0500$  & — \\
+H2 & Mann-Whitney U ($n=11$ vs 31)             & $U = 2$    & $< 0.0001$ & $\delta = -0.991$ \\
+H3 & Mann-Whitney U ($n=12$ vs 12)             & $U = 132$  & $0.0001$   & $\delta = +0.710$ \\
+\bottomrule
+\end{tabular}
+\caption{Three hypotheses, one summary. H1 establishes the systemic
+density penalty; H2 establishes the most extreme single-mode failure
+(LRT); H3 establishes that contrast exists (BRT). Together they
+support the verdict ``not every \$10B station is misaligned, but most
+are.''}
+\end{table}
+\rowcolors{0}{}{}

@@ -29,6 +29,14 @@ desktop.ini
 *.temp
 ~$*
 
+# LaTeX build artifacts (Report/)
+*.aux
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
 # Notebook backups and scratch drafts
 *.bak
 *.bak2

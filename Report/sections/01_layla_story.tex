@@ -1,0 +1,173 @@
+% =====================================================================
+%  Section 01 — Layla's Story (Act I) and the Problem Statement
+% =====================================================================
+\makesectioncover{Layla's Cairo}
+
+\section{Layla's Story}
+\label{sec:layla}
+
+\subsection{6:15 AM, Imbaba}
+
+It is six fifteen in the morning. The neighbourhood is already loud.
+
+Layla — \ar{ليلى} — lives in Imbaba on the west bank of the Nile, in
+one of the densest neighbourhoods on Earth: \stat{63{,}000 people per
+square kilometre}. To put that in perspective, the average density of
+Manhattan is about 27{,}000. New Cairo, the satellite city forty
+kilometres east, has fewer than 3{,}000 — a \stat{21$\times$ ratio}
+between where Cairenes already live and where the state has been
+building.
+
+No metro line ran through Imbaba until 2024. None runs at a useful
+walking distance from Layla's apartment today.
+
+\begin{callout}
+\textbf{\color{plotblue}A note on Layla.}\quad Layla is a \emph{composite
+persona} — a fictional commuter who stands in for the
+\stat{1.4 million Cairenes} whose commutes the state's formal
+transport map does not describe. Every number in her story is real and
+notebook-verified: Imbaba's density figure is from \texttt{citypopulation.de}
+(Phase 2 source S6, 408 admin rows filtered to Greater Cairo); the
+\stat{83-minute} round-trip averages \texttt{explorecity.life}
+crowdsourced data and the World Bank Cairo Traffic Congestion Study;
+the route polyline is fourteen hand-digitised waypoints across 26th of
+July Street and the Corniche.
+\end{callout}
+
+\subsection{The office is in Maadi, eleven kilometres away}
+
+Across the city. South of the Nile. \ar{المعادي · ١١ كيلومتر} — eleven
+kilometres on paper. The haversine crow-flies distance from Imbaba's
+centroid (31.2083\textdegree, 30.0866\textdegree) to her office in
+Maadi (31.2581\textdegree, 29.9601\textdegree) is exactly that — eleven
+kilometres, computed great-circle with Earth radius \mbox{6{,}371 km}.
+
+But Layla cannot fly. To get to work she must cross two transport
+systems that were never designed to connect:
+
+\begin{itemize}
+  \item \kw{System A} — the formal, state-built network. Cairo Metro,
+        Transport-for-Cairo's published bus routes, the new LRT to the
+        New Administrative Capital, the Ring-Road BRT.
+  \item \kw{System B} — the lived, informal network. A web of 1{,}302
+        microbus stops, 280 \emph{mawaqif} (terminals), and the
+        rider-knowledge that every Cairene carries in their head.
+\end{itemize}
+
+\subsection{The real route is 83 minutes each way}
+
+\ar{الرحلة الحقيقية · ٨٣ دقيقة}. Three vehicles. Two transfers. No single
+app that can plan the trip end-to-end.
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{} >{\color{plotorange}\bfseries}l
+                    >{\color{bodytext}}l
+                    >{\color{plotyellow}}r @{}}
+\toprule
+\color{plotblue}Leg & \color{plotblue}Mode & \color{plotblue}Minutes \\
+\midrule
+Walk to mawfaq         & on foot                  & 8  \\
+Wait at mawfaq         & informal terminal queue  & 8.5 \\
+Microbus 1             & informal microbus        & 25 \\
+Walk between systems   & on foot                  & 12 \\
+Metro Line 2 to Maadi  & formal metro             & 30 \\
+\midrule
+\textbf{Total one-way} &                          & \stat{83} \\
+\bottomrule
+\end{tabular}
+\caption{One morning leg of Layla's commute. Round-trip $\approx$ 166 minutes.
+At 260 commuting days per year, Layla loses \stat{720 hours} — about
+\stat{30 working days} — to a city that cannot route her.}
+\end{table}
+
+\subsection{At 6:15 the mawfaq decides for her}
+
+\ar{الموقف · الساعة ٦:١٥}. The \emph{mawfaq} (Arabic plural \emph{mawaqif})
+is the physical expression of System B. Five microbuses are loading at
+once, five destinations written in Arabic on taped cardboard, drivers
+shouting competing routes.
+
+\begin{itemize}
+  \item There is no schedule.
+  \item There is no app.
+  \item No driver knows her specific trip.
+\end{itemize}
+
+She picks a microbus by guessing which direction it starts in. On Phase
+1's integrated dataset (cleaning notebook, 280 terminals + Stage-4
+SBERT multilingual reconciliation) we can confirm that this specific
+mawfaq is not linked to any post-2014 metro station within its 2 km
+walkshed. The infrastructure investment of the last decade simply did
+not reach her morning.
+
+\subsection{The problem this report is documenting}
+
+\begin{callout}
+Cairo runs on \kw{two parallel transport systems}. Since 2014 the state
+has spent more than \stat{\$10 billion} expanding System A — Metro Line 3
+(Ataba to Adly Mansour, then westwards to Kit Kat), the Cairo LRT to the
+New Administrative Capital, and the Ring-Road BRT. Yet the daily reality
+of the \stat{1.4 million Cairenes who commute like Layla} has not
+materially changed.
+
+Why? Because System A was largely built where people \emph{will} live
+according to state plans, while System B continues to carry people
+where they \emph{already} live. The two systems overlap geographically
+but not functionally — neither has a published timetable that
+references the other; neither can route the rider through the other.
+
+This report investigates that disconnect with data. \kw{Phase 1} cleans
+seven raw GeoJSON datasets that describe the \emph{existing} transport
+reality (1{,}302 stops, 1{,}784 routes, 280 terminals, 9{,}258 road
+segments, 1{,}525 population hexagons), answers twelve research
+questions about it, and produces \kw{four structural gaps} —
+115 ghost terminals, 19 empty-return terminals, vehicle-route mismatch
+on 75\% of long routes, and 79 underserved population hexagons.
+
+\kw{Phase 2} then scrapes eight new sources to describe what the state
+\emph{has built} since 2014 (89 metro stations, 20 LRT stations,
+21 BRT stations, 68 districts of Greater Cairo population, vehicle
+ownership, GTFS, OpenStreetMap), integrates it with the Phase 1 reality
+through a four-stage pipeline (KNN spatial $\to$ OSM cross-verification
+$\to$ RapidFuzz fuzzy text $\to$ \kw{SBERT multilingual semantic
+matching}), then asks thirteen research questions and tests
+\kw{three formal hypotheses} about whether the new infrastructure
+closes the four gaps.
+
+The answer — derived from a \stat{\$10B} investment cross-tabulated against
+four gaps and three modes — is that \stat{no cell of the resulting
+3$\times$4 matrix sits above 25\%}. Most are below 16\%. The
+infrastructure did not reach Layla. \kw{The data shows why, and the
+report walks through every step of how we know.}
+\end{callout}
+
+\subsection{How this report is organised}
+
+Reading order:
+
+\begin{enumerate}
+  \item \textbf{Phase 1} — what Cairo's existing transport system looks like.
+        Data sources, pre-clean nulls, KNN imputation, seven spatial
+        merges, twelve research questions, four structural gaps.
+        (Sections 2--8.)
+  \item \textbf{Phase 2} — what the state built since 2014. Eight scraped
+        sources, the four-stage integration pipeline, thirteen
+        research questions. (Sections 9--13.)
+  \item \textbf{AI techniques} — three explicit AI methods used in the
+        project (SBERT, K-Means, Moran's~I), each chosen because a
+        classical method could not solve the same problem. (Section 14.)
+  \item \textbf{Hypothesis tests} — a standalone methods reference for
+        every statistical test used (Spearman, Kruskal-Wallis,
+        Mann-Whitney, Cliff's $\delta$, $\varepsilon^2$, permutation,
+        Moran's~I, K-Means), then a deep walkthrough of \kw{H1}
+        coverage-need mismatch, \kw{H2} LRT catchment deficit, and
+        \kw{H3} BRT corridor match. (Section 15.)
+  \item \textbf{Synthesis} — what the evidence collectively says, the
+        gap-closure matrix that is the single most important result,
+        and the resolution stat (\stat{83 $\to$ 40 minutes}) that ends
+        Layla's story. (Section 16.)
+  \item \textbf{Appendices} — file manifest and a glossary of every
+        abbreviation. (Sections 17--18.)
+\end{enumerate}

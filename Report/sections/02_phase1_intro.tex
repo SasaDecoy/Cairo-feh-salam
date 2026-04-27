@@ -1,0 +1,48 @@
+% =====================================================================
+%  Section 02 — Phase 1 introduction
+% =====================================================================
+\makesectioncover{Phase 1 \textbullet\ The Existing Reality}
+
+\section{Phase 1 \textbullet\ Auditing the Existing System}
+\label{sec:phase1-intro}
+
+\subsection{What Phase 1 is doing and why}
+
+Phase 1 is the audit phase. Before we can ask whether new infrastructure
+is solving real problems we need to know what the existing transport
+reality \emph{is}.
+
+The work splits across two notebooks:
+
+\begin{itemize}
+  \item \fn{Cleaning Data.ipynb} — loads seven raw GeoJSON datasets,
+        reprojects them to a metric CRS, KNN-imputes missing values,
+        and builds seven spatial/attribute merges (A--G) that downstream
+        analysis depends on.
+  \item \fn{Visual Analysis.ipynb} — answers twelve research questions
+        (Q1--Q12) using those merges and produces 40 Plotly visualisations.
+        The questions converge on \kw{four structural gaps} that frame
+        every Phase 2 hypothesis: ghost terminals, empty-return terminals,
+        vehicle-route mismatch, underserved hexagons.
+\end{itemize}
+
+\subsection{The two-system framing}
+
+Throughout this report we use two labels:
+
+\begin{itemize}
+  \item \kw{System A · formal} — the published, official network. In Phase 1
+        this is approximated by the routes-with-fares (\fn{Public Transport
+        Routes.json}) and the published terminals
+        (\fn{Public Transport Terminals.json}). In Phase 2 it is augmented
+        with GTFS, the metro network, the LRT, and the BRT.
+  \item \kw{System B · informal/lived} — the network the city actually
+        rides every morning. In Phase 1 this is approximated by the
+        microbus boardings (\fn{Cairo Daily Boarding.json}) and the
+        passenger-flow segments (\fn{Public Transport Passenger Flow.json}).
+\end{itemize}
+
+The point of Phase 1 is to make the two systems comparable on a single
+map and a single set of metrics — buffer distances, boarding totals,
+fare-per-km. The four structural gaps are the cells of that comparison
+that fail.

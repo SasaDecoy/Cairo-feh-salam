@@ -1,0 +1,134 @@
+% =====================================================================
+%  Section 16 — Synthesis
+% =====================================================================
+\makesectioncover{Synthesis}
+
+\section{Synthesis}
+\label{sec:synthesis}
+
+\subsection{What the project established}
+
+Across two phases, four notebooks, twenty-five research questions,
+three formal hypothesis tests, three AI techniques, and 157
+visualisations, the Cairo Public Transport project establishes four
+claims with quantitative evidence:
+
+\begin{enumerate}
+  \item \kw{Cairo runs on two parallel transport systems.}
+        System A (formal) and System B (informal) overlap geographically
+        but not operationally. Q19 quantifies the data asymmetry; Q21
+        quantifies the fare asymmetry; the hero map (Fig.~\ref{fig:hero-twocairos})
+        visualises the spatial overlap.
+
+  \item \kw{New infrastructure does not align with existing demand.}
+        H1 ($\varepsilon^2 = 0.826$, huge effect) shows that dense
+        districts get $\sim$12$\times$ fewer stations per 100k.
+        H2 ($\delta = -0.991$) shows the LRT was built where almost
+        no one lives. Q14 (84\% of ghosts beyond 2\,km of new metro)
+        and Q22 (top-15 worst residuals all in Giza/Qalyubia)
+        independently corroborate the finding.
+
+  \item \kw{Not all new infrastructure is equally weak.}
+        H3 ($\delta = +0.710$) shows the BRT is sited on top of real
+        informal demand. The Q18b gap-closure matrix has its single
+        $25\%$ cell at BRT $\times$ G3 for the same reason. The
+        contrast matters: state-led planning \emph{can} be
+        demand-aligned — the question is when it chooses to.
+
+  \item \kw{There is a measurable, sized market for closing the gap.}
+        K-Means produces a 4-cluster partition with ARI = 1.00; three
+        of the four clusters together cover \stat{62 districts and
+        18.9 million residents} — the addressable market for any
+        product that visibly bridges the two systems.
+\end{enumerate}
+
+\subsection{The 12-cell verdict}
+
+The single most important visual in the project is the gap-closure
+matrix (Q18b), reproduced one more time:
+
+\figitem{phase2/q18b_matrix.png}{1.0}{The Q18b gap-closure matrix. Row = Phase 1 gap, column = Phase 2 mode, cell = \% of gap sites within 2\,km of any station of that mode. \stat{No cell above 25\%}; most below 16\%. The single best cell is BRT $\times$ G3.}{fig:synthesis-matrix}
+
+A planning programme that closes a quarter or less of any single gap
+is not a programme that solves a city. The data does not show that
+the post-2014 infrastructure is wasted; it shows that it served a
+\emph{different} planning objective (build for the future of the New
+Administrative Capital) than the one Layla's commute requires
+(reach the existing dense core). Both can be true simultaneously.
+
+\subsection{Resolution — Layla, integrated}
+
+The story this report opened with (Section~\ref{sec:layla}) ends not
+in 83 minutes, but in 40.
+
+\begin{callout}
+\textbf{\color{plotblue}One app, both systems.}\quad The 40-minute
+projection in the chapter-13 resolution is not an infrastructure
+claim; it is a \kw{software claim}. Run the GTFS route graph for
+System A and a crowdsourced microbus graph for System B through a
+standard Dijkstra shortest-path with transfer penalties calibrated
+from explorecity.life wait-time distributions. The result reduces
+Layla's round-trip from 83 minutes to roughly 40 — not because new
+infrastructure was built, but because the existing infrastructure
+became routable end-to-end.
+
+The K-Means market segmentation
+(Section~\ref{sec:phase2-questions}, Q24) gives the addressable
+audience: the Formal-Served Core (31 districts), Peripheral Growth
+(19), and Mixed (12) clusters together cover \stat{62 districts and
+18.9 million residents}. That is the size of the readership for a
+product that surfaces both transport systems on the same screen.
+
+The infrastructure gap is structural and slow to close. The data gap
+is software-shaped and closeable today.
+\end{callout}
+
+\figitem{phase2/market_sizing_bar.png}{1.0}{Market sizing — population per K-Means cluster. The three left bars (Formal-Served Core, Peripheral Growth, Mixed) sum to 18.9M.}{fig:market-final}
+
+\subsection{What the project did not do}
+
+\begin{warningbox}
+\textbf{\color{plotorange}Honesty section.}\quad Several deliberate
+limitations frame any reading of the report.
+
+\begin{itemize}
+  \item \textbf{Population data is 2018 / 2017} — the most recent
+        Egyptian census window. Greater Cairo has continued to grow;
+        the underservedness measurement is therefore a lower bound.
+  \item \textbf{LRT coordinate backfill rescued only 12 of 20
+        operational stations.} The H2 result is computed on the 11 of
+        those 12 with valid lat/lon. Adding the missing stations would
+        very likely strengthen the result (their planned locations are
+        even further from population centres) but we report only what
+        is currently measurable.
+  \item \textbf{BRT coverage grew from 12 to 21 stations} during the
+        course of the project as Google Maps re-indexed the corridor.
+        H3 was originally computed on the smaller set; rerunning on
+        the larger set leaves the conclusion unchanged.
+  \item \textbf{The Cairo Monorail is not in the gap-closure matrix}
+        because it is not yet operational. When it opens, every Phase
+        2 question that uses ``post-2014 modes'' should be rerun.
+  \item \textbf{Moran's I p-value sits on 0.05.} With $n = 68$ districts
+        the spatial-clustering test is at the edge of where it has
+        statistical power. Reading: under-service \emph{concentrates}
+        but the conclusion is suggestive, not definitive.
+  \item \textbf{The 5-pair SBERT gold set is small.} Stage-4 matches
+        are strong candidates, not ground truth.
+\end{itemize}
+\end{warningbox}
+
+\subsection{What this report tries to be}
+
+The brief was simple: ``a formal report that includes every single
+detail in this project with the data up to date and includes all the
+visualisations in their suitable place.'' The output is roughly
+eighty pages of LaTeX and 133 PNG figures across eighteen sections.
+Every number cited in this document is traceable to a notebook cell
+and a cleaned CSV file in \fn{CleanedData/} or \fn{Phase2/CleanedData/}.
+Every figure was rendered from a notebook export in \fn{Exports/} or
+\fn{Phase2/Exports/}. Every method has its calculation written out in
+{\S}\ref{sec:hyp-methods}.
+
+The story of Layla — \ar{ليلى} — is the frame, but the substance
+is data. We hope this version is the one you can defend in a viva
+without flipping pages.

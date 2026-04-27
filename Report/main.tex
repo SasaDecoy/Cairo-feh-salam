@@ -1,0 +1,67 @@
+% =====================================================================
+%  Cairo Public Transport · Comprehensive Formal Report
+%
+%  Compile with:  bash build.sh
+%   (or)          pdflatex -shell-escape main.tex   (run twice for ToC)
+% =====================================================================
+
+\documentclass[11pt, a4paper]{article}
+
+\input{preamble}
+
+\begin{document}
+\setlength{\parskip}{6pt}
+
+% ─── Title page ──────────────────────────────────────────────────────
+\input{sections/00_titlepage}
+
+% ─── Table of Contents ───────────────────────────────────────────────
+{
+  \hypersetup{linkcolor=plotblue}
+  \tableofcontents
+}
+\newpage
+
+% ═══════════════════════════════════════════════════════════════════
+%  ACT I · LAYLA · PROBLEM
+% ═══════════════════════════════════════════════════════════════════
+\input{sections/01_layla_story}
+
+% ═══════════════════════════════════════════════════════════════════
+%  PHASE 1 · the existing transport reality
+% ═══════════════════════════════════════════════════════════════════
+\input{sections/02_phase1_intro}
+\input{sections/03_phase1_datasets}
+\input{sections/04_phase1_nulls}
+\input{sections/05_phase1_cleaning}
+\input{sections/06_phase1_merges}
+\input{sections/07_phase1_questions}
+\input{sections/08_phase1_gaps}
+
+% ═══════════════════════════════════════════════════════════════════
+%  PHASE 2 · what the state built since 2014
+% ═══════════════════════════════════════════════════════════════════
+\input{sections/09_phase2_intro}
+\input{sections/10_phase2_sources}
+\input{sections/11_phase2_integration}
+\input{sections/12_phase2_questions}
+\input{sections/13_phase2_questions_conclusion}
+
+% ═══════════════════════════════════════════════════════════════════
+%  AI · how we use it and why it works for THIS problem
+% ═══════════════════════════════════════════════════════════════════
+\input{sections/14_ai_in_the_project}
+
+% ═══════════════════════════════════════════════════════════════════
+%  HYPOTHESES · the formal evidence
+% ═══════════════════════════════════════════════════════════════════
+\input{sections/15_phase2_hypotheses}
+
+% ═══════════════════════════════════════════════════════════════════
+%  Synthesis & appendices
+% ═══════════════════════════════════════════════════════════════════
+\input{sections/16_synthesis}
+\input{sections/17_appendix_files}
+\input{sections/18_appendix_glossary}
+
+\end{document}
