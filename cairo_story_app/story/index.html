@@ -534,6 +534,20 @@
     border: 1px solid rgba(88,166,255,0.12);
     text-transform: uppercase;
   }
+  /* ─── Density 3D heatmap iframe (Scene 7 / "TWO DENSITIES") ─────────────
+     Sits above the MapLibre map + vignette but below the narrative panel,
+     top bar, charts, legend, and splash so the parent UI still owns the
+     chrome.  Mounted only while sceneIdx === 6.  Loads density3d.html
+     with ?embed=1 which strips its own panels (see density3d.html
+     `body.embed` rules).                                                  */
+  .density-iframe {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    border: 0; margin: 0; padding: 0;
+    z-index: 6;
+    background: var(--bg);
+    animation: fade-in 700ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
   /* ─── Top-right colour legend (replaces the dev debug HUD) ────────────── */
   .legend-card {
     position: fixed; top: 44px; right: 14px;
@@ -3723,6 +3737,17 @@ function App() {
     <>
       <div ref={mapContainerRef} className="map-stage" />
       <div className="vignette" />
+      {/* Scene 7 ("TWO DENSITIES") swaps the MapLibre map for a dedicated
+          3D population-surface viz built from the 2023 census
+          (Phase2/CleanedData/districts.csv).  See density3d.html.       */}
+      {sceneIdx === 6 && (
+        <iframe
+          key="density-iframe"
+          src="density3d.html?embed=1"
+          className="density-iframe"
+          title="Cairo · Density 3D Heatmap"
+        />
+      )}
       <div className="version-tag">BUILD · V23 · FULL METRO NETWORK</div>
       <ColorLegend />
       {mapReady && <TopBar scene={scene} sceneIdx={sceneIdx} total={SCENES.length} />}

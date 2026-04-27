@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1">
+<title>Cairo · Density · 3D Heatmap</title>
+
+<!-- Fonts (matching the project's main story app) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=Noto+Sans+Arabic:wght@400;600;700&display=swap">
+
+<!-- Three.js as ES module + addons (postprocessing for bloom) -->
+<script type="importmap">
+{
+  "imports": {
+    "three":          "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/":  "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<style>
+  /* Project theme tokens (taken verbatim from cairo_story_app/story/index.html) */
+  :root {
+    --bg:         #07090C;
+    --bg-alt:     #0D1117;
+    --panel:      #161B22;
+    --panel-deep: #111820;
+    --fg:         #E6EDF3;
+    --fg-body:    #C9D1D9;
+    --fg-muted:   #8B949E;
+    --fg-dim:     #6E7681;
+    --grid:       #21262D;
+    --accent:     #58A6FF;
+    --ok:         #2A9D8F;
+    --gold:       #E9C46A;
+    --warn:       #E86F51;
+    --orange:     #F4A261;
+    --purple:     #7B2D8E;
+    --pink:       #FF6B6B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100vw; height: 100vh;
+    background: var(--bg);
+    color: var(--fg-body);
+    font-family: 'Share Tech Mono', 'Courier New', monospace;
+    overflow: hidden;
+  }
+
+  /* ── Canvas + vignette ─────────────────────────────────────── */
+  #canvas-container {
+    position: fixed; inset: 0;
+    z-index: 0;
+  }
+  .vignette {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center,
+                transparent 50%,
+                rgba(7,9,12,0.35) 88%,
+                rgba(7,9,12,0.7) 100%);
+    pointer-events: none; z-index: 5;
+  }
+
+  /* ── Frosted glass card (matches story app .card) ──────────── */
+  .card {
+    position: relative;
+    background: linear-gradient(160deg,
+                rgba(13,17,23,0.85) 0%,
+                rgba(17,24,32,0.85) 50%,
+                rgba(13,17,23,0.85) 100%);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid rgba(88,166,255,0.16);
+    border-radius: 14px;
+    box-shadow: 0 0 40px rgba(88,166,255,0.08),
+                inset 0 0 30px rgba(88,166,255,0.02);
+    overflow: hidden;
+  }
+  .card::before, .card::after, .card .bl, .card .br {
+    content: ''; position: absolute; width: 28px; height: 28px;
+    opacity: 0.72; pointer-events: none;
+  }
+  .card::before {
+    top: 0; left: 0;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+    border-radius: 14px 0 0 0;
+  }
+  .card::after {
+    top: 0; right: 0;
+    border-top: 2px solid var(--ok);
+    border-right: 2px solid var(--ok);
+    border-radius: 0 14px 0 0;
+  }
+  .card .bl {
+    bottom: 0; left: 0;
+    border-bottom: 2px solid var(--ok);
+    border-left: 2px solid var(--ok);
+    border-radius: 0 0 0 14px;
+  }
+  .card .br {
+    bottom: 0; right: 0;
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    border-radius: 0 0 14px 0;
+  }
+
+  /* ── Top brand pill + view-mode buttons ────────────────────── */
+  @keyframes shimmer {
+    0%   { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .topbar {
+    position: fixed; top: 18px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 30;
+    display: flex; align-items: center; gap: 14px;
+    pointer-events: none;
+    animation: fade-up 700ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .brand {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 11px; letter-spacing: 3px;
+    background: linear-gradient(90deg,
+      var(--accent) 0%, var(--ok) 40%,
+      var(--gold) 65%, var(--accent) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+    filter: drop-shadow(0 0 16px rgba(88,166,255,0.45));
+    text-transform: uppercase;
+    padding: 10px 18px; border-radius: 100px;
+    background-color: rgba(13,17,23,0.78);
+    border: 1px solid rgba(88,166,255,0.18);
+    pointer-events: auto;
+  }
+  .mode-btns { display: flex; gap: 4px; padding: 4px; pointer-events: auto;
+               background: rgba(13,17,23,0.78);
+               border: 1px solid rgba(88,166,255,0.14);
+               border-radius: 100px;
+               backdrop-filter: blur(14px); }
+  .mode-btn {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px; letter-spacing: 0.25em;
+    padding: 8px 16px; border-radius: 100px;
+    background: transparent;
+    color: var(--fg-muted);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 200ms;
+    text-transform: uppercase;
+  }
+  .mode-btn:hover {
+    color: var(--accent);
+    background: rgba(88,166,255,0.06);
+  }
+  .mode-btn.active {
+    color: var(--accent);
+    background: rgba(88,166,255,0.14);
+    border-color: rgba(88,166,255,0.35);
+    box-shadow: 0 0 12px rgba(88,166,255,0.3);
+  }
+
+  /* ── Left narrative panel ──────────────────────────────────── */
+  .panel-left {
+    position: fixed; top: 50%; left: 28px;
+    transform: translateY(-50%);
+    z-index: 20;
+    max-width: 340px;
+    padding: 28px 30px;
+    animation: fade-up 700ms 200ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .kicker {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9.5px; letter-spacing: 0.5em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .arabic {
+    font-family: 'Noto Sans Arabic', sans-serif;
+    font-size: 14px; color: var(--ok); font-weight: 600;
+    direction: rtl; letter-spacing: 0.02em;
+    margin-bottom: 10px;
+    text-shadow: 0 0 14px rgba(42,157,143,0.3);
+  }
+  .headline {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 1.55rem; line-height: 1.12;
+    margin: 4px 0 18px 0;
+    background: linear-gradient(120deg,
+      var(--gold) 0%, var(--accent) 50%, var(--ok) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 18px rgba(88,166,255,0.25));
+  }
+  .body {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12.5px; line-height: 1.72;
+    color: rgba(201,209,217,0.9);
+  }
+  .body em {
+    font-style: normal;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(233,196,106,0.3);
+  }
+  .divider {
+    height: 1px; margin: 20px 0;
+    background: linear-gradient(90deg,
+      transparent, rgba(88,166,255,0.4) 30%,
+      rgba(42,157,143,0.4) 70%, transparent);
+  }
+  .stats-row { display: flex; gap: 28px; }
+  .stat-block { flex: 1; }
+  .stat-val {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 1.85rem; line-height: 1;
+    color: var(--gold);
+    filter: drop-shadow(0 0 14px rgba(233,196,106,0.45));
+  }
+  .stat-val.accent { color: var(--accent);
+                     filter: drop-shadow(0 0 14px rgba(88,166,255,0.45)); }
+  .stat-lbl {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8.5px; letter-spacing: 0.32em;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+    margin-top: 7px;
+  }
+
+  /* ── Right legend panel ────────────────────────────────────── */
+  .panel-right {
+    position: fixed; top: 50%; right: 28px;
+    transform: translateY(-50%);
+    z-index: 20;
+    padding: 22px 24px;
+    min-width: 200px;
+    animation: fade-up 700ms 350ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .legend-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9.5px; letter-spacing: 0.36em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(88,166,255,0.18);
+  }
+  .legend-grad-row { display: flex; gap: 12px; }
+  .legend-gradient {
+    width: 8px; height: 170px; border-radius: 4px;
+    /* Heat ramp built from the project palette  */
+    background: linear-gradient(to bottom,
+      #FFD8C0 0%,        /* peak */
+      #FF6B6B 12%,       /* pink */
+      #E86F51 28%,       /* coral / warn */
+      #E9C46A 45%,       /* gold */
+      #2A9D8F 62%,       /* teal / ok */
+      #58A6FF 78%,       /* accent blue */
+      #1F2937 92%,       /* slate */
+      #0D1117 100%);     /* deep bg */
+    box-shadow: 0 0 18px rgba(88,166,255,0.25);
+  }
+  .legend-ticks {
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    height: 170px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 0.06em;
+    color: var(--fg-muted);
+  }
+  .legend-ticks span:first-child { color: var(--pink); }
+  .legend-meta {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid rgba(88,166,255,0.12);
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .legend-meta-row {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 10px; color: var(--fg-muted);
+  }
+  .legend-swatch {
+    width: 11px; height: 11px; border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+    flex: none;
+  }
+
+  /* ── Bottom hint bar ──────────────────────────────────────── */
+  .bottombar {
+    position: fixed; bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 25; pointer-events: none;
+    animation: fade-up 700ms 500ms cubic-bezier(0.22,0.61,0.36,1) both;
+  }
+  .hint-pill {
+    pointer-events: auto;
+    display: flex; align-items: center; gap: 18px;
+    padding: 10px 22px; border-radius: 100px;
+    background: rgba(13,17,23,0.78);
+    border: 1px solid rgba(88,166,255,0.14);
+    backdrop-filter: blur(14px);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px; letter-spacing: 0.22em;
+    color: var(--fg-muted);
+    text-transform: uppercase;
+  }
+  .hint-pill .sep { width: 1px; height: 12px; background: rgba(255,255,255,0.1); }
+  .hint-pill kbd {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 9px; padding: 2px 7px;
+    color: var(--accent);
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.3);
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+
+  /* ── District labels (floating, billboarded by JS) ─────────── */
+  #labels-container {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 8;
+  }
+  .area-label {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    pointer-events: none; white-space: nowrap;
+    transition: opacity 350ms;
+    text-align: center;
+  }
+  .area-label .lbl-name {
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 9px; letter-spacing: 0.22em;
+    color: rgba(230,237,243,0.85);
+    text-transform: uppercase;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.95),
+                 0 0 16px rgba(88,166,255,0.4);
+  }
+  .area-label .lbl-ar {
+    font-family: 'Noto Sans Arabic', sans-serif;
+    font-size: 10px; color: rgba(42,157,143,0.85);
+    direction: rtl;
+    text-shadow: 0 0 10px rgba(42,157,143,0.4);
+  }
+  .area-label .lbl-pop {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; letter-spacing: 0.1em;
+    color: var(--gold);
+    margin-top: 2px;
+    text-shadow: 0 0 8px rgba(233,196,106,0.5);
+  }
+  .area-label .lbl-line {
+    width: 1px; height: 14px; margin: 3px auto 0;
+    background: linear-gradient(to bottom,
+      var(--accent), rgba(88,166,255,0));
+  }
+  .area-label .lbl-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent);
+    margin: 0 auto;
+    box-shadow: 0 0 10px var(--accent);
+  }
+
+  /* ── Splash ────────────────────────────────────────────────── */
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  .splash {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    background: var(--bg); z-index: 50;
+    transition: opacity 600ms;
+  }
+  .splash.hidden { opacity: 0; pointer-events: none; }
+  .splash-logo {
+    font-family: 'Orbitron', sans-serif; font-weight: 900;
+    font-size: 1.7rem; letter-spacing: 0.32em;
+    background: linear-gradient(90deg,
+      var(--accent), var(--ok), var(--gold), var(--accent));
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+    filter: drop-shadow(0 0 28px rgba(88,166,255,0.5));
+  }
+  .splash-sub {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--fg-muted); letter-spacing: 0.4em;
+    font-size: 10px; margin-top: 16px;
+    text-transform: uppercase;
+  }
+  .splash-bar {
+    width: 220px; height: 1px; margin-top: 22px;
+    background: rgba(88,166,255,0.15); overflow: hidden;
+  }
+  .splash-bar::after {
+    content: ''; display: block; width: 30%; height: 100%;
+    background: var(--accent);
+    animation: scan 1.4s linear infinite;
+    box-shadow: 0 0 14px var(--accent);
+  }
+
+  /* ── Responsive ────────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .panel-left, .panel-right { display: none; }
+  }
+
+  /* ── Embed mode (?embed=1) ─────────────────────────────────────
+     When iframed by cairo_story_app/story/index.html on Scene 7,
+     the parent's narrative panel + topbar own the chrome.  Hide
+     this page's own panels so the two UIs don't double up. */
+  body.embed .topbar,
+  body.embed .panel-left,
+  body.embed .panel-right,
+  body.embed .bottombar,
+  body.embed .splash { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+<div class="vignette"></div>
+<div id="labels-container"></div>
+
+<!-- Top: brand + view modes -->
+<div class="topbar">
+  <div class="brand">CAIRO · DENSITY · 3D</div>
+  <div class="mode-btns">
+    <button class="mode-btn active" data-view="overview">OVERVIEW</button>
+    <button class="mode-btn"        data-view="core">INNER CORE</button>
+    <button class="mode-btn"        data-view="periphery">PERIPHERY</button>
+  </div>
+</div>
+
+<!-- Left: narrative card -->
+<div class="card panel-left">
+  <div class="bl"></div><div class="br"></div>
+  <div class="kicker">2023 CENSUS · 35 DISTRICTS</div>
+  <div class="arabic">القاهرة · سطح السكان · ٢٠٢٣</div>
+  <div class="headline">A population surface for 21 million</div>
+  <div class="body">
+    Each peak is a Cairo or Giza district, height scaled by 2023 census
+    population on a log scale. The dense inner ring — <em>Imbābah</em>,
+    <em>Al-Marj</em>, <em>Nasr City</em> — towers over the desert
+    expansion cities of <em>New Cairo</em> and <em>6th of October</em>.
+    Drag to orbit, scroll to zoom.
+  </div>
+  <div class="divider"></div>
+  <div class="stats-row">
+    <div class="stat-block">
+      <div class="stat-val accent">21:1</div>
+      <div class="stat-lbl">Density Ratio</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-val">21M</div>
+      <div class="stat-lbl">Population</div>
+    </div>
+  </div>
+</div>
+
+<!-- Right: legend card -->
+<div class="card panel-right">
+  <div class="bl"></div><div class="br"></div>
+  <div class="legend-title">Density Scale</div>
+  <div class="legend-grad-row">
+    <div class="legend-gradient"></div>
+    <div class="legend-ticks">
+      <span>≥1.2M</span>
+      <span>800K</span>
+      <span>500K</span>
+      <span>250K</span>
+      <span>100K</span>
+      <span>≤16K</span>
+    </div>
+  </div>
+  <div class="legend-meta">
+    <div class="legend-meta-row">
+      <span class="legend-swatch" style="background:#FF6B6B; color:#FF6B6B;"></span>
+      <span>Peak · Imbābah</span>
+    </div>
+    <div class="legend-meta-row">
+      <span class="legend-swatch" style="background:#E9C46A; color:#E9C46A;"></span>
+      <span>Inner ring</span>
+    </div>
+    <div class="legend-meta-row">
+      <span class="legend-swatch" style="background:#58A6FF; color:#58A6FF;"></span>
+      <span>Periphery / desert</span>
+    </div>
+    <div class="legend-meta-row">
+      <span class="legend-swatch" style="background:#1F4068; color:#1F4068;"></span>
+      <span>Nile channel</span>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom: hint pill -->
+<div class="bottombar">
+  <div class="hint-pill">
+    <span><kbd>DRAG</kbd>Orbit</span>
+    <div class="sep"></div>
+    <span><kbd>SCROLL</kbd>Zoom</span>
+    <div class="sep"></div>
+    <span><kbd>R</kbd>Reset</span>
+    <div class="sep"></div>
+    <span style="color:var(--fg-dim)">Source · Phase2 / districts.csv</span>
+  </div>
+</div>
+
+<!-- Splash -->
+<div class="splash" id="splash">
+  <div class="splash-logo">CAIRO · DENSITY · 3D</div>
+  <div class="splash-sub">Building population surface…</div>
+  <div class="splash-bar"></div>
+</div>
+
+<script type="module">
+/* When iframed by the parent story app, the parent passes ?embed=1.
+   Flip a body class BEFORE Three.js boots so the chrome-hiding rules
+   kick in immediately (no flash-of-chrome on slow loads). */
+if (new URLSearchParams(location.search).has('embed')) {
+  document.body.classList.add('embed');
+}
+
+import * as THREE from 'three';
+import { OrbitControls }    from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer }   from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass }       from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass }  from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass }       from 'three/addons/postprocessing/OutputPass.js';
+
+/* ════════════════════════════════════════════════════════════════
+   DISTRICT DATA · year 2023, sourced from
+   Phase2/CleanedData/districts.csv ⨯ districts_wide.csv
+   Filter:  centroid_source == 'nominatim'  (drops gov_fallback rows
+            that all collapse to the same city centroid)
+   Aggregation: kism + markaz at the same geocoded centroid are
+            summed (e.g. Imbābah kism 682k + markaz 586k = 1.27M)
+   ════════════════════════════════════════════════════════════════ */
+const DISTRICTS_2023 = [
+  { name: "Imbābah",            ar: "إمبابة",              lat: 30.0759374, lon: 31.2075704, pop: 1268438 },
+  { name: "Al-Marj",            ar: "المرج",                lat: 30.1415494, lon: 31.3418801, pop:  858032 },
+  { name: "Al-Warrāq",          ar: "الوراق",               lat: 30.1129853, lon: 31.2287297, pop:  797066 },
+  { name: "Nasr City",          ar: "مدينة نصر",            lat: 30.0521177, lon: 31.3422045, pop:  759471 },
+  { name: "Al-Jīzah",           ar: "الجيزة",               lat: 29.9870753, lon: 31.2118063, pop:  722092 },
+  { name: "Al-Ahrām",           ar: "الأهرام",              lat: 29.9842871, lon: 31.1344924, pop:  711161 },
+  { name: "As-Salām",           ar: "السلام",               lat: 30.0595737, lon: 31.5362573, pop:  681626 },
+  { name: "Ḥulwān",             ar: "حلوان",                lat: 29.8500001, lon: 31.3333330, pop:  560070 },
+  { name: "Al-'Ayyāṭ",          ar: "العياط",               lat: 29.6195757, lon: 31.2581312, pop:  557971 },
+  { name: "Al-Basātīn",         ar: "البساتين",            lat: 29.9630749, lon: 31.3102454, pop:  532191 },
+  { name: "Kirdāsah",           ar: "كرداسة",              lat: 30.0315846, lon: 31.1118810, pop:  501949 },
+  { name: "Aṣ-Ṣaff",            ar: "الصف",                lat: 29.5647221, lon: 31.2811109, pop:  472963 },
+  { name: "6th of October",     ar: "السادس من أكتوبر",     lat: 29.9723458, lon: 30.9409205, pop:  376302 },
+  { name: "Hada'iq al-Qubbah",  ar: "حدائق القبة",          lat: 30.0821784, lon: 31.2825387, pop:  339612 },
+  { name: "New Cairo",          ar: "القاهرة الجديدة",      lat: 30.0277688, lon: 31.4756825, pop:  319488 },
+  { name: "Al-'Ajūzah",         ar: "العجوزة",              lat: 30.0549435, lon: 31.2127281, pop:  300422 },
+  { name: "Old Cairo",          ar: "مصر القديمة",          lat: 30.0174001, lon: 31.2331964, pop:  268920 },
+  { name: "An-Nuzhah",          ar: "النزهة",               lat: 30.1034694, lon: 31.3383633, pop:  248464 },
+  { name: "Ṭurah",              ar: "طره",                  lat: 29.9345933, lon: 31.2807256, pop:  246648 },
+  { name: "Al-Muqaṭṭam",        ar: "المقطم",               lat: 30.0333330, lon: 31.2833330, pop:  240799 },
+  { name: "Al-Ḥawāmidiyah",     ar: "الحوامدية",            lat: 29.8959326, lon: 31.2650621, pop:  208535 },
+  { name: "Az-Zaytūn",          ar: "الزيتون",              lat: 30.1084626, lon: 31.3057943, pop:  187179 },
+  { name: "Rūd al-Faraj",       ar: "روض الفرج",            lat: 30.0805647, lon: 31.2453510, pop:  156505 },
+  { name: "Heliopolis",         ar: "مصر الجديدة",          lat: 30.1005985, lon: 31.3329136, pop:  144106 },
+  { name: "15 May City",        ar: "مدينة 15 مايو",        lat: 29.8541469, lon: 31.3856998, pop:  100511 },
+  { name: "Sheikh Zayed",       ar: "الشيخ زايد",           lat: 30.0483470, lon: 30.9832235, pop:   97848 },
+  { name: "Al-Ma'ādī",          ar: "المعادي",              lat: 29.9597112, lon: 31.2580771, pop:   95194 },
+  { name: "Ash-Shurūq",         ar: "الشروق",               lat: 30.1794734, lon: 31.6057531, pop:   93759 },
+  { name: "Shubrā",             ar: "شبرا",                 lat: 30.0482403, lon: 31.2456081, pop:   82421 },
+  { name: "Aẓ-Ẓāhir",           ar: "الظاهر",               lat: 30.0707688, lon: 31.2460061, pop:   77236 },
+  { name: "Ad-Duqqī",           ar: "الدقي",                lat: 30.0388955, lon: 31.2125563, pop:   76528 },
+  { name: "Ad-Darb al-Aḥmar",   ar: "الدرب الأحمر",         lat: 30.0501432, lon: 31.2787786, pop:   62837 },
+  { name: "Būlāq",              ar: "بولاق",                lat: 30.0338799, lon: 31.1910129, pop:   51741 },
+  { name: "Al-Azbakiyah",       ar: "الأزبكية",             lat: 30.0538891, lon: 31.2454725, pop:   21241 },
+  { name: "Az-Zamālik",         ar: "الزمالك",              lat: 30.0204678, lon: 31.2254432, pop:   16064 },
+];
+
+/* Cairo bounds — lon/lat → unit-square UV mapping */
+const LON_MIN = 30.92, LON_MAX = 31.62;     // span 0.70°
+const LAT_MIN = 29.55, LAT_MAX = 30.20;     // span 0.65°
+
+/* Project lon/lat → UV ∈ [0,1].
+   v is flipped so HIGH-LATITUDE (north) = LOW-V (top of canvas). */
+const toUV = (lon, lat) => [
+  (lon - LON_MIN) / (LON_MAX - LON_MIN),
+  1 - (lat - LAT_MIN) / (LAT_MAX - LAT_MIN),
+];
+
+/* Log-normalize population to [0,1] intensity. Spread is enormous
+   (Zamalek 16k → Imbābah 1.27M, almost 80×), so log keeps the
+   "valleys" visible without flattening the inner-city mountain range. */
+const popMax = Math.max(...DISTRICTS_2023.map(d => d.pop));
+const popMin = Math.min(...DISTRICTS_2023.map(d => d.pop));
+const lpMax  = Math.log10(popMax);
+const lpMin  = Math.log10(popMin);
+
+const SPOTS = DISTRICTS_2023.map(d => {
+  const intensity = (Math.log10(d.pop) - lpMin) / (lpMax - lpMin);
+  const [u, v] = toUV(d.lon, d.lat);
+  /* Larger districts get a wider gradient kernel so the surface
+     reads as a plateau, not a needle. */
+  const radius = 0.035 + intensity * 0.060;
+  return { ...d, u, v, intensity, radius };
+});
+
+/* ════════════════════════════════════════════════════════════════
+   DENSITY TEXTURE · 1024² canvas of additive radial gradients
+   ════════════════════════════════════════════════════════════════ */
+function generateDensityTexture() {
+  const S = 1024;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, S, S);
+
+  /* Each district is a radial blob; alpha follows intensity */
+  SPOTS.forEach(s => {
+    const cx  = s.u * S;
+    const cy  = s.v * S;
+    const rad = Math.max(2, s.radius * S);
+    const a   = Math.pow(s.intensity, 0.85);   // gentle gamma
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    g.addColorStop(0.00, `rgba(255,255,255,${a.toFixed(3)})`);
+    g.addColorStop(0.28, `rgba(255,255,255,${(a * 0.62).toFixed(3)})`);
+    g.addColorStop(0.58, `rgba(255,255,255,${(a * 0.22).toFixed(3)})`);
+    g.addColorStop(1.00, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, S, S);
+  });
+
+  /* Carve the Nile out — vertical channel ≈ longitude 31.225 */
+  const nileLon = 31.225;
+  const nileX = ((nileLon - LON_MIN) / (LON_MAX - LON_MIN)) * S;
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.lineCap = 'round';
+  /* Wide soft bank */
+  ctx.lineWidth = 28;
+  ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+  ctx.beginPath();
+  ctx.moveTo(nileX,         0);
+  ctx.bezierCurveTo(nileX - 14, S * 0.30,
+                    nileX +  8, S * 0.55,
+                    nileX -  4, S);
+  ctx.stroke();
+  /* Sharper main channel */
+  ctx.lineWidth = 11;
+  ctx.strokeStyle = 'rgba(0,0,0,0.92)';
+  ctx.stroke();
+  ctx.restore();
+
+  return c;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   THREE.JS SCENE
+   ════════════════════════════════════════════════════════════════ */
+const container = document.getElementById('canvas-container');
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#07090C');
+scene.fog = new THREE.FogExp2('#07090C', 0.020);
+
+const camera = new THREE.PerspectiveCamera(
+  44, innerWidth / innerHeight, 0.1, 120,
+);
+/* Start high — intro tween will drop the camera down */
+camera.position.set(7, 13, 7);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.18;
+container.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping  = true;
+controls.dampingFactor  = 0.05;
+controls.minDistance    = 4;
+controls.maxDistance    = 20;
+controls.maxPolarAngle  = Math.PI / 2.15;
+controls.minPolarAngle  = Math.PI / 7;
+controls.autoRotate     = true;
+controls.autoRotateSpeed = 0.25;
+controls.target.set(0, 0, 0);
+
+/* ── Lighting rig (project palette) ─────────────────────────── */
+scene.add(new THREE.AmbientLight('#1A1F28', 0.65));
+const sun = new THREE.DirectionalLight('#FFE5C0', 0.45);
+sun.position.set(5, 12, 4);
+scene.add(sun);
+const rim = new THREE.DirectionalLight('#88BBFF', 0.30);
+rim.position.set(-4, 9, -3);
+scene.add(rim);
+
+/* Two coloured point lights — accent (blue) + warn (coral) — to
+   give the surface subtle two-tone emphasis from below */
+const ptAccent = new THREE.PointLight('#58A6FF', 0.40, 14);
+ptAccent.position.set(-1.5, -0.6, 1.0);
+scene.add(ptAccent);
+const ptWarn = new THREE.PointLight('#E86F51', 0.35, 14);
+ptWarn.position.set(1.5, -0.6, -0.5);
+scene.add(ptWarn);
+
+/* ════════════════════════════════════════════════════════════════
+   HEATMAP MESH · plane + GLSL shader with vertex displacement
+   ════════════════════════════════════════════════════════════════ */
+const densityCanvas  = generateDensityTexture();
+const densityTexture = new THREE.CanvasTexture(densityCanvas);
+densityTexture.minFilter = THREE.LinearFilter;
+densityTexture.magFilter = THREE.LinearFilter;
+
+const SIZE = 10;     // plane edge in world units
+const SEG  = 220;    // tessellation
+const DISP = 2.4;    // peak displacement
+
+const vertSrc = `
+  uniform sampler2D uDensityMap;
+  uniform float uTime;
+  uniform float uDisp;
+
+  varying vec2  vUv;
+  varying float vDensity;
+  varying vec3  vWorldPos;
+  varying vec3  vViewNormal;
+
+  void main() {
+    vUv = uv;
+    float d = texture2D(uDensityMap, uv).r;
+    vDensity = d;
+
+    /* Subtle "breathing" pulse — denser cells pulse harder */
+    float pulse = 1.0 + sin(uTime * 1.3 + d * 7.5) * 0.030 * d;
+    float h = pow(d, 1.55) * uDisp * pulse;
+
+    vec3 pos = position;
+    pos.y += h;
+    vWorldPos = (modelMatrix * vec4(pos, 1.0)).xyz;
+
+    /* Compute analytical normal from the density map (4-tap finite
+       difference) so lighting + fresnel rim look correct on slopes */
+    float tx = 1.0 / 1024.0;
+    float dL = texture2D(uDensityMap, uv + vec2(-tx, 0.0)).r;
+    float dR = texture2D(uDensityMap, uv + vec2( tx, 0.0)).r;
+    float dD = texture2D(uDensityMap, uv + vec2(0.0,-tx)).r;
+    float dU = texture2D(uDensityMap, uv + vec2(0.0, tx)).r;
+    vec3 n = normalize(vec3(
+      (dL - dR) * uDisp * 1.8,
+      1.0,
+      (dD - dU) * uDisp * 1.8
+    ));
+    vViewNormal = normalize(normalMatrix * n);
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+  }
+`;
+
+const fragSrc = `
+  uniform float uTime;
+  varying vec2  vUv;
+  varying float vDensity;
+  varying vec3  vWorldPos;
+  varying vec3  vViewNormal;
+
+  /* Heat ramp built from the project palette — 8 stops:
+     bg → slate → mid-blue → accent → ok → gold → warn → pink → peak */
+  vec3 heat(float t) {
+    vec3 c0 = vec3(0.029, 0.035, 0.047);  // var(--bg)        #07090C
+    vec3 c1 = vec3(0.122, 0.161, 0.216);  // slate            #1F2937
+    vec3 c2 = vec3(0.180, 0.380, 0.700);  // mid blue
+    vec3 c3 = vec3(0.345, 0.651, 1.000);  // var(--accent)    #58A6FF
+    vec3 c4 = vec3(0.165, 0.616, 0.561);  // var(--ok)        #2A9D8F
+    vec3 c5 = vec3(0.914, 0.769, 0.416);  // var(--gold)      #E9C46A
+    vec3 c6 = vec3(0.910, 0.435, 0.318);  // var(--warn)      #E86F51
+    vec3 c7 = vec3(1.000, 0.420, 0.420);  // var(--pink)      #FF6B6B
+    vec3 c8 = vec3(1.000, 0.850, 0.760);  // hot peak — almost incandescent
+    float s = clamp(t, 0.0, 1.0) * 8.0;
+    if (s < 1.0) return mix(c0, c1, s);
+    if (s < 2.0) return mix(c1, c2, s - 1.0);
+    if (s < 3.0) return mix(c2, c3, s - 2.0);
+    if (s < 4.0) return mix(c3, c4, s - 3.0);
+    if (s < 5.0) return mix(c4, c5, s - 4.0);
+    if (s < 6.0) return mix(c5, c6, s - 5.0);
+    if (s < 7.0) return mix(c6, c7, s - 6.0);
+    return                 mix(c7, c8, s - 7.0);
+  }
+
+  void main() {
+    vec3 col = heat(vDensity);
+
+    /* Fine "data" grid — invisible at low density, subtly visible
+       on the populated mesa.  6× major + 48× minor lines. */
+    vec2 g = abs(fract(vUv * 48.0 - 0.5) - 0.5);
+    float gl = min(g.x, g.y);
+    float gm = 1.0 - smoothstep(0.0, 0.025, gl);
+    col = mix(col, col * 1.5, gm * 0.07 * smoothstep(0.04, 0.25, vDensity));
+
+    vec2 mg = abs(fract(vUv * 6.0 - 0.5) - 0.5);
+    float mgl = min(mg.x, mg.y);
+    float mgm = 1.0 - smoothstep(0.0, 0.018, mgl);
+    col = mix(col, col * 1.7, mgm * 0.06 * smoothstep(0.03, 0.20, vDensity));
+
+    /* Fresnel rim — edges of every mountain glow accent-blue */
+    vec3 vd = normalize(cameraPosition - vWorldPos);
+    float fr = pow(1.0 - max(dot(vd, vViewNormal), 0.0), 4.5);
+    col += fr * vDensity * vec3(0.20, 0.43, 0.78);
+
+    /* Emissive peak — drives the bloom pass */
+    float em = pow(vDensity, 2.8) * 2.1;
+    col += em * heat(min(vDensity * 1.20, 1.0));
+
+    /* Tiny noise grain — kills banding on the dark-end gradient */
+    float n = fract(sin(dot(vUv * 900.0 + uTime * 0.005, vec2(12.9898, 78.233))) * 43758.5453);
+    col += (n - 0.5) * 0.010;
+
+    /* Fade out the empty corners (cleaner silhouette) */
+    float alpha = smoothstep(0.008, 0.055, vDensity);
+    gl_FragColor = vec4(col, alpha);
+  }
+`;
+
+const heatMat = new THREE.ShaderMaterial({
+  vertexShader:   vertSrc,
+  fragmentShader: fragSrc,
+  uniforms: {
+    uDensityMap: { value: densityTexture },
+    uTime:       { value: 0 },
+    uDisp:       { value: DISP },
+  },
+  transparent: true,
+  side:        THREE.DoubleSide,
+  depthWrite:  true,
+});
+
+const planeGeo = new THREE.PlaneGeometry(SIZE, SIZE, SEG, SEG);
+planeGeo.rotateX(-Math.PI / 2);
+const heatMesh = new THREE.Mesh(planeGeo, heatMat);
+scene.add(heatMesh);
+
+/* Dark base plane underneath so empty cells don't render the sky */
+const baseMat  = new THREE.MeshBasicMaterial({ color: '#06080C' });
+const baseMesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(SIZE * 1.4, SIZE * 1.4), baseMat,
+);
+baseMesh.rotation.x = -Math.PI / 2;
+baseMesh.position.y = -0.03;
+scene.add(baseMesh);
+
+/* ════════════════════════════════════════════════════════════════
+   PEAK INDICATOR · pulsing rings on the highest-density cell
+   ════════════════════════════════════════════════════════════════ */
+function makeRing(inner, outer, color) {
+  const rg = new THREE.RingGeometry(inner, outer, 80);
+  rg.rotateX(-Math.PI / 2);
+  const rm = new THREE.MeshBasicMaterial({
+    color, transparent: true, opacity: 0.3,
+    side: THREE.DoubleSide, depthWrite: false,
+  });
+  return { mesh: new THREE.Mesh(rg, rm), mat: rm };
+}
+
+const peak = SPOTS.reduce((a, b) => b.intensity > a.intensity ? b : a);
+const peakX = (peak.u - 0.5) * SIZE;
+const peakZ = (peak.v - 0.5) * SIZE;
+const peakY = Math.pow(peak.intensity, 1.55) * DISP + 0.05;
+
+const ring1 = makeRing(0.24, 0.30, '#FF6B6B');
+const ring2 = makeRing(0.40, 0.43, '#E86F51');
+[ring1, ring2].forEach(r => {
+  r.mesh.position.set(peakX, peakY, peakZ);
+  scene.add(r.mesh);
+});
+
+/* ════════════════════════════════════════════════════════════════
+   PARTICLE FIELD · upward-drifting sparks weighted by density
+   ════════════════════════════════════════════════════════════════ */
+const PCOUNT = 1800;
+const pPos  = new Float32Array(PCOUNT * 3);
+const pDens = new Float32Array(PCOUNT);
+const pVel  = new Float32Array(PCOUNT);
+const pLife = new Float32Array(PCOUNT);
+
+const dCtx  = densityCanvas.getContext('2d');
+const dData = dCtx.getImageData(0, 0, 1024, 1024).data;
+const sampD = (u, v) => {
+  const x = Math.min(1023, Math.max(0, Math.floor(u * 1024)));
+  const y = Math.min(1023, Math.max(0, Math.floor(v * 1024)));
+  return dData[(y * 1024 + x) * 4] / 255;
+};
+
+for (let i = 0; i < PCOUNT; i++) {
+  const u = Math.random(), v = Math.random();
+  const d = sampD(u, v);
+  pDens[i] = d;
+  pPos[i * 3]     = (u - 0.5) * SIZE;
+  pPos[i * 3 + 1] = Math.pow(d, 1.55) * DISP + Math.random() * 0.3;
+  pPos[i * 3 + 2] = (v - 0.5) * SIZE;
+  pVel[i]  = 0.004 + d * 0.020;
+  pLife[i] = Math.random();
+}
+
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+
+/* Particle sprite — radial gradient in the project's gold/coral hue */
+const pc = document.createElement('canvas');
+pc.width = pc.height = 64;
+{
+  const x = pc.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0.00, 'rgba(255,255,255,1)');
+  g.addColorStop(0.18, 'rgba(255,220,170,0.85)');
+  g.addColorStop(0.45, 'rgba(232,111,81,0.30)');
+  g.addColorStop(1.00, 'rgba(232,64,64,0)');
+  x.fillStyle = g;
+  x.fillRect(0, 0, 64, 64);
+}
+const pMat = new THREE.PointsMaterial({
+  map: new THREE.CanvasTexture(pc),
+  size: 0.14,
+  transparent: true,
+  opacity: 0.55,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  sizeAttenuation: true,
+  color: '#FFB17A',
+});
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+/* ════════════════════════════════════════════════════════════════
+   FLOATING DISTRICT LABELS · DOM elements projected from world →
+   screen each frame.  Only the top-N most populous show.
+   ════════════════════════════════════════════════════════════════ */
+const labelsEl = document.getElementById('labels-container');
+const TOP_N    = 16;
+const topSpots = [...SPOTS]
+  .sort((a, b) => b.intensity - a.intensity)
+  .slice(0, TOP_N);
+
+const labelObjs = topSpots.map(s => {
+  const el = document.createElement('div');
+  el.className = 'area-label';
+  const dotAlpha  = (0.4 + s.intensity * 0.6).toFixed(2);
+  const dotShadow = (s.intensity * 14).toFixed(0);
+  el.innerHTML = `
+    <div class="lbl-name">${s.name}</div>
+    <div class="lbl-ar">${s.ar}</div>
+    <div class="lbl-pop">${(s.pop / 1000).toFixed(0)}K</div>
+    <div class="lbl-line"></div>
+    <div class="lbl-dot" style="opacity:${dotAlpha};
+         box-shadow:0 0 ${dotShadow}px rgba(88,166,255,${(s.intensity * 0.85).toFixed(2)});"></div>
+  `;
+  labelsEl.appendChild(el);
+  return { el, ...s };
+});
+
+const _v3 = new THREE.Vector3();
+function updateLabels() {
+  labelObjs.forEach(l => {
+    const wx = (l.u - 0.5) * SIZE;
+    const wz = (l.v - 0.5) * SIZE;
+    const wy = Math.pow(l.intensity, 1.55) * DISP + 0.45;
+    _v3.set(wx, wy, wz).project(camera);
+    const sx = (_v3.x * 0.5 + 0.5) * innerWidth;
+    const sy = (-_v3.y * 0.5 + 0.5) * innerHeight;
+    const visible = _v3.z > 0 && _v3.z < 1;
+    const inBounds = sx > 70 && sx < innerWidth - 70
+                  && sy > 70 && sy < innerHeight - 70;
+    l.el.style.left = sx + 'px';
+    l.el.style.top  = sy + 'px';
+    l.el.style.opacity = (visible && inBounds) ? '1' : '0';
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   POSTPROCESSING · render → bloom → output
+   ════════════════════════════════════════════════════════════════ */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(
+  new THREE.Vector2(innerWidth, innerHeight),
+  0.70,   // strength
+  0.50,   // radius
+  0.40,   // threshold
+);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+/* ════════════════════════════════════════════════════════════════
+   CAMERA · intro tween + view-mode buttons
+   ════════════════════════════════════════════════════════════════ */
+const VIEWS = {
+  overview:  { x:  6.5, y: 6.5, z:  6.5, bloom: 0.70 },
+  core:      { x:  3.0, y: 4.5, z:  3.0, bloom: 0.95 },
+  periphery: { x:  9.0, y: 4.0, z:  9.0, bloom: 0.50 },
+};
+
+function flyTo(target, dur = 1400) {
+  const s = camera.position.clone();
+  const t0 = performance.now();
+  function step(now) {
+    const t = Math.min((now - t0) / dur, 1);
+    const e = 1 - Math.pow(1 - t, 3);
+    camera.position.set(
+      s.x + (target.x - s.x) * e,
+      s.y + (target.y - s.y) * e,
+      s.z + (target.z - s.z) * e,
+    );
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* Initial intro — slide from a wide high-angle into Overview */
+flyTo(VIEWS.overview, 2200);
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const v = VIEWS[btn.dataset.view];
+    if (!v) return;
+    flyTo(v);
+    bloom.strength = v.bloom;
+  });
+});
+
+/* Keyboard — R resets to Overview */
+window.addEventListener('keydown', e => {
+  if (e.key === 'r' || e.key === 'R') {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('[data-view="overview"]').classList.add('active');
+    flyTo(VIEWS.overview);
+    bloom.strength = VIEWS.overview.bloom;
+  }
+});
+
+/* ════════════════════════════════════════════════════════════════
+   ANIMATION LOOP
+   ════════════════════════════════════════════════════════════════ */
+const clock = new THREE.Clock();
+const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (prefersReduced) {
+  controls.autoRotate = false;
+  pMat.opacity = 0.3;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  heatMat.uniforms.uTime.value = t;
+
+  /* Particles — drift up, recycle when above peak */
+  const pa = pGeo.attributes.position.array;
+  for (let i = 0; i < PCOUNT; i++) {
+    const d = pDens[i];
+    pLife[i] += 0.0024 + d * 0.008;
+    if (pLife[i] > 1) {
+      const u = Math.random(), v = Math.random();
+      const nd = sampD(u, v);
+      pDens[i] = nd;
+      pa[i * 3]     = (u - 0.5) * SIZE;
+      pa[i * 3 + 1] = Math.pow(nd, 1.55) * DISP;
+      pa[i * 3 + 2] = (v - 0.5) * SIZE;
+      pLife[i] = 0;
+    } else {
+      pa[i * 3 + 1] += pVel[i] * d;
+      pa[i * 3]     += Math.sin(t * 0.8 + i * 0.3) * 0.0008;
+      pa[i * 3 + 2] += Math.cos(t * 0.6 + i * 0.5) * 0.0008;
+    }
+  }
+  pGeo.attributes.position.needsUpdate = true;
+  pMat.opacity = prefersReduced ? 0.3
+               : (0.42 + Math.sin(t * 0.4) * 0.08);
+
+  /* Pulsing peak rings */
+  const r1s = 1 + Math.sin(t * 2.0)        * 0.20;
+  const r2s = 1 + Math.sin(t * 2.0 + 1.5)  * 0.26;
+  ring1.mesh.scale.setScalar(r1s);
+  ring1.mat.opacity = 0.20 + Math.sin(t * 2.0) * 0.12;
+  ring2.mesh.scale.setScalar(r2s);
+  ring2.mat.opacity = 0.14 + Math.sin(t * 2.0 + 1.5) * 0.10;
+
+  /* Subtle light flicker — accent + warn out of phase */
+  ptAccent.intensity = 0.36 + Math.sin(t * 1.1)     * 0.10;
+  ptWarn.intensity   = 0.30 + Math.sin(t * 0.7 + 2) * 0.08;
+
+  controls.update();
+  updateLabels();
+  composer.render();
+}
+animate();
+
+/* Hide splash once first frame is scheduled */
+requestAnimationFrame(() => {
+  setTimeout(() => document.getElementById('splash').classList.add('hidden'), 250);
+});
+
+/* Resize */
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+  bloom.setSize(innerWidth, innerHeight);
+});
+</script>
+
+</body>
+</html>
