@@ -104,14 +104,15 @@ H2 = dict(
     test="Mann-Whitney U",
     U=2, p=0.0000, cliffs_delta=-0.991,
     medians=dict(lrt=916, metro_l3_post_2012=634_333),
-    # Live CSV counts: LRT has 12 stations with valid coordinates; Metro Line 3
-    # post-2012 has 31 stations (the notebook subset for H2 was 27 — using the
-    # post-2012 filter on the current CSV gives 31).
-    n_by_group=dict(lrt=12, metro_l3=31),
+    # Live CSV counts (Phase2/CleanedData/lrt_stations.csv):
+    # LRT has 12 operational stations, but only 11 have valid lat/lon.
+    # Metro Line 3 post-2012 has 31 stations (the notebook subset for H2 was 27 —
+    # using the post-2012 filter on the current CSV gives 31).
+    n_by_group=dict(lrt=11, metro_l3=31),
     sensitivity_radii_km=[1, 2, 3],
     sensitivity_note="δ stays below −0.95 at every radius",
     interpretation=(
-        "LRT median 2-km catchment is 916 residents (12 LRT stations "
+        "LRT median 2-km catchment is 916 residents (11 operational LRT stations "
         "have valid coordinates after the OSM + Google Maps backfill in "
         "S4); post-2012 Metro L3 median is ~634k. Cliff's delta = "
         "-0.991 is very close to the theoretical maximum of -1."
@@ -141,15 +142,15 @@ Q14 = dict(
 
 Q18B = dict(
     # Fallback values — the chart prefers data.live.compute_q18b_matrix()
-    # which recomputes from the live CSVs.  These match the CSVs as of
-    # the latest notebook commit (gap site counts: G1=115 · G2=19 · G3=4 ·
-    # G4=382;  mode counts: Metro L3 post-2014=27 · LRT=12 · BRT=21).
+    # which recomputes from the live CSVs. These match the CSVs as of the
+    # latest notebook commit (gap site counts: G1=115 · G2=19 · G3=4 ·
+    # G4=382; mode counts: Metro L3 post-2014=27 · LRT operational-with-coords=11 · BRT=21).
     modes=["METRO L3", "LRT", "BRT"],
     gaps=["GHOSTS", "EMPTY-RETURN", "VEHICLE MISMATCH", "UNDER-SERVED"],
     values=[
-        [15.7, 5.3,  0.0, 9.7],   # Metro L3 post-2014
-        [ 3.5, 5.3, 25.0, 2.6],   # LRT
-        [ 4.3, 10.5, 25.0, 13.6], # BRT
+        [15.7, 5.3,  0.0, 6.0],   # Metro L3 post-2014
+        [ 2.6, 5.3,  0.0, 1.6],   # LRT (operational-with-coords)
+        [ 7.8, 10.5, 25.0, 13.1], # BRT
     ],
     note="No Monorail row — the Cairo Monorail is not operational yet.",
 )
@@ -264,7 +265,8 @@ SCRAPE = dict(
              coords_on_page=0, rescued_overpass=9, rescued_gmaps=7,
              with_coords=12, remaining=8,
              note=("CSV currently shows 12 stations with valid lat/lon; "
-                   "8 are still planned-only or coordinate-less in the CSV.")),
+                   "only 11 are operational-with-coords; 8 are still planned-only or "
+                   "coordinate-less in the CSV.")),
     brt=dict(source="Google Maps (playwright)", n=21, with_coords=21,
              method="10 viewport queries + regex aria-labels + uroman romanization + 3-tier dedup",
              note="BRT scrape grew from the original 12 to 21 stations after rerunning S5."),

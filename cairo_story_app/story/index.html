@@ -2518,7 +2518,7 @@ function ChartH1() {
       <BarRow label="HIGH DENSITY"  value={2.15} max={28} color="#E86F51" valueText="2.15"  />
       <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
                     letterSpacing: '0.06em', marginTop: 14 }}>
-        KRUSKAL-WALLIS H = 55.7 · p &lt; 0.001 · ε² = 0.826 · MORAN'S I = 0.087
+        KRUSKAL-WALLIS H = 55.7 · p &lt; 0.001 · ε² = 0.826 · MORAN'S I = 0.214
       </div>
     </div>
   );
@@ -2530,7 +2530,7 @@ function ChartH2() {
       <div className="bl"></div><div className="br"></div>
       <div className="chart-title">H2 · MEDIAN 2-KM CATCHMENT · LRT vs METRO</div>
       <BarRow label="LRT · n=12"                 value={916}    max={700000} color="#7B2D8E" valueText="916"     />
-      <BarRow label="METRO L3 POST-2012 · n=27"  value={634333} max={700000} color="#58A6FF" valueText="634,333" />
+      <BarRow label="METRO L3 POST-2012 · n=31"  value={634333} max={700000} color="#58A6FF" valueText="634,333" />
       <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
                     letterSpacing: '0.06em', marginTop: 14 }}>
         MANN-WHITNEY U = 2 · p &lt; 0.0001 · CLIFF'S δ = −0.991
@@ -2557,9 +2557,9 @@ function ChartH3() {
 function ChartQ18b() {
   const gaps = ['GHOSTS', 'EMPTY-RET', 'VEH MISM', 'UNDERSRV'];
   const rows = [
-    { mode: 'METRO L3', vals: [15.7, 5.3, 0.0, 9.7] },
-    { mode: 'LRT',      vals: [3.5,  5.3, 25.0, 2.6] },
-    { mode: 'BRT',      vals: [4.3,  10.5, 25.0, 13.6] },
+    { mode: 'METRO L3', vals: [15.7, 5.3, 0.0, 6.0] },
+    { mode: 'LRT',      vals: [2.6,  5.3, 0.0, 1.6] },
+    { mode: 'BRT',      vals: [7.8,  10.5, 25.0, 13.1] },
   ];
   const cellColor = (v) => {
     if (v >= 20) return 'rgba(42,157,143,0.35)';
