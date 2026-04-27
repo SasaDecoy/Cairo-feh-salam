@@ -9,20 +9,20 @@ S3_metro,Tora El-Asmant,طرة الأسمنت ‎,223,Basateen,54,0.61539656,380
 S3_metro,Kozzika,كوتسيكا ‎,245,Kafr Tohormos,50,0.7386064,3567.2138831884054,False,review_needed,below semantic or spatial threshold
 S3_metro,Tora El-Balad,طرة البلد ‎,153,Qalyoub El Balad,48,0.69656,2204.453158783697,False,review_needed,below semantic or spatial threshold
 S3_metro,Sakanat El-Maadi,ثكنات المعادي ‎,250,Maadi Metro,51,0.87596,1017.2483482280134,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Maadi,المعادي ‎,265,Shabramant,66,0.76731914,97.90314974103104,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Maadi,المعادي ‎,265,Shabramant,66,0.76731926,97.90314974103104,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Hadayek El-Maadi,حدائق المعادي ‎,203,Qism El Hadayek,64,0.8171219,527.4737848067783,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Dar El-Salam,دار السلام ‎,281,Dar El Salam,91,0.9410972,330.68014136513676,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El-Zahraa',الزهراء ‎,143,Zahraa Ain Shams,54,0.7079214,29.97675595628046,False,review_needed,below semantic or spatial threshold
-S3_metro,Mar Girgis ,مار جرجس ‎,197,Tibeen,54,0.88268584,465.6530598029367,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Mar Girgis ,مار جرجس ‎,197,Tibeen,54,0.88268566,465.6530598029367,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El-Malek El-Saleh,الملك الصالح ‎,231,Al Malek Al Saleh,70,0.87840134,255.48450770177445,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Al-Sayeda Zeinab,السيدة زينب ‎,274,Al Sayeda Zeinab,93,0.96369964,115.42465035689195,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Al-Sayeda Zeinab,السيدة زينب ‎,274,Al Sayeda Zeinab,93,0.9636998,115.42465035689195,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Saad Zaghloul,سعد زغلول ‎,109,Zahraa Madinet Nasr,81,0.8123326,226.17880201012858,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Sadat,السادات ‎,265,Shabramant,53,0.6949016,630.8290471635441,False,review_needed,below semantic or spatial threshold
-S3_metro,Nasser,جمال عبدالناصر ‎,251,Al Sheikh Mansour,61,0.8511433,136.1161564413278,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Orabi,عرابي ‎,197,Tibeen,58,0.88245094,508.23284247347624,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Al-Shohadaa ,الشهداء ‎,30,Abou Al Reesh,51,0.7346982,138.53903230992773,False,review_needed,below semantic or spatial threshold
-S3_metro,Ghamra,غمرة ‎,156,Ghamra,100,1.0000004,102.5713072488301,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,El-Demerdash,الدمرداش ‎,264,Abou El Numrus,52,0.6883755,827.7301932284224,False,review_needed,below semantic or spatial threshold
+S3_metro,Sadat,السادات ‎,265,Shabramant,53,0.6949014,630.8290471635441,False,review_needed,below semantic or spatial threshold
+S3_metro,Nasser,جمال عبدالناصر ‎,251,Al Sheikh Mansour,61,0.8511434,136.1161564413278,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Orabi,عرابي ‎,197,Tibeen,58,0.882451,508.23284247347624,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Al-Shohadaa ,الشهداء ‎,30,Abou Al Reesh,51,0.7346983,138.53903230992773,False,review_needed,below semantic or spatial threshold
+S3_metro,Ghamra,غمرة ‎,156,Ghamra,100,1.0000002,102.5713072488301,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,El-Demerdash,الدمرداش ‎,264,Abou El Numrus,52,0.6883756,827.7301932284224,False,review_needed,below semantic or spatial threshold
 S3_metro,Manshiet El-Sadr,منشية الصدر ‎,139,Mostorod,68,0.569577,595.9838309054323,False,review_needed,below semantic or spatial threshold
 S3_metro,Kobri El-Qobba,كوبري القبة ‎,226,El Kafr (Birak Al Khiyam),57,0.79407275,273.85943495720716,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Hammamat El-Qobba,حمامات القبة ‎,166,Masaken Al Shorouq,58,0.6758367,778.2407734186927,False,review_needed,below semantic or spatial threshold
@@ -36,17 +36,17 @@ S3_metro,El-Marg,المرج ‎,275,Ard El Lewaa,53,0.64876986,607.1517486246169
 S3_metro,New El-Marg,المرج الجديدة ‎,85,New Marg,84,0.8417758,143.0262078649344,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El-Mounib,المنيب ‎,264,Abou El Numrus,53,0.7702073,164.26720249750895,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Sakiat Mekky,ساقية مكي ‎,265,Shabramant,44,0.7312692,1157.2458244958134,False,review_needed,below semantic or spatial threshold
-S3_metro,Omm El-Masryeen ,أم المصريين ‎,159,Mosheer Ahmed Ismail (Sheraton),46,0.69129616,1210.5065837656343,False,review_needed,below semantic or spatial threshold
+S3_metro,Omm El-Masryeen ,أم المصريين ‎,159,Mosheer Ahmed Ismail (Sheraton),46,0.691296,1210.5065837656343,False,review_needed,below semantic or spatial threshold
 S3_metro,El Giza,الجيزة ‎,279,Giza Square,44,0.8542203,713.039101438298,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Faisal,فيصل ‎,252,Awwel Faisal,66,0.8561732,84.12861687294433,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Faisal,فيصل ‎,252,Awwel Faisal,66,0.8561731,84.12861687294433,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Cairo University,جامعة القاهرة ‎,253,Cairo University,100,0.9999996,43.33798880162226,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El Bohoth,البحوث ‎,126,Bohooth (Al Kobri Al Khashab),50,0.69222575,182.26107671478766,False,review_needed,below semantic or spatial threshold
-S3_metro,Dokki,الدقي ‎,194,Jazirat Mohamed,100,0.8128285,112.34989912313885,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Opera,الأوبرا ‎,35,Masraweya,50,0.48412707,1137.0413399071003,False,review_needed,below semantic or spatial threshold
-S3_metro,Sadat,السادات ‎,265,Shabramant,53,0.6949016,630.8290471635441,False,review_needed,below semantic or spatial threshold
+S3_metro,Dokki,الدقي ‎,194,Jazirat Mohamed,100,0.8128284,112.34989912313885,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Opera,الأوبرا ‎,35,Masraweya,50,0.48412699,1137.0413399071003,False,review_needed,below semantic or spatial threshold
+S3_metro,Sadat,السادات ‎,265,Shabramant,53,0.6949014,630.8290471635441,False,review_needed,below semantic or spatial threshold
 S3_metro,Mohamed Naguib,محمد نجيب ‎,251,Al Sheikh Mansour,48,0.73990184,856.5723003243155,False,review_needed,below semantic or spatial threshold
-S3_metro,Attaba,العتبة ‎,158,Attaba,100,0.99999964,330.2115427641897,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Al-Shohadaa ,الشهداء ‎,30,Abou Al Reesh,51,0.7346982,138.53903230992773,False,review_needed,below semantic or spatial threshold
+S3_metro,Attaba,العتبة ‎,158,Attaba,100,0.9999996,330.2115427641897,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Al-Shohadaa ,الشهداء ‎,30,Abou Al Reesh,51,0.7346983,138.53903230992773,False,review_needed,below semantic or spatial threshold
 S3_metro,Masarra,مسرة ‎,133,Masarra,100,1.0000004,525.4547472331028,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Road El-Farag,روض الفرج ‎,342,Mabyadah Square - Rod El Farag,51,0.740878,30.453760637011012,False,review_needed,below semantic or spatial threshold
 S3_metro,St. Teresa,سانتا تريزا ‎,135,Kattameya Church,57,0.52101904,863.1808456371708,False,review_needed,below semantic or spatial threshold
@@ -57,28 +57,28 @@ S3_metro,Shubra El-Kheima,شبرا الخيمة ‎,226,El Kafr (Birak Al Khiyam
 S3_metro,Adly Mansour,عدلي منصور ‎,265,Shabramant,68,0.76513517,1404.2161796406008,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El Haykestep,الهايكستب ‎,265,Shabramant,59,0.64315647,478.5725203236202,False,review_needed,below semantic or spatial threshold
 S3_metro,Omar Ibn El-Khattab,عمر بن الخطاب ‎,194,Jazirat Mohamed,42,0.86375844,603.4817975752746,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Qobaa,قباء ‎,97,Qalyoub,60,0.81765646,1776.6749185901137,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Qobaa,قباء ‎,97,Qalyoub,60,0.8176565,1776.6749185901137,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Hesham Barakat,هشام بركات ‎,168,Al Banhawi,55,0.7566938,1086.5189095273893,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El-Nozha,النزهة ‎,264,Abou El Numrus,46,0.77641404,391.54723923213913,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Nadi El-Shams,نادي الشمس ‎,264,Abou El Numrus,50,0.709374,486.4705229144425,False,review_needed,below semantic or spatial threshold
 S3_metro,Alf Maskan,ألف مسكن ‎,20,Alf Maskan,100,1.0000001,125.84749064519552,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Heliopolis Square,ميدان هليوبوليس ‎,256,Khalafawy Square,68,0.7086983,862.155793632526,False,review_needed,below semantic or spatial threshold
-S3_metro,Haroun,هارون ‎,265,Shabramant,50,0.7013027,1134.737265041459,False,review_needed,below semantic or spatial threshold
+S3_metro,Haroun,هارون ‎,265,Shabramant,50,0.7013026,1134.737265041459,False,review_needed,below semantic or spatial threshold
 S3_metro,Al-Ahram,الأهرام ‎,30,Abou Al Reesh,57,0.82882977,304.50525405774937,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Koleyet El-Banat,كلية البنات ‎,235,Koleyet Al Banat - Ain Shams University,54,0.7187043,338.3826169676537,False,review_needed,below semantic or spatial threshold
+S3_metro,Koleyet El-Banat,كلية البنات ‎,235,Koleyet Al Banat - Ain Shams University,54,0.71870404,338.3826169676537,False,review_needed,below semantic or spatial threshold
 S3_metro,Stadium,الإستاد ‎,256,Khalafawy Square,37,0.6117535,968.4956603611022,False,review_needed,below semantic or spatial threshold
 S3_metro,Fair Zone,أرض المعارض ‎,76,Industrial Zone 3,50,0.45460585,1597.6451946354236,False,review_needed,below semantic or spatial threshold
 S3_metro,Abbassia,العباسية ‎,92,Abbasseya,82,0.88368106,483.47099454992997,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Abdou Pasha,عبده باشا ‎,29,Abd Al Moneim Riad,69,0.8374437,1060.721875822479,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El Geish,الجيش ‎,275,Ard El Lewaa,52,0.6171553,716.0010186944337,False,review_needed,below semantic or spatial threshold
 S3_metro,Bab El Shaaria,باب الشعرية ‎,147,Masaken Helmeyet Al Zaitoun,62,0.69638497,229.67049456673178,False,review_needed,below semantic or spatial threshold
-S3_metro,Attaba,العتبة ‎,158,Attaba,100,0.99999964,330.2115427641897,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Attaba,العتبة ‎,158,Attaba,100,0.9999996,330.2115427641897,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Nasser,جمال عبدالناصر ‎,251,Al Sheikh Mansour,61,0.8511434,136.1161564413278,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Maspero,ماسبيرو ‎,133,Masarra,70,0.7862953,482.8137753684271,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Safaa Hegazy,صفاء حجازي ‎,63,Masaken Zeinhom,66,0.65633965,962.2130152871745,False,review_needed,below semantic or spatial threshold
 S3_metro,Kit Kat,الكيت كات ‎,163,Kit Kat Square,66,0.62064666,60.679145319646906,False,review_needed,below semantic or spatial threshold
-S3_metro,Sudan,السودان ‎,155,Warraq Al Arab (Cima),40,0.49383625,431.14423501168585,False,review_needed,below semantic or spatial threshold
-S3_metro,Imbaba,إمبابة ‎,232,Imbaba,100,0.8618975,784.113041273108,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Sudan,السودان ‎,155,Warraq Al Arab (Cima),40,0.49383616,431.14423501168585,False,review_needed,below semantic or spatial threshold
+S3_metro,Imbaba,إمبابة ‎,232,Imbaba,100,0.86189723,784.113041273108,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El-Bohy,البوهي ‎,264,Abou El Numrus,36,0.81266034,419.91461295385693,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,El-Qawmia,القومية ‎,188,Qawmeya Arabeya,42,0.67616224,464.198653570762,False,review_needed,below semantic or spatial threshold
 S3_metro,Ring Road,الطريق الدائري ‎,217,Mostorod Ring Rd,42,0.54689217,297.2387245836208,False,review_needed,below semantic or spatial threshold
@@ -87,44 +87,38 @@ S3_metro,Tawfikia,التوفيقية ‎,197,Tibeen,46,0.73364,641.7428168926875
 S3_metro,Wadi El Nile,وادي النيل ‎,329,Awwel Gamal - Gesr EL Suez,48,0.57926846,929.0120220266725,False,review_needed,below semantic or spatial threshold
 S3_metro,Gamat El Dowal,جامعة الدول العربية ‎,167,Arab Al Tawaila,61,0.78000766,1148.0684364207075,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S3_metro,Boulak El Dakrour,بولاق الدكرور ‎,137,Bulaq Al Dakrur,68,0.8365457,210.13161198235088,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S3_metro,Cairo University,جامعة القاهرة ‎,253,Cairo University,100,0.9999997,43.33798880162226,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
-S4_lrt,Adly Mansour,,139,Mostorod,68,0.5556143,1404.2161796406008,False,review_needed,below semantic or spatial threshold
-S4_lrt,El-Obour,,69,Obour,76,0.7336184,1886.9265001868403,False,review_needed,below semantic or spatial threshold
-S4_lrt,Future,,31,FUE,42,0.7796807,5653.855047096191,False,review_needed,below semantic or spatial threshold
-S4_lrt,El-Shorouk,,6,Al Shorouq,70,0.7786172,2484.7675369089297,False,review_needed,below semantic or spatial threshold
-S4_lrt,New Heliopolis,,72,Hegaz Square,48,0.5011527,3861.734943711515,False,review_needed,below semantic or spatial threshold
-S4_lrt,Badr,,207,Badr City,61,0.8004831,400.85646287157124,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S3_metro,Cairo University,جامعة القاهرة ‎,253,Cairo University,100,0.9999996,43.33798880162226,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
+S4_lrt,Adly Mansour,,139,Mostorod,68,0.55561435,1404.2161796406008,False,review_needed,below semantic or spatial threshold
+S4_lrt,El-Obour,,69,Obour,76,0.73361826,1886.9265001868403,False,review_needed,below semantic or spatial threshold
+S4_lrt,Future,,31,FUE,42,0.7796808,5653.855047096191,False,review_needed,below semantic or spatial threshold
+S4_lrt,El-Shorouk,,6,Al Shorouq,70,0.77861696,2484.7675369089297,False,review_needed,below semantic or spatial threshold
+S4_lrt,New Heliopolis,,72,Hegaz Square,48,0.50115275,3861.734943711515,False,review_needed,below semantic or spatial threshold
+S4_lrt,Badr,,207,Badr City,61,0.8004833,400.85646287157124,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S4_lrt,Industrial Park,,76,Industrial Zone 3,68,0.5973106,7840.912026332854,False,review_needed,below semantic or spatial threshold
-S4_lrt,Knowledge City,,207,Badr City,50,0.4909949,8784.904567798625,False,review_needed,below semantic or spatial threshold
+S4_lrt,Knowledge City,,207,Badr City,50,0.49099484,8784.904567798625,False,review_needed,below semantic or spatial threshold
 S4_lrt,West of Ramadan,,136,10th of Ramadan City,57,0.79880947,inf,False,review_needed,below semantic or spatial threshold
 S4_lrt,10th of Ramadan,,136,10th of Ramadan City,85,0.90435463,1400.1584664561888,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S4_lrt,Ramadan City Center,,136,10th of Ramadan City,71,0.8477641,inf,False,review_needed,below semantic or spatial threshold
-S4_lrt,El-Robaiky,,264,Abou El Numrus,42,0.67315906,3842.2452033802533,False,review_needed,below semantic or spatial threshold
+S4_lrt,El-Robaiky,,264,Abou El Numrus,42,0.67315924,3842.2452033802533,False,review_needed,below semantic or spatial threshold
 S4_lrt,Hadayek al-Assema,,92,Abbasseya,62,0.7469252,6900.742255255333,False,review_needed,below semantic or spatial threshold
 S4_lrt,Capital Airport,,94,Cairo Airport,78,0.72440875,7724.1411908468945,False,review_needed,below semantic or spatial threshold
 S4_lrt,Arts and Culture City,,161,Nahda City,48,0.50787646,1124.3082593138888,False,review_needed,below semantic or spatial threshold
 S4_lrt,Nativity Cathedral,,135,Kattameya Church,52,0.6448192,inf,False,review_needed,below semantic or spatial threshold
-S4_lrt,Octagon,,139,Mostorod,42,0.6430953,inf,False,review_needed,below semantic or spatial threshold
+S4_lrt,Octagon,,139,Mostorod,42,0.64309514,inf,False,review_needed,below semantic or spatial threshold
 S4_lrt,International Sports City,,349,City Stars,51,0.48806444,inf,False,review_needed,below semantic or spatial threshold
 S4_lrt,Central Capital,,339,Wizarat District - New Administrative Capital,48,0.6083537,inf,False,review_needed,below semantic or spatial threshold
-S4_lrt,Industrial Zone,,76,Industrial Zone 3,93,0.84226763,inf,False,review_needed,below semantic or spatial threshold
+S4_lrt,Industrial Zone,,76,Industrial Zone 3,93,0.8422675,inf,False,review_needed,below semantic or spatial threshold
 S5_brt,BRT Bahtim,BRT Bahtim,353,Manshiyet Al Bakary,58,0.6469623,595.9103309510338,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta 'dly mnswr BRT,محطة عدلي منصور BRT,265,Shabramant,41,0.6406751,1225.6475322621955,False,review_needed,below semantic or spatial threshold
 S5_brt,BRT Moasast El zakah,BRT Moasast El zakah,63,Masaken Zeinhom,73,0.69753146,109.25614971819383,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta shbra alkhyma BRT,محطة شبرا الخيمة BRT,226,El Kafr (Birak Al Khiyam),44,0.567654,69.70357696339495,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta alatwbys altrddy mstrd,محطة الاتوبيس الترددي مسطرد,139,Mostorod,40,0.44802183,129.0725543171004,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta alatwbys altrddy alslam,محطة الأتوبيس الترددي السلام,139,Mostorod,42,0.5927529,1075.0847534397117,False,review_needed,below semantic or spatial threshold
-S5_brt,mhta alatwbys altrddy karfwr,محطة الاتوبيس الترددي كارفور,244,Helmeyet El Zaitoun Metro,41,0.60201234,534.3242184058719,False,review_needed,below semantic or spatial threshold
-S5_brt,mhta alatwbys altrddy alshhyd,محطة الاتوبيس الترددي الشهيد,250,Maadi Metro,40,0.8996677,2084.4662213372144,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta alatwbys altrddy alkhsws,محطة الاتوبيس الترددي الخصوص,146,Ain Shams Metro,41,0.51205856,343.68375503095774,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta alatwbys altrddy alshrqawya,محطة الاتوبيس الترددي الشرقاوية,358,Wataneya Moqatam,42,0.8355053,820.8037829160814,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S5_brt,mhta alatwbys altrddy tryq alswys,محطة الاتوبيس الترددي طريق السويس,93,Badrasheen Ferry,40,0.7857692,2133.892410454124,False,review_needed,below semantic or spatial threshold
-S5_brt,mhta alatwbys altrddy alawtwstrad,محطة الاتوبيس الترددي الاوتوستراد,146,Ain Shams Metro,40,0.49935356,763.0803405558993,False,review_needed,below semantic or spatial threshold
-S5_brt,mhta alatwbys altrddy alhdba alwsty,محطة الاتوبيس الترددي الهضبة الوسطي,45,Al Zawya Al Hamra,42,0.5478307,19.297872453541864,False,review_needed,below semantic or spatial threshold
-S5_brt,mhta alatwbys altrddy shar' aljzayer,محطة الاتوبيس الترددي شارع الجزائر,184,Al Shari' Al Gadeed  (Bahteem),41,0.66609263,462.85580661513967,False,review_needed,below semantic or spatial threshold
 S5_brt,alatwbys altrddy alsry' - mhta almrj,الاتوبيس الترددي السريع - محطة المرج,139,Mostorod,42,0.6220925,439.79393305794423,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta alqlj - alatwbys altrddy alsry',محطة القلج - الاتوبيس الترددي السريع,6,Al Shorouq,40,0.53444827,668.0637997658814,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta jardynya alatwbys altrddy jadrynya,محطة جاردينيا الاتوبيس الترددي جادرينيا,244,Helmeyet El Zaitoun Metro,44,0.507567,354.6677848916151,False,review_needed,below semantic or spatial threshold
-S5_brt,mhta alatwbys altrddy alnsajwn alshrqywn,محطة الاتوبيس الترددي النساجون الشرقيون,132,Zamalek Ferry,37,0.7205816,1179.5546603791006,False,review_needed,below semantic or spatial threshold
 S5_brt,mhta alatwbys altrddy tryq shbra bnha alhr,محطة الاتوبيس الترددي طريق شبرا بنها الحر,250,Maadi Metro,40,0.84735906,413.7266340534483,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m
 S5_brt,mhta alatwbys altrddy alfryq abrahym 'raby,محطة الاتوبيس الترددي الفريق ابراهيم عرابي,194,Jazirat Mohamed,39,0.8500977,655.7107348974371,True,accepted,semantic_score>=0.75 and nearest_terminal<2000m

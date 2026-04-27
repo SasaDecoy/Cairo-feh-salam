@@ -260,23 +260,22 @@
   }
   .legend-grad-row { display: flex; gap: 12px; }
   .legend-gradient {
-    width: 8px; height: 170px; border-radius: 4px;
-    /* Heat ramp built from the project palette  */
+    width: 10px; height: 200px; border-radius: 5px;
+    /* Plotly-style blue→red sequential, top = peak red, bottom = low blue */
     background: linear-gradient(to bottom,
-      #F4A261 0%,        /* peak */
-      #D95F4A 12%,       /* muted red */
-      #E86F51 28%,       /* coral / warn */
-      #E9C46A 45%,       /* gold */
-      #2A9D8F 62%,       /* teal / ok */
-      #58A6FF 78%,       /* accent blue */
-      #1F2937 92%,       /* slate */
-      #0D1117 100%);     /* deep bg */
-    box-shadow: 0 0 18px rgba(88,166,255,0.25);
+      #FF9E8A  0%,    /* warm peak       */
+      #FF6B6B  18%,   /* var(--pink) red */
+      #E86F51  38%,   /* var(--warn)     */
+      #58A6FF  68%,   /* var(--accent)   */
+      #1F4068  88%,   /* deep navy       */
+      #0D1117 100%);  /* bg              */
+    box-shadow: 0 0 22px rgba(255,107,107,0.22),
+                0 0 14px rgba(88,166,255,0.18);
   }
   .legend-ticks {
     display: flex; flex-direction: column;
     justify-content: space-between;
-    height: 170px;
+    height: 200px;
     font-family: 'Share Tech Mono', monospace;
     font-size: 9px; letter-spacing: 0.06em;
     color: var(--fg-muted);
@@ -341,35 +340,40 @@
   }
   .area-label .lbl-name {
     font-family: 'Orbitron', sans-serif; font-weight: 700;
-    font-size: 9px; letter-spacing: 0.22em;
-    color: rgba(230,237,243,0.85);
+    font-size: 14px; letter-spacing: 0.18em;
+    color: rgba(240,244,250,0.96);
     text-transform: uppercase;
-    text-shadow: 0 1px 8px rgba(0,0,0,0.95),
-                 0 0 16px rgba(88,166,255,0.4);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.98),
+                 0 0 22px rgba(0,0,0,0.85),
+                 0 0 18px rgba(88,166,255,0.42);
   }
   .area-label .lbl-ar {
     font-family: 'Noto Sans Arabic', sans-serif;
-    font-size: 10px; color: rgba(42,157,143,0.85);
+    font-size: 14.5px; font-weight: 700;
+    color: rgba(80,200,180,0.95);
     direction: rtl;
-    text-shadow: 0 0 10px rgba(42,157,143,0.4);
+    margin-top: 2px;
+    text-shadow: 0 1px 10px rgba(0,0,0,0.95),
+                 0 0 14px rgba(42,157,143,0.55);
   }
   .area-label .lbl-pop {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px; letter-spacing: 0.1em;
+    font-family: 'Orbitron', sans-serif; font-weight: 700;
+    font-size: 12.5px; letter-spacing: 0.12em;
     color: var(--gold);
-    margin-top: 2px;
-    text-shadow: 0 0 8px rgba(233,196,106,0.5);
+    margin-top: 4px;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.95),
+                 0 0 12px rgba(233,196,106,0.6);
   }
   .area-label .lbl-line {
-    width: 1px; height: 14px; margin: 3px auto 0;
+    width: 1px; height: 18px; margin: 4px auto 0;
     background: linear-gradient(to bottom,
       var(--accent), rgba(88,166,255,0));
   }
   .area-label .lbl-dot {
-    width: 5px; height: 5px; border-radius: 50%;
+    width: 7px; height: 7px; border-radius: 50%;
     background: var(--accent);
     margin: 0 auto;
-    box-shadow: 0 0 10px var(--accent);
+    box-shadow: 0 0 14px var(--accent);
   }
 
   /* ── Splash ────────────────────────────────────────────────── */
@@ -492,8 +496,8 @@
       <span>Peak · Imbābah</span>
     </div>
     <div class="legend-meta-row">
-      <span class="legend-swatch" style="background:#E9C46A; color:#E9C46A;"></span>
-      <span>Inner ring</span>
+      <span class="legend-swatch" style="background:#E86F51; color:#E86F51;"></span>
+      <span>Inner ring · dense</span>
     </div>
     <div class="legend-meta-row">
       <span class="legend-swatch" style="background:#58A6FF; color:#58A6FF;"></span>
@@ -911,27 +915,23 @@ const fragSrc = `
   varying vec3  vWorldPos;
   varying vec3  vViewNormal;
 
-  /* Heat ramp built from the project palette — 8 stops:
-     bg → slate → mid-blue → accent → ok → gold → warn → pink → peak */
+  /* Heat ramp — clean Plotly-style blue→red sequential, 6 stops:
+     bg → deep navy → accent blue → coral → pink red → warm peak.
+     Low density reads as cool blue, high density reads as warm red,
+     matching the project's dark Plotly palette. */
   vec3 heat(float t) {
-    vec3 c0 = vec3(0.029, 0.035, 0.047);  // var(--bg)        #07090C
-    vec3 c1 = vec3(0.122, 0.161, 0.216);  // slate            #1F2937
-    vec3 c2 = vec3(0.180, 0.380, 0.700);  // mid blue
-    vec3 c3 = vec3(0.345, 0.651, 1.000);  // var(--accent)    #58A6FF
-    vec3 c4 = vec3(0.165, 0.616, 0.561);  // var(--ok)        #2A9D8F
-    vec3 c5 = vec3(0.760, 0.630, 0.300);  // muted gold
-    vec3 c6 = vec3(0.760, 0.320, 0.240);  // muted coral
-    vec3 c7 = vec3(0.900, 0.330, 0.330);  // restrained peak red
-    vec3 c8 = vec3(0.960, 0.650, 0.500);  // warm peak, not white-hot
-    float s = clamp(t, 0.0, 1.0) * 8.0;
+    vec3 c0 = vec3(0.052, 0.068, 0.090);  // bg dark           #0D1117
+    vec3 c1 = vec3(0.122, 0.251, 0.408);  // deep navy         #1F4068
+    vec3 c2 = vec3(0.345, 0.651, 1.000);  // var(--accent)     #58A6FF
+    vec3 c3 = vec3(0.910, 0.435, 0.318);  // var(--warn) coral #E86F51
+    vec3 c4 = vec3(1.000, 0.420, 0.420);  // var(--pink) red   #FF6B6B
+    vec3 c5 = vec3(1.000, 0.620, 0.560);  // warm peak (not white-hot)
+    float s = clamp(t, 0.0, 1.0) * 5.0;
     if (s < 1.0) return mix(c0, c1, s);
     if (s < 2.0) return mix(c1, c2, s - 1.0);
     if (s < 3.0) return mix(c2, c3, s - 2.0);
     if (s < 4.0) return mix(c3, c4, s - 3.0);
-    if (s < 5.0) return mix(c4, c5, s - 4.0);
-    if (s < 6.0) return mix(c5, c6, s - 5.0);
-    if (s < 7.0) return mix(c6, c7, s - 6.0);
-    return                 mix(c7, c8, s - 7.0);
+    return                 mix(c4, c5, s - 4.0);
   }
 
   void main() {

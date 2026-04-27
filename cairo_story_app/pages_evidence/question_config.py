@@ -43,6 +43,54 @@ _C = PHASE1["counts"]
 _CLEAN = PHASE1["cleaning"]
 
 PHASE1_CLEANING: List[Question] = [
+    # ───────────────────────────────────────────────────────────────────
+    #  P1-E0 · pre-clean exploration (NEW — added because the cleaning
+    #  notebook actually does this work; we surface it here)
+    # ───────────────────────────────────────────────────────────────────
+    Question(
+        id="P1-E0", phase="phase1", nav_label="◆ EXPLORATION",
+        kicker="PHASE 01 · CLEANING · DATA EXPLORATION",
+        headline="What we look at before any cleaning logic runs",
+        question_text="What does each raw GeoJSON look like before we touch it?",
+        why_it_matters=(
+            "If we jump straight to imputation we don't know what we are "
+            "imputing. The exploration pass tells us which fields are "
+            "actually broken (so we can target them) and which are clean "
+            "(so we leave them alone). It is the cheapest defence against "
+            "fabricating a result."
+        ),
+        method="Per dataset: shape · dtypes · geometry type · null count per column · numeric range sanity check",
+        kpis=[
+            ("DATASETS AUDITED", "7", "BOARDING · POP · ROUTES · ..."),
+            ("FIELDS WITH NULLS", "3", "BOARDING · FARE · PAX_FLOW"),
+            ("NULL CELLS PRE", f"{_CLEAN['null_cells_pre']:,}", "TOTAL"),
+            ("ROWS DROPPED", f"{_CLEAN['rows_dropped']}", "ZERO"),
+        ],
+        insight=(
+            "**Three fields needed work, every other numeric field came in clean.**\n\n"
+            "**Boarding dataset.** 12 numeric counts (Daily_All_BA, Morning_All_BA, "
+            "the formal/informal splits, the per-route counts) had sparse nulls "
+            "spread across about 42 stops. Spatially clustered enough that a "
+            "5-nearest-neighbour imputer could recover them.\n\n"
+            "**Routes.Fare.** 45.9% null. The single biggest hole. Vehicle type, "
+            "length, capacity, and direction were complete, so the imputation "
+            "could lean on those four features.\n\n"
+            "**Passengers per Hour (pax flow).** Sparse nulls on a few hundred "
+            "segments. Each segment has a centroid and a length, so the imputer "
+            "had geometry features to work with.\n\n"
+            "Population, terminals, vehicle flow, and commercial speeds were "
+            "fully populated — no imputation needed."
+        ),
+        methodology=(
+            "The audit lives in Section 06 of `Cleaning Data.ipynb`. For each "
+            "dataset we open the GeoDataFrame, inspect `df.dtypes`, "
+            "`df.geometry.geom_type.unique()`, and `df.isnull().sum()`. We then "
+            "run a quick `df.describe()` on the numeric columns to make sure no "
+            "field is degenerate (all zeros, all NaN, all the same value). The "
+            "output is a styled HTML table that lists every (dataset, column) "
+            "with non-zero nulls and the total count across the project."
+        ),
+    ),
     Question(
         id="P1-C1", phase="phase1", nav_label="◆ DATASETS",
         kicker="PHASE 01 · CLEANING · DATA SOURCES",
@@ -749,6 +797,58 @@ def _build_q19_chart():            from components.charts import q19_gtfs_covera
 
 
 PHASE2_CLEANING: List[Question] = [
+    # ───────────────────────────────────────────────────────────────────
+    #  P2-E0 · per-source exploration helper (NEW)
+    # ───────────────────────────────────────────────────────────────────
+    Question(
+        id="P2-E0", phase="phase2", nav_label="◆ EXPLORATION",
+        kicker="PHASE 02 · CLEANING · POST-SCRAPE EXPLORATION",
+        headline="One audit helper, eight sources, the same five checks every time",
+        question_text="How do we explore each scraped source without writing a custom audit per source?",
+        why_it_matters=(
+            "Eight sources × five checks each is forty audit calls. Doing them "
+            "by hand drifts: one source gets a coordinate-spread chart, another "
+            "doesn't. We wrote one helper, `explore_scraped_data()`, and called "
+            "it after every scrape so the audit is uniform."
+        ),
+        method="explore_scraped_data(label, csv_path, key_cols, coord_cols) → row count + dtypes + null %, coordinate bounds vs Cairo bbox, IQR outliers, top-N duplicates, head(3)",
+        kpis=[
+            ("SOURCES AUDITED", "8", "S1 · S3 · S4 · S5 · S6 · S7 · S8"),
+            ("CHECKS PER SOURCE", "5", "UNIFORM"),
+            ("CHARTS WRITTEN", "57", "scraping_notebook_visuals/"),
+            ("DATA MUTATED", "0", "AUDIT-ONLY"),
+        ],
+        viz_html_paths=[
+            "Phase2/Exports/scraping_notebook_visuals/p2-c2_01_null_percentage_per_column_post_cleaning_all_7_sources.html",
+            "Phase2/Exports/scraping_notebook_visuals/p2-c3_01_null_percentage_per_column_post_cleaning_all_7_sources.html",
+        ],
+        insight=(
+            "**Five checks every audit runs.**\n\n"
+            "1. **Shape and dtypes.** Confirms the CSV has the columns we expect and "
+            "their types are sensible (no `lat` ending up as object/string).\n\n"
+            "2. **Null percentage per column.** Surfaces real holes. Caught the "
+            "Wikipedia LRT page shipping zero coordinates and the BRT scrape "
+            "missing `station_ar` rows when search returned only English.\n\n"
+            "3. **Coordinate spread vs Cairo bbox.** A single Cairo bbox is the "
+            "sanity rail. Anything outside it is either a parser error or the "
+            "wrong row entirely.\n\n"
+            "4. **IQR outlier candidates.** For numeric columns, flags rows that "
+            "sit beyond Q1 − 1.5·IQR or Q3 + 1.5·IQR. We do not delete these — "
+            "they are documented and carried forward — but we look at them.\n\n"
+            "5. **Top-N duplicates by key columns.** Catches the same physical "
+            "station discovered twice from English and Arabic searches before the "
+            "uroman + RapidFuzz dedup kicks in."
+        ),
+        methodology=(
+            "All audit functions live in `drafts/phase2_utils.py` (`show_df`, "
+            "`show_metrics`, `show_note`, `explore_scraped_data`). The helper is "
+            "**audit-only** — it never mutates rows. Every chart it produces is "
+            "saved as standalone HTML under `Phase2/Exports/scraping_notebook_visuals/` "
+            "so the exploration story is reproducible without rerunning the "
+            "scraper. The cleaning notebook calls the helper once after every "
+            "source block (cells 17, 25, 30, 41, 48, 51, 61, 66, 70)."
+        ),
+    ),
     Question(
         id="P2-C1", phase="phase2", nav_label="◆ 8 SOURCES (S1–S8)",
         kicker="PHASE 02 · CLEANING · DATA SOURCES",
@@ -1215,9 +1315,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("DISTRICTS", "68", "ANALYZED"),
               ("SAMPLE", "89+20+12", "METRO · LRT · BRT"),
               ("METHOD", "SPEARMAN", "MONOTONIC")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q13_01_q13_metro_opening_year_vs_district_population_at_the_closest.html',
-            'Phase2/Exports/notebook_visuals/q13_02_q13_add_on_distribution_of_station_adjacent_district_populat.html',
-            'Phase2/Exports/notebook_visuals/q13_03_q13_add_on_population_observation_year_used_for_each_line.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q13_notebook_visuals.html'
+        ],
         insight=(
             "Line 1 and Line 2 show modest density sorting: older stations are "
             "centrally placed. Line 3, extended through 2024, shows the strongest "
@@ -1249,8 +1349,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("GHOSTS", "115", "TOTAL"),
               ("WITHIN 1 KM", "9", "8%"),
               ("BEYOND 2 KM", "97", "84%")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q14_01_q14_ghost_terminals_by_distance_to_nearest_post_2014_metro_s.html',
-            'Phase2/Exports/notebook_visuals/q14_02_q14_add_on_stranded_ghost_terminals_vs_post_2014_line_3_geog.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q14_notebook_visuals.html'
+        ],
         insight=(
             "The answer is unambiguous. Only 9 of the 115 Phase 1 ghost terminals "
             "sit within a 1-km walk of any post-2014 metro station. 97 of them "
@@ -1283,9 +1384,9 @@ PHASE2_QUESTIONS: List[Question] = [
               ("WALKABLE", "≤ 500 m", "FRIENDLY"),
               ("STRETCH", "≤ 1 KM", "TOLERABLE"),
               ("STATIONS ANALYSED", f"{SCRAPE['metro']['n']}", "METRO ONLY")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q15_01_q15_did_new_metro_openings_land_near_the_existing_terminal_b.html',
-            'Phase2/Exports/notebook_visuals/q15_02_q15_transfer_distance_distribution_by_metro_line.html',
-            'Phase2/Exports/notebook_visuals/q15_03_q15_add_on_where_metro_can_act_as_the_bridge_into_system_b.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q15_notebook_visuals.html'
+        ],
         insight=(
             "Stations close to high-route terminals are where System A and System B can meet — "
             "they're the transfer points Masari should privilege in route planning. "
@@ -1317,8 +1418,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("FASTEST CAGR", "+15%", "NEW CAIRO"),
               ("GROWTH AXIS", "DESERT", "SATELLITES"),
               ("INNER CORE", "SLOWER", "STILL DENSE")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q16_01_q16_top_15_fastest_growing_districts_cagr_vs_new_mode_covera.html',
-            'Phase2/Exports/notebook_visuals/q16_02_q16_add_on_fast_growth_population_at_risk_when_coverage_is_z.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q16_notebook_visuals.html'
+        ],
         insight=(
             "The fastest-growing districts between 2017 and 2023 are dominated by "
             "new satellite cities: New Cairo, 6th October, Shorouk, and Sheikh "
@@ -1349,9 +1451,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("HEXES", "1,525", "ANALYZED"),
               ("UNDERSERVED", "79", "SCORE > 0.5"),
               ("TARGET QUADRANT", "DEF", "DENSE + UNDERSERVED")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q17_01_q17_population_density_underserved_score_spearman_0_548_p_1e.html',
-            'Phase2/Exports/notebook_visuals/q17_02_q17_add_on_dense_and_underserved_target_zone_by_decile.html',
-            'Phase2/Exports/notebook_visuals/q17_03_q17_map.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q17_notebook_visuals.html'
+        ],
         insight=(
             "Q17 now names the target, not just the pattern. The dense-and-"
             "underserved quadrant becomes a concrete H3 list: places where many "
@@ -1384,10 +1486,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("ρ", "0.025", "FLAT"),
               ("MEAN SHARE", "47%", "INFORMAL"),
               ("STRUCTURAL", "YES", "ALL DENSITIES")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q18_01_q18_informal_transport_share_vs_hex_population_0_025.html',
-            'Phase2/Exports/notebook_visuals/q18_02_q18_add_on_informal_share_distribution_across_density_tiers.html',
-            'Phase2/Exports/notebook_visuals/q18_03_q18b_do_the_new_modes_close_phase_1_gaps.html',
-            'Phase2/Exports/notebook_visuals/q18_04_q18b_add_on_percent_of_each_phase_1_gap_still_uncovered_by_e.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q18_notebook_visuals.html'
+        ],
         insight=(
             "Informal share is statistically flat across density tiers. Microbus "
             "and tomnaya are not a niche response to only dense neighborhoods; "
@@ -1455,9 +1556,9 @@ PHASE2_QUESTIONS: List[Question] = [
               ("STOPS", "1,210", "GTFS"),
               ("PARATRANSIT GTFS", "~0", "ROUTES"),
               ("UNDOCUMENTED", "≈1,500", "MICROBUS")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q19_01_q19_published_gtfs_vs_phase_1_formal_informal_reality.html',
-            'Phase2/Exports/notebook_visuals/q19_02_q19_informal_heavy_stops_beyond_an_800m_gtfs_catchment.html',
-            'Phase2/Exports/notebook_visuals/q19_03_q19_add_on_published_gtfs_formal_routes_by_agency.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q19_notebook_visuals.html'
+        ],
         insight=(
             "Q19 tests the real product boundary. GTFS gives Masari a strong "
             "formal backbone, but Phase 1 shows many stops where informal demand "
@@ -1487,8 +1588,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("STATIONS", "12", "BRT SCRAPED"),
               ("TOP-RANK", "14,726", "AL-MARG (BOARDINGS/DAY)"),
               ("BUFFER", "500 m", "CORRIDOR")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q20_01_q20_informal_phase_1_transit_demand_within_500_m_of_each_brt.html',
-            'Phase2/Exports/notebook_visuals/q20_02_q20_add_on_pareto_curve_of_informal_demand_near_brt_stations.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q20_notebook_visuals.html'
+        ],
         insight=(
             "BRT station-level demand is uneven. Some stations bridge informal "
             "demand well, while weaker stations still need feeder integration. "
@@ -1520,8 +1622,9 @@ PHASE2_QUESTIONS: List[Question] = [
               ("METRO · GTFS", f"{Q21['fares_egp_per_km']['metro']:.2f}", "EGP/KM"),
               ("MICROBUS", f"{Q21['fares_egp_per_km']['microbus']:.2f}", "EGP/KM · ≈3× FORMAL"),
               ("TOMNAYA", f"{Q21['fares_egp_per_km']['tomnaya']:.2f}", "EGP/KM · ≈6× FORMAL")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q21_01_q21_fare_per_km_gtfs_derived_formal_blue_vs_phase_1_informal.html',
-            'Phase2/Exports/notebook_visuals/q21_02_q21_add_on_median_fare_km_formal_vs_informal.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q21_notebook_visuals.html'
+        ],
         insight=(
             f"Real GTFS numbers: formal **Bus 0.22 EGP/km** (214 routes), formal "
             f"**Metro 0.25 EGP/km**. Phase 1's informal distribution: "
@@ -1557,9 +1660,9 @@ PHASE2_QUESTIONS: List[Question] = [
               ("BUFFER",   "3 km",     "around centroid"),
               ("DISTRICTS","68",       "with valid pop"),
               ("LIVE",     "✓",       "RECOMPUTED FROM CSVs")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q22_01_q22_metro_coverage_residual_by_district_negative_under_serve.html',
-            'Phase2/Exports/notebook_visuals/q22_02_q22_top_15_under_served_districts_by_metro_coverage_residual.html',
-            'Phase2/Exports/notebook_visuals/q22_03_q22_add_on_distribution_of_metro_coverage_residuals_by_gover.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q22_notebook_visuals.html'
+        ],
         insight=(
             "The chart ranks the most under-served districts by metro-coverage "
             "residual. Negative bars are districts where population predicts more "
@@ -1592,9 +1695,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("MODES WITHIN 2.5 KM", f"{Q23_ADLY['modes_within_2_5km']}", "M+L+B+OSM"),
               ("NODES WITHIN 2.5 KM", f"{Q23_ADLY['total_stations_within_2_5km']}", "STATIONS + TERMINALS"),
               ("PERCENTILE", f"{Q23_ADLY['percentile']}st", "OF 150 RANDOM CLUSTERS")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q23_01_q23_map.html',
-            'Phase2/Exports/notebook_visuals/q23_02_q23_adly_mansour_rank_vs_random_cairo_2_5_km_clusters_p21.html',
-            'Phase2/Exports/notebook_visuals/q23_03_q23_add_on_what_makes_adly_mansour_multimodal.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q23_notebook_visuals.html'
+        ],
         insight=(
             f"Adly Mansour sits around the **{Q23_ADLY['percentile']}st percentile** "
             "of the random 2.5-km cluster sample. It proves multimodal convergence, "
@@ -1625,11 +1728,9 @@ PHASE2_QUESTIONS: List[Question] = [
               ("ARI",    f"{Q24['ARI']:.2f}",                            f"OVER {Q24['n_seeds_for_stability']} SEEDS"),
               ("TARGET", f"{MARKET['target_districts']}",                "DISTRICTS"),
               ("MARKET", f"{MARKET['target_population_millions']}M",      "RESIDENTS")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q24_01_k_means_model_selection_selected_k_4_policy_granularity.html',
-            'Phase2/Exports/notebook_visuals/q24_02_q24_k_means_segmentation_k_4_mean_ari_1_00.html',
-            'Phase2/Exports/notebook_visuals/q24_03_q24_add_on_cluster_opportunity_score_informal_stops_minus_fo.html',
-            'Phase2/Exports/notebook_visuals/q24_04_q24_parallel_coordinates_of_district_features_colored_by_k_m.html',
-            'Phase2/Exports/notebook_visuals/q24_05_q24_radar_feature_z_score_signatures_per_cluster.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q24_notebook_visuals.html'
+        ],
         insight=(
             f"**ARI = {Q24['ARI']:.2f} across {Q24['n_seeds_for_stability']} random "
             "seeds** — the clusters are stable in the current notebook. The four "
@@ -1663,8 +1764,9 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("FORMAL LAYER",   "GTFS + M + L + B", "SYSTEM A"),
               ("INFORMAL LAYER", "PHASE 1 STOPS",    "WHERE INFORMAL > FORMAL"),
               ("SCORING",        "DEMAND × 1/DIST",  "BRIDGE PRIORITY")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/q25_01_q25_masari_bridge_map_informal_demand_stops_connected_to_for.html',
-            'Phase2/Exports/notebook_visuals/q25_02_q25_how_much_informal_demand_is_already_bridgeable.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/q25_notebook_visuals.html'
+        ],
         insight=(
             "**This is Masari in one figure.** Red points are the informal system "
             "people already use. Blue/gold/green points are the formal system apps "
@@ -1853,8 +1955,9 @@ HYPOTHESIS_QUESTIONS: List[Question] = [
               ("p",         "< 0.001",              "STRONGLY SIGNIFICANT"),
               ("ε²",        f"{H1['eps_sq']:.3f}",  "HUGE EFFECT"),
               ("MORAN'S I", f"{H1['morans_I']:.3f}", "SPATIAL CLUSTERING")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/h1_01_h1_coverage_need_mismatch_global_moran_s_i_0_214_p_0_002.html',
-            'Phase2/Exports/notebook_visuals/h1_02_h1_add_on_continuous_density_penalty_population_vs_stations_.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/h1_notebook_visuals.html'
+        ],
         insight=(
             f"Coverage per 100k differs significantly across density tertiles. "
             f"**Low-density districts get a median of {H1['tertile_medians']['low']:.1f} "
@@ -1895,9 +1998,9 @@ HYPOTHESIS_QUESTIONS: List[Question] = [
               ("δ",          f"{H2['cliffs_delta']:.3f}",                 "NEAR-MAX NEGATIVE"),
               ("LRT n",      f"{H2['n_by_group']['lrt']}",                "OSM + GMAPS BACKFILL"),
               ("METRO L3 n", f"{H2['n_by_group']['metro_l3']}",            "POST-2012")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/h2_01_h2_2_km_catchment_population_mann_whitney_p_0_000_cliff_0_99.html',
-            'Phase2/Exports/notebook_visuals/h2_02_h2_every_station_s_2_km_catchment_population_lrt_coral_vs_me.html',
-            'Phase2/Exports/notebook_visuals/h2_03_h2_add_on_cumulative_catchment_population_curves.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/h2_notebook_visuals.html'
+        ],
         insight=(
             f"LRT median 2-km catchment: **{H2['medians']['lrt']:,} residents**. "
             f"Post-2012 Metro L3 median: **{H2['medians']['metro_l3_post_2012']:,} "
@@ -1932,12 +2035,9 @@ HYPOTHESIS_QUESTIONS: List[Question] = [
               ("BRT MEDIAN",     f"{H3['medians']['brt']:,}",          "DAILY INFORMAL"),
               ("CONTROL MEDIAN", f"{H3['medians']['control']}",        "ZERO"),
               ("BRT n",          f"{H3['n_brt']}",                     "STATIONS")],
-        viz_html_paths=['Phase2/Exports/notebook_visuals/h3_01_h3_pre_brt_informal_demand_in_500_m_buffers_p_0_000_cliff_0_.html',
-            'Phase2/Exports/notebook_visuals/h3_02_h3_add_on_individual_buffer_demand_brt_stations_vs_random_co.html',
-            'Phase2/Exports/notebook_visuals/h3_03_h3_map.html',
-            'Phase2/Exports/notebook_visuals/h3_04_cairo_metro_expansion_1987_2026.html',
-            'Phase2/Exports/notebook_visuals/h3_05_masari_cluster_populations_primary_market_formal_served_core.html',
-            'Phase2/Exports/notebook_visuals/h3_06_sunburst_governorate_cluster_district_arc_2023_population.html'],
+        viz_html_paths=[
+            'Phase2/Exports/notebook_sections/h3_notebook_visuals.html'
+        ],
         insight=(
             "The BRT was built on top of existing demand. **Median daily informal "
             f"boardings inside a 500-m BRT corridor buffer: {H3['medians']['brt']:,}. "

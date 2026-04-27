@@ -2983,10 +2983,14 @@ function ChartH3() {
 
 function ChartQ18b() {
   const gaps = ['GHOSTS', 'EMPTY-RET', 'VEH MISM', 'UNDERSRV'];
+  // Live Phase 2 notebook values (latest run of Phase2_Analysis_Hypothesis.ipynb,
+  // cell 81). The G4 column previously under-counted because the matrix used
+  // polygon.within(buffer) instead of centroid distance — now matches cell 81
+  // exactly: METRO L3 G4=9.7, LRT G3=25.0, BRT G4=14.1.
   const rows = [
-    { mode: 'METRO L3', vals: [15.7, 5.3, 0.0, 6.0] },
-    { mode: 'LRT',      vals: [2.6,  5.3, 0.0, 1.6] },
-    { mode: 'BRT',      vals: [7.8,  10.5, 25.0, 13.1] },
+    { mode: 'METRO L3', vals: [15.7,  5.3,  0.0,  9.7] },
+    { mode: 'LRT',      vals: [ 3.5,  5.3, 25.0,  2.6] },
+    { mode: 'BRT',      vals: [ 6.1, 10.5, 25.0, 14.1] },
   ];
   const cellColor = (v) => {
     if (v >= 20) return 'rgba(42,157,143,0.35)';

@@ -263,15 +263,21 @@ def q24_cluster_sizes() -> go.Figure:
 
 def q24_cagr_pop() -> go.Figure:
     clusters = Q24["clusters"]
-    labels = [k for k in clusters.keys() if clusters[k]["cagr_pct"] is not None]
+    # Need both CAGR and pop_sum to plot a cluster — Low-Activity Outskirts
+    # has pop_sum=None in findings.py, so it gets filtered here.
+    labels = [
+        k for k, cl in clusters.items()
+        if cl.get("cagr_pct") is not None and cl.get("pop_sum") is not None
+    ]
     cagrs = [clusters[k]["cagr_pct"] for k in labels]
-    pops = [clusters[k].get("pop_sum", 0) / max(clusters[k]["n"], 1) for k in labels]
+    pops = [clusters[k]["pop_sum"] / max(clusters[k]["n"], 1) for k in labels]
     pretty = [clusters[k]["label"] for k in labels]
+    palette = [GOLD, ACCENT, OK, WARN, PURPLE]  # length-safe
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=cagrs, y=pops, mode="markers+text",
-        marker=dict(size=[max(16, n * 1.8) for n in [clusters[k]["n"] for k in labels]],
-                    color=[GOLD, ACCENT, OK],
+        marker=dict(size=[max(16, clusters[k]["n"] * 1.8) for k in labels],
+                    color=palette[:len(labels)],
                     line=dict(color=BG, width=1)),
         text=pretty, textposition="top center",
         textfont=dict(family=FONT, color=TEXT, size=10),
@@ -846,9 +852,12 @@ def q24_cluster_choropleth() -> go.Figure:
         if chunk.empty:
             continue
         sizes = np.clip(np.sqrt(chunk["pop"].fillna(0).values + 1) * 0.18, 8, 36)
-        fig.add_trace(go.Scattermap(
+        # Scattermapbox (older Mapbox-GL API) renders inside iframes more
+        # reliably than the new MapLibre-backed Scattermap when the HTML
+        # is embedded via streamlit components.html.
+        fig.add_trace(go.Scattermapbox(
             lon=chunk[lng_col], lat=chunk[lat_col], mode="markers",
-            marker=dict(size=sizes, color=meta["color"], opacity=0.78),
+            marker=dict(size=sizes, color=meta["color"], opacity=0.85),
             text=chunk.get("name", chunk.get("disp_name", "")),
             hovertemplate=(
                 f"<b>%{{text}}</b><br>{meta['label']}<br>"
@@ -859,8 +868,8 @@ def q24_cluster_choropleth() -> go.Figure:
         ))
 
     fig.update_layout(
-        map=dict(style="carto-darkmatter",
-                 center=dict(lon=31.30, lat=30.05), zoom=9.4),
+        mapbox=dict(style="carto-darkmatter",
+                    center=dict(lon=31.30, lat=30.05), zoom=9.4),
         height=520, margin=dict(l=0, r=0, t=46, b=10),
         paper_bgcolor=BG, plot_bgcolor=BG,
         font=dict(family=FONT, color=TEXT, size=11),
@@ -1468,13 +1477,15 @@ def metro_animation() -> go.Figure:
         line_col = "line"
 
     import plotly.express as px
-    fig = px.scatter_map(
+    # Use scatter_mapbox (Mapbox-GL) instead of scatter_map (MapLibre) so the
+    # animated tiles render reliably inside streamlit's iframe.
+    fig = px.scatter_mapbox(
         anim, lat="lat", lon="lng", color=line_col,
         color_discrete_map=color_map,
         animation_frame="frame_year",
         hover_name="name" if "name" in anim.columns else None,
         zoom=9.5, center={"lat": 30.05, "lon": 31.30},
-        opacity=0.9, map_style="carto-darkmatter",
+        opacity=0.9, mapbox_style="carto-darkmatter",
     )
     fig.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG,

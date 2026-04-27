@@ -34,6 +34,8 @@ desktop.ini
 *.out
 *.toc
 *.synctex.gz
+*.synctex(busy)
+Report/main.synctex(busy)
 *.fls
 *.fdb_latexmk
 

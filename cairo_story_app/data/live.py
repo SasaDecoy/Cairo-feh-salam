@@ -105,10 +105,25 @@ def compute_q18b_matrix() -> dict:
     brt_g = _to_metric(pd.read_csv(P2 / "brt_stations.csv"))
 
     def pct_within(gap_gdf, mode_gdf, buffer_m=2000):
+        """Match the Phase 2 notebook (cell 81) exactly: centroid-to-station
+        nearest-neighbour distance < buffer_m. Using `within` on the raw
+        polygon under-counts G4 hexes that straddle the 2 km boundary."""
         if len(gap_gdf) == 0 or len(mode_gdf) == 0:
             return 0.0
-        union = mode_gdf.geometry.buffer(buffer_m).union_all()
-        return float(gap_gdf.geometry.within(union).sum()) / len(gap_gdf) * 100
+        try:
+            from sklearn.neighbors import NearestNeighbors
+            import numpy as np
+        except ImportError:
+            # Fallback: centroid within union of buffered stations
+            union = mode_gdf.geometry.buffer(buffer_m).union_all()
+            return float(gap_gdf.geometry.centroid.within(union).sum()) / len(gap_gdf) * 100
+
+        gap_centroids = gap_gdf.geometry.centroid
+        G = np.column_stack([gap_centroids.x.values, gap_centroids.y.values])
+        M = np.column_stack([mode_gdf.geometry.x.values, mode_gdf.geometry.y.values])
+        nn = NearestNeighbors(n_neighbors=1).fit(M)
+        dist, _ = nn.kneighbors(G)
+        return float((dist[:, 0] < buffer_m).sum()) / len(gap_gdf) * 100
 
     gaps_order = ["GHOSTS", "EMPTY-RETURN", "VEHICLE MISMATCH", "UNDER-SERVED"]
     modes_order = ["METRO L3", "LRT", "BRT"]
