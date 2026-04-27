@@ -813,7 +813,11 @@ PHASE2_CLEANING: List[Question] = [
         kpis=[("STATIONS", "89", "ALL WITH COORDS"),
               ("LINES", "3", "L1 · L2 · L3"),
               ("WINDOW", "1987–2024", "37 YEARS")],
-        viz_html_paths=["Phase2/Exports/metro_opening_timeline.html"],
+        viz_html_paths=['Phase2/Exports/scraping_notebook_visuals/p2-s3_01_s3_metro_stations_coordinate_spread_vs_cairo_bbox.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s3_02_s3_metro_stations_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s3_03_s3_metro_stations_line_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s3_04_s3_metro_stations_phase_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s3_05_s3_metro_opening_year_spread_by_line.html'],
         insight=(
             "**Three eras visible in the timeline.** Line 1 launches the system in "
             "1987 with 14 stations on the Helwan–Marg corridor; opens slowly through "
@@ -852,7 +856,22 @@ PHASE2_CLEANING: List[Question] = [
               ("LRT WITH COORDS",    f"{SCRAPE['lrt']['with_coords']}",      "AFTER BACKFILL"),
               ("BRT STATIONS",       f"{SCRAPE['brt']['n']}",                "FROM GOOGLE MAPS"),
               ("BRT METHOD",         "PLAYWRIGHT",                            "DYNAMIC FETCHER")],
-        viz_html_paths=["Phase2/Exports/lrt_coordinate_backfill.html", "Phase2/Exports/brt_scrape_diagnostic.html"],
+        viz_html_paths=['Phase2/Exports/scraping_notebook_visuals/p2-s4s5_01_s4_lrt_station_list_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_02_s4_lrt_station_list_is_operational_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_03_s4_lrt_station_list_opened_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_04_s4_lrt_operational_vs_non_operational_stations.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_05_s5_brt_stations_deduped_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_06_s5_brt_stations_deduped_coordinate_spread_vs_cairo_bbox.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_07_s5_brt_stations_deduped_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_08_s5_brt_stations_deduped_search_lang_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_09_s5_brt_stations_deduped_station_en_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_10_s5_brt_retained_rows_by_scrape_query.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_11_s8_lrt_stations_after_coordinate_backfill_missing_values_by_.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_12_s8_lrt_stations_after_coordinate_backfill_coordinate_spread_.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_13_s8_lrt_stations_after_coordinate_backfill_numeric_iqr_outlie.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_14_s8_lrt_stations_after_coordinate_backfill_is_operational_dis.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_15_s8_lrt_stations_after_coordinate_backfill_opened_distributio.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s4s5_16_s8_lrt_located_vs_still_missing_coordinates.html'],
         insight=(
             f"**LRT.** Wikipedia lists {SCRAPE['lrt']['n']} stations but ships "
             f"**zero coordinates**. We rescue {SCRAPE['lrt']['rescued_overpass']} "
@@ -898,7 +917,25 @@ PHASE2_CLEANING: List[Question] = [
               ("CENSUS YEARS",    "1996/2006/2017/2023", "4 POINTS"),
               ("MEDIAN CAGR",     "+1.2%",      "PER YEAR"),
               ("FASTEST",         "≈+15%",      "NEW SATELLITE CITIES")],
-        viz_html_paths=["Phase2/Exports/districts_cagr_distribution.html"],
+        viz_html_paths=['Phase2/Exports/scraping_notebook_visuals/p2-s6s7_01_s6_districts_long_table_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_02_s6_districts_long_table_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_03_s6_districts_long_table_governorate_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_04_s6_districts_long_table_status_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_05_s6_districts_wide_table_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_06_s6_districts_wide_table_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_07_s6_districts_wide_table_governorate_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_08_s6_districts_wide_table_status_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_09_s6_districts_population_trend_sanity_check.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_10_s6_districts_with_centroids_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_11_s6_districts_with_centroids_coordinate_spread_vs_cairo_bbox.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_12_s6_districts_with_centroids_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_13_s6_districts_with_centroids_centroid_source_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_14_s6_districts_with_centroids_governorate_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_15_s6_districts_centroid_source_mix.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_16_s7_vehicles_by_governorate_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_17_s7_vehicles_by_governorate_governorate_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_18_s7_vehicles_by_governorate_method_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s6s7_19_s7_vehicles_count_trajectory_by_vehicle_type.html'],
         insight=(
             "The CAGR distribution is **right-skewed**: the median district grows "
             "around 1.2% per year, but the right tail — **New Cairo 1, 6th October "
@@ -937,7 +974,25 @@ PHASE2_CLEANING: List[Question] = [
               ("GTFS ROUTES",  "217",   "FORMAL + INFORMAL"),
               ("GTFS FARES",   "3",     "ZONE-LEVEL"),
               ("OSM SOURCE",   "OVERPASS", "INDEPENDENT")],
-        viz_html_paths=["Phase2/Exports/q19_gtfs_coverage.html", "Phase2/Exports/osm_cross_verification_map.html"],
+        viz_html_paths=['Phase2/Exports/scraping_notebook_visuals/p2-s1s8_01_s1_gtfs_stops_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_02_s1_gtfs_stops_coordinate_spread_vs_cairo_bbox.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_03_s1_gtfs_stops_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_04_s1_gtfs_routes_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_05_s1_gtfs_routes_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_06_s1_gtfs_routes_route_text_color_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_07_s1_gtfs_routes_route_color_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_08_s1_gtfs_trips_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_09_s1_gtfs_trips_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_10_s1_gtfs_shapes_coordinate_spread_vs_cairo_bbox.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_11_s1_gtfs_shapes_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_12_s1_gtfs_fares_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_13_s1_gtfs_fares_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_14_s8_osm_transport_features_missing_values_by_column.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_15_s8_osm_transport_features_coordinate_spread_vs_cairo_bbox.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_16_s8_osm_transport_features_numeric_iqr_outlier_candidates.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_17_s8_osm_transport_features_highway_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_18_s8_osm_transport_features_amenity_distribution.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-s1s8_19_s8_osm_non_null_transport_tags.html'],
         insight=(
             "**GTFS reveals the data asymmetry**: the formal CTA bus + Metro routes "
             "(31 of 217) are published cleanly, but the bulk of the feed is "
@@ -979,7 +1034,8 @@ PHASE2_CLEANING: List[Question] = [
               ("STAGE 2", "OSM > 50 m", "FLAG"),
               ("STAGE 3", f"τ = {SCRAPE['sbert']['tau']*100:.0f}", "RAPIDFUZZ"),
               ("STAGE 4", f"SBERT τ = {SCRAPE['sbert']['tau']}", "SEMANTIC MATCH")],
-        viz_html_paths=["Phase2/Exports/integration_yield.html", "Phase2/Exports/osm_cross_verification_map.html"],
+        viz_html_paths=['Phase2/Exports/scraping_notebook_visuals/p2-c2_01_null_percentage_per_column_post_cleaning_all_7_sources.html',
+            'Phase2/Exports/scraping_notebook_visuals/p2-c2_02_integration_diagnostics_scraped_data_with_ai_similarity_scor.html'],
         insight=(
             "**Stage 1 — KNN (`sklearn.neighbors.NearestNeighbors`).** First-pass "
             "pairing — for every scraped station, find the nearest Phase 1 terminal in "
@@ -1025,7 +1081,7 @@ PHASE2_CLEANING: List[Question] = [
               ("LRT", f"{SCRAPE['lrt']['remaining']} planned", "STILL NO COORDS"),
               ("BRT", "PARTIAL", "GMAPS-ONLY"),
               ("GATE", "ASSERT FILE EXISTS", "BLOCKS NB4")],
-        viz_html_paths=["Phase2/Exports/null_audit_before_after.html"],
+        viz_html_paths=['Phase2/Exports/scraping_notebook_visuals/p2-c3_01_null_percentage_per_column_post_cleaning_all_7_sources.html'],
         insight=(
             "**Null audit.** Section 10 of Notebook 3 builds a per-source null-audit "
             "table and renders it as a grouped bar chart (Plotly). After Cleaning Steps "

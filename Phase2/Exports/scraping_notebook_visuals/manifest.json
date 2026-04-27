@@ -1,0 +1,498 @@
+[
+  {
+    "group": "P2-S3",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s3_01_s3_metro_stations_coordinate_spread_vs_cairo_bbox.html",
+    "title": "S3 metro stations ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 25
+  },
+  {
+    "group": "P2-S3",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s3_02_s3_metro_stations_numeric_iqr_outlier_candidates.html",
+    "title": "S3 metro stations ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 25
+  },
+  {
+    "group": "P2-S3",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s3_03_s3_metro_stations_line_distribution.html",
+    "title": "S3 metro stations ? line distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 25
+  },
+  {
+    "group": "P2-S3",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s3_04_s3_metro_stations_phase_distribution.html",
+    "title": "S3 metro stations ? phase distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 25
+  },
+  {
+    "group": "P2-S3",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s3_05_s3_metro_opening_year_spread_by_line.html",
+    "title": "S3 metro ? opening-year spread by line",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 25
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_01_s4_lrt_station_list_numeric_iqr_outlier_candidates.html",
+    "title": "S4 LRT station list ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 30
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_02_s4_lrt_station_list_is_operational_distribution.html",
+    "title": "S4 LRT station list ? is_operational distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 30
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_03_s4_lrt_station_list_opened_distribution.html",
+    "title": "S4 LRT station list ? opened distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 30
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_04_s4_lrt_operational_vs_non_operational_stations.html",
+    "title": "S4 LRT ? operational vs non-operational stations",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 30
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_05_s5_brt_stations_deduped_missing_values_by_column.html",
+    "title": "S5 BRT stations deduped ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 41
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_06_s5_brt_stations_deduped_coordinate_spread_vs_cairo_bbox.html",
+    "title": "S5 BRT stations deduped ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 41
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_07_s5_brt_stations_deduped_numeric_iqr_outlier_candidates.html",
+    "title": "S5 BRT stations deduped ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 41
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_08_s5_brt_stations_deduped_search_lang_distribution.html",
+    "title": "S5 BRT stations deduped ? search_lang distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 41
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_09_s5_brt_stations_deduped_station_en_distribution.html",
+    "title": "S5 BRT stations deduped ? station_en distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 41
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_10_s5_brt_retained_rows_by_scrape_query.html",
+    "title": "S5 BRT ? retained rows by scrape query",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 41
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_11_s8_lrt_stations_after_coordinate_backfill_missing_values_by_.html",
+    "title": "S8 LRT stations after coordinate backfill ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 70
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_12_s8_lrt_stations_after_coordinate_backfill_coordinate_spread_.html",
+    "title": "S8 LRT stations after coordinate backfill ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 70
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_13_s8_lrt_stations_after_coordinate_backfill_numeric_iqr_outlie.html",
+    "title": "S8 LRT stations after coordinate backfill ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 70
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_14_s8_lrt_stations_after_coordinate_backfill_is_operational_dis.html",
+    "title": "S8 LRT stations after coordinate backfill ? is_operational distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 70
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_15_s8_lrt_stations_after_coordinate_backfill_opened_distributio.html",
+    "title": "S8 LRT stations after coordinate backfill ? opened distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 70
+  },
+  {
+    "group": "P2-S4S5",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s4s5_16_s8_lrt_located_vs_still_missing_coordinates.html",
+    "title": "S8 LRT ? located vs still missing coordinates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 70
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_01_s6_districts_long_table_missing_values_by_column.html",
+    "title": "S6 districts long table ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_02_s6_districts_long_table_numeric_iqr_outlier_candidates.html",
+    "title": "S6 districts long table ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_03_s6_districts_long_table_governorate_distribution.html",
+    "title": "S6 districts long table ? governorate distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_04_s6_districts_long_table_status_distribution.html",
+    "title": "S6 districts long table ? status distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_05_s6_districts_wide_table_missing_values_by_column.html",
+    "title": "S6 districts wide table ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_06_s6_districts_wide_table_numeric_iqr_outlier_candidates.html",
+    "title": "S6 districts wide table ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_07_s6_districts_wide_table_governorate_distribution.html",
+    "title": "S6 districts wide table ? governorate distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_08_s6_districts_wide_table_status_distribution.html",
+    "title": "S6 districts wide table ? status distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_09_s6_districts_population_trend_sanity_check.html",
+    "title": "S6 districts ? population trend sanity check",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 48
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_10_s6_districts_with_centroids_missing_values_by_column.html",
+    "title": "S6 districts with centroids ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 51
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_11_s6_districts_with_centroids_coordinate_spread_vs_cairo_bbox.html",
+    "title": "S6 districts with centroids ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 51
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_12_s6_districts_with_centroids_numeric_iqr_outlier_candidates.html",
+    "title": "S6 districts with centroids ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 51
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_13_s6_districts_with_centroids_centroid_source_distribution.html",
+    "title": "S6 districts with centroids ? centroid_source distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 51
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_14_s6_districts_with_centroids_governorate_distribution.html",
+    "title": "S6 districts with centroids ? governorate distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 51
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_15_s6_districts_centroid_source_mix.html",
+    "title": "S6 districts ? centroid source mix",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 51
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_16_s7_vehicles_by_governorate_numeric_iqr_outlier_candidates.html",
+    "title": "S7 vehicles by governorate ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 61
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_17_s7_vehicles_by_governorate_governorate_distribution.html",
+    "title": "S7 vehicles by governorate ? governorate distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 61
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_18_s7_vehicles_by_governorate_method_distribution.html",
+    "title": "S7 vehicles by governorate ? method distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 61
+  },
+  {
+    "group": "P2-S6S7",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s6s7_19_s7_vehicles_count_trajectory_by_vehicle_type.html",
+    "title": "S7 vehicles ? count trajectory by vehicle type",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 61
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_01_s1_gtfs_stops_missing_values_by_column.html",
+    "title": "S1 GTFS stops ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_02_s1_gtfs_stops_coordinate_spread_vs_cairo_bbox.html",
+    "title": "S1 GTFS stops ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_03_s1_gtfs_stops_numeric_iqr_outlier_candidates.html",
+    "title": "S1 GTFS stops ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_04_s1_gtfs_routes_missing_values_by_column.html",
+    "title": "S1 GTFS routes ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_05_s1_gtfs_routes_numeric_iqr_outlier_candidates.html",
+    "title": "S1 GTFS routes ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_06_s1_gtfs_routes_route_text_color_distribution.html",
+    "title": "S1 GTFS routes ? route_text_color distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_07_s1_gtfs_routes_route_color_distribution.html",
+    "title": "S1 GTFS routes ? route_color distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_08_s1_gtfs_trips_missing_values_by_column.html",
+    "title": "S1 GTFS trips ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_09_s1_gtfs_trips_numeric_iqr_outlier_candidates.html",
+    "title": "S1 GTFS trips ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_10_s1_gtfs_shapes_coordinate_spread_vs_cairo_bbox.html",
+    "title": "S1 GTFS shapes ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_11_s1_gtfs_shapes_numeric_iqr_outlier_candidates.html",
+    "title": "S1 GTFS shapes ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_12_s1_gtfs_fares_missing_values_by_column.html",
+    "title": "S1 GTFS fares ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_13_s1_gtfs_fares_numeric_iqr_outlier_candidates.html",
+    "title": "S1 GTFS fares ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 17
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_14_s8_osm_transport_features_missing_values_by_column.html",
+    "title": "S8 OSM transport features ? missing values by column",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 66
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_15_s8_osm_transport_features_coordinate_spread_vs_cairo_bbox.html",
+    "title": "S8 OSM transport features ? coordinate spread vs Cairo bbox",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 66
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_16_s8_osm_transport_features_numeric_iqr_outlier_candidates.html",
+    "title": "S8 OSM transport features ? numeric IQR outlier candidates",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 66
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_17_s8_osm_transport_features_highway_distribution.html",
+    "title": "S8 OSM transport features ? highway distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 66
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_18_s8_osm_transport_features_amenity_distribution.html",
+    "title": "S8 OSM transport features ? amenity distribution",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 66
+  },
+  {
+    "group": "P2-S1S8",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-s1s8_19_s8_osm_non_null_transport_tags.html",
+    "title": "S8 OSM ? non-null transport tags",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 66
+  },
+  {
+    "group": "P2-C2",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-c2_01_null_percentage_per_column_post_cleaning_all_7_sources.html",
+    "title": "Null percentage per column, post-cleaning (all 7 sources)",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 76
+  },
+  {
+    "group": "P2-C2",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-c2_02_integration_diagnostics_scraped_data_with_ai_similarity_scor.html",
+    "title": "Integration diagnostics · scraped data with AI similarity scoring",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 104
+  },
+  {
+    "group": "P2-C3",
+    "path": "Phase2/Exports/scraping_notebook_visuals/p2-c3_01_null_percentage_per_column_post_cleaning_all_7_sources.html",
+    "title": "Null percentage per column, post-cleaning (all 7 sources)",
+    "kind": "plotly",
+    "height": 680,
+    "cell": 87
+  }
+]

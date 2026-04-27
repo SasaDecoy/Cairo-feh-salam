@@ -19,7 +19,7 @@ from pages_evidence.question_config import Question
 
 
 def _viz_height(path: str) -> int:
-    if "notebook_visuals/" in path:
+    if "notebook_visuals/" in path or "scraping_notebook_visuals/" in path:
         return 760 if "_map" in path else 680
     if "notebook_sections/" in path or "phase2_analysis_all_visualizations" in path:
         return 920
@@ -27,7 +27,7 @@ def _viz_height(path: str) -> int:
 
 
 def _viz_scroll(path: str) -> bool:
-    return not ("notebook_visuals/" in path)
+    return not ("notebook_visuals/" in path or "scraping_notebook_visuals/" in path)
 
 
 def _resolve_viz(path: str):
