@@ -62,3 +62,7 @@ DatasetsGeojson/
 # Generated local browser/runtime caches
 node_modules/
 .cache/
+
+# Runtime mirror for serving the standalone story through Streamlit static URLs.
+static/story_assets/
+cairo_story_app/static/story_assets/

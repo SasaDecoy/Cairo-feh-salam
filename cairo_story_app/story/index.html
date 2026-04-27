@@ -534,6 +534,49 @@
     border: 1px solid rgba(88,166,255,0.12);
     text-transform: uppercase;
   }
+  .streamlit-return {
+    position: fixed;
+    top: 14px;
+    right: 238px;
+    z-index: 80;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: 34px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(233,196,106,0.36);
+    background:
+      linear-gradient(135deg, rgba(13,17,23,0.82), rgba(17,24,32,0.78)),
+      radial-gradient(circle at 20% 50%, rgba(233,196,106,0.18), transparent 55%);
+    color: #E9C46A;
+    box-shadow: 0 0 26px rgba(233,196,106,0.12), inset 0 0 18px rgba(88,166,255,0.04);
+    backdrop-filter: blur(14px) saturate(150%);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+  }
+  .streamlit-return:hover {
+    transform: translateY(-1px);
+    color: #071018;
+    border-color: rgba(233,196,106,0.8);
+    background: linear-gradient(90deg, #E9C46A, #58A6FF, #2A9D8F);
+    box-shadow: 0 0 34px rgba(88,166,255,0.34);
+  }
+  .streamlit-return:focus-visible {
+    outline: 2px solid #58A6FF;
+    outline-offset: 3px;
+  }
+  .streamlit-return-arrow {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0;
+  }
   /* ─── Density 3D heatmap iframe (Scene 7 / "TWO DENSITIES") ─────────────
      Sits above the MapLibre map + vignette but below the narrative panel,
      top bar, charts, legend, and splash so the parent UI still owns the
@@ -595,12 +638,54 @@
     .panel { width: 88vw; left: 6vw; right: 6vw; max-width: none; }
     .chart-card { width: 88vw; right: 6vw; left: 6vw; max-width: none; bottom: 120px; }
     .headline { font-size: 1.6rem; }
+    .streamlit-return {
+      top: 58px;
+      right: 14px;
+      height: 32px;
+      padding: 0 13px;
+      font-size: 8px;
+    }
   }
 </style>
 </head>
 <body>
 
+<button id="streamlit-return" class="streamlit-return" type="button" aria-label="Back to Streamlit">
+  <span class="streamlit-return-arrow">&lt;-</span>
+  <span>Back to Streamlit</span>
+</button>
 <div id="root"></div>
+
+<script>
+(() => {
+  function streamlitReturnUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const explicitReturn = params.get('returnTo') || params.get('return');
+    if (explicitReturn) {
+      try { return new URL(explicitReturn, window.location.origin).href; }
+      catch (_) {}
+    }
+
+    if (document.referrer) {
+      try {
+        const ref = new URL(document.referrer);
+        const isStoryStatic = ref.pathname.includes('/app/static/story_assets/');
+        if (ref.origin === window.location.origin && !isStoryStatic) return ref.href;
+      } catch (_) {}
+    }
+
+    return `${window.location.origin}/`;
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const button = document.getElementById('streamlit-return');
+    if (!button) return;
+    button.addEventListener('click', () => {
+      window.location.assign(streamlitReturnUrl());
+    });
+  });
+})();
+</script>
 
 <!--  ╔════════════════════════════════════════════════════════════╗
       ║  MAIN APP                                                  ║
