@@ -18,6 +18,18 @@ from data.paths import DATA_ROOT
 from pages_evidence.question_config import Question
 
 
+def _viz_height(path: str) -> int:
+    if "notebook_visuals/" in path:
+        return 760 if "_map" in path else 680
+    if "notebook_sections/" in path or "phase2_analysis_all_visualizations" in path:
+        return 920
+    return 560
+
+
+def _viz_scroll(path: str) -> bool:
+    return not ("notebook_visuals/" in path)
+
+
 def _resolve_viz(path: str):
     """Join a viz path against DATA_ROOT if not absolute."""
     from pathlib import Path
@@ -57,7 +69,7 @@ def render_question_page(q: Question):
             with frosted_card():
                 try:
                     html = full.read_text(encoding="utf-8")
-                    components.html(html, height=560, scrolling=True)
+                    components.html(html, height=_viz_height(path), scrolling=_viz_scroll(path))
                 except Exception as exc:
                     st.warning(f"Failed to render {path}: {exc}")
         else:

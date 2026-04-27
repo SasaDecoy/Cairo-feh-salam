@@ -1,11 +1,19 @@
 """
 Per-question catalogue for Evidence mode.
 Each Question carries its own visualizations, KPIs, insight, and methodology.
+
+All headline statistics come from data.findings — that file is the single
+source of truth.  When a notebook stat changes, update findings.py and
+nothing else.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
+
+from data.findings import (
+    H1, H2, H3, Q14, Q18, Q18B, Q21, Q22, Q23_ADLY, Q24, Q25, MARKET, PHASE1, SCRAPE
+)
 
 
 @dataclass(frozen=True)
@@ -24,6 +32,136 @@ class Question:
     viz_builders: List[Callable] = field(default_factory=list)
     insight: str = ""
     methodology: str = ""
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  PHASE 1 · CLEANING · 3 condensed entries
+#  (NEW — explains the data engineering before the analysis)
+# ═══════════════════════════════════════════════════════════════════════
+
+_C = PHASE1["counts"]
+_CLEAN = PHASE1["cleaning"]
+
+PHASE1_CLEANING: List[Question] = [
+    Question(
+        id="P1-C1", phase="phase1", nav_label="◆ DATASETS",
+        kicker="PHASE 01 · CLEANING · DATA SOURCES",
+        headline="Seven raw GeoJSON files describe Cairo's existing transport network",
+        question_text="What does the Phase 1 raw data look like, and where does it come from?",
+        why_it_matters=(
+            "Every Phase 1 question reads from these seven files. Knowing what is in "
+            "each one — and how big — is the prerequisite for trusting any chart "
+            "downstream. The GeoJSONs come from Transport for Cairo's GCR survey "
+            "and from PTV-Visum-style operational exports."
+        ),
+        method="`gpd.read_file(...)` on every GeoJSON in DatasetsGeojson/",
+        kpis=[
+            ("BOARDING STOPS", f"{_C['boarding_stops']:,}", "DAILY BOARDING + ALIGHTING"),
+            ("ROUTES", f"{_C['routes']:,}", "VEHICLE_TYPE · FARE · LENGTH"),
+            ("TERMINALS", f"{_C['terminals']}", "MAWAQIF (POINTS)"),
+            ("POPULATION HEXES", f"{_C['population_hexes']:,}", "1 KM² GRID"),
+        ],
+        insight=(
+            "The seven files together describe **supply** (1,302 stops, 1,784 routes, "
+            "280 terminals), **demand** (boarding counts per stop, per time of day), "
+            "**flow** (9,258 passenger-flow segments, 5,592 vehicle-flow segments, "
+            "26,154 commercial-speed records), and **context** (1,525 population hexes "
+            "with job-accessibility scores). Every Phase 1 question reads from this "
+            "set — the analysis notebook never re-fetches anything."
+        ),
+        methodology=(
+            "**Supply layer.**\n"
+            "- `Cairo Daily Boarding.json` (1,302 rows) — bus stops with boarding/alighting "
+            "  counts split by time of day.\n"
+            "- `Public Transport Routes.json` (1,784 rows) — route lines with `Vehicle_Type`, "
+            "  fare, length.\n"
+            "- `Public Transport Terminals.json` (280 rows) — origin/destination terminals.\n\n"
+            "**Demand & flow.**\n"
+            "- `Public Transport Passenger Flow.json` (9,258 segments).\n"
+            "- `Public Transport Vehicles Flow.json` (5,592 segments).\n"
+            "- `Public Transport Commercial Speeds 2.json` (26,154 records).\n\n"
+            "**Context.**\n"
+            "- `Population & Employment Access .json` (1,525 hexes, 1 km² each)."
+        ),
+    ),
+
+    Question(
+        id="P1-C2", phase="phase1", nav_label="◆ CLEANING",
+        kicker="PHASE 01 · CLEANING · CRS + KNN IMPUTATION",
+        headline="Reproject to UTM 36N, KNN-impute the gaps, drop zero rows",
+        question_text="How do we turn the seven raw GeoJSONs into trustworthy analytical inputs?",
+        why_it_matters=(
+            "Two engineering choices determine whether every later chart is honest: "
+            "(1) **the CRS**, because every buffer and nearest-neighbour query downstream "
+            "assumes meters, and (2) **the imputation strategy**, because zeros and means "
+            "are the easy ways to fabricate the conclusion."
+        ),
+        method="EPSG:4326 → EPSG:32636 (UTM 36N) + KNN imputation (k=5, distance-weighted, nan_euclidean)",
+        kpis=[
+            ("CRS", _CLEAN["crs"], "UTM 36N · METERS"),
+            ("IMPUTATION", "KNN k=5", "DISTANCE-WEIGHTED"),
+            ("ROWS DROPPED", f"{_CLEAN['rows_dropped']}", "ZERO LOSS"),
+            ("NULL CELLS PRE", f"{_CLEAN['null_cells_pre']:,}", "RECOVERED"),
+        ],
+        insight=(
+            "**Why EPSG:32636.** The raw GeoJSONs ship in EPSG:4326 (lat/long degrees). "
+            "Degrees are useless for distance work — at Cairo's latitude, 1° of "
+            "longitude is ~96 km. UTM 36N gives meters; every Q3 corridor buffer (120 m), "
+            "Q11 ghost-terminal test (100 m), and population join needs metric distance. "
+            "**Why KNN.** A missing count is **unknown**, not zero. Imputing zeros would "
+            "*invent* the conclusion that some stops are dead. KNN with `weights='distance'` "
+            "preserves spatial structure; `metric='nan_euclidean'` lets the imputer compute "
+            "distance even when a feature vector itself has NaNs (it skips the missing "
+            "dimensions). Result: zero rows dropped, 2,409 null cells filled."
+        ),
+        methodology=(
+            "**Section 03.** `df.to_crs('EPSG:32636')` on every dataframe.\n\n"
+            "**Section 06–07.** Three KNN imputations run independently:\n"
+            "1. **Boarding numeric** (12 cols, ~250 cells, 42 rows) — features: XY + all boarding cols.\n"
+            "2. **Routes.Fare** (45.9% null) — features: route length, capacity, direction, encoded vehicle type.\n"
+            "3. **Pax_Flow.Passengers/Hour** — features: segment centroid XY + segment length.\n\n"
+            "Each uses `sklearn.impute.KNNImputer(n_neighbors=5, weights='distance', metric='nan_euclidean')`."
+        ),
+    ),
+
+    Question(
+        id="P1-C3", phase="phase1", nav_label="◆ MERGES A–G",
+        kicker="PHASE 01 · CLEANING · SPATIAL JOINS",
+        headline="Seven merge tables A–G — one spatial join per question",
+        question_text="Why pre-join the data into seven `merge_*.csv` tables?",
+        why_it_matters=(
+            "Every Phase 1 question would otherwise repeat the same spatial join. With "
+            "9,258 passenger-flow segments × 280 terminals × 1,525 hexes, repeating "
+            "expensive `gpd.sjoin` operations costs 10s of seconds each time. Doing each "
+            "join once and persisting the result guarantees every downstream chart sees "
+            "exactly the same data."
+        ),
+        method="gpd.sjoin + buffer-based aggregation; each merge serves a specific question",
+        kpis=[
+            ("MERGE TABLES", "A–G", "PRE-JOINED"),
+            ("CRS", "EPSG:32636", "METERS"),
+            ("GAPS DEFINED", "G1 · G2 · G3 · G4", "BY MERGE G + Q9 + Q10 + Q12"),
+        ],
+        insight=(
+            "**Merge A** — Boarding ⨝ Population (point-in-polygon) → feeds Q1 (jobs × alighting), Q9 (underserved hexes).\n\n"
+            "**Merge B** — Terminals ⨝ Population (centroid join) → feeds Q2 (symmetry), Q5 (density × terminals).\n\n"
+            "**Merge C** — Routes ⨝ Terminals (attribute join on `o_id`/`d_id`) → feeds Q10 (empty returns), Q11 (ghosts).\n\n"
+            "**Merge D** — Vehicle/Pax Flow ⨝ Terminals (50 m buffer aggregation) → feeds Q2, Q10.\n\n"
+            "**Merge E** — B + D combined → full per-terminal record with population, jobs, flow.\n\n"
+            "**Merge F** — Routes per terminal (group-by counts) → feeds Q11.\n\n"
+            "**Merge G** — Underused-terminal detector (route + zero boarding within 100 m) → defines **G1 ghost terminals (n=115)**.\n\n"
+            "Two formulas worth remembering live in this section:\n"
+            "- **G2 · Empty Return Index** = `1 − (passengers / vehicles)`. Threshold ≥ 0.60 → 19 critical terminals.\n"
+            "- **G4 · Underserved Score** = `Population / Total_Boarding`. Threshold > 0.5 → 79 underserved hexes."
+        ),
+        methodology=(
+            "All joins run in EPSG:32636 so distances are in meters. Section 09 of "
+            "`Cleaning Data.ipynb` produces these merges in a single pass, writes them "
+            "to `CleanedData/merge_*.csv`, and the visualization notebook reads only "
+            "from those CSVs — never re-running the joins."
+        ),
+    ),
+]
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -582,7 +720,339 @@ GAP_QUESTIONS: List[Question] = [
 
 
 # ═══════════════════════════════════════════════════════════════════════
-#  PHASE 2 · Q13-Q24
+#  PHASE 2 · CLEANING · 3 condensed entries
+#  (NEW — sources, integration pipeline, semantic matching with SBERT)
+# ═══════════════════════════════════════════════════════════════════════
+
+def _build_p2_osm_cross_verify():
+    from components.charts import osm_cross_verification_map
+    return osm_cross_verification_map()
+
+
+def _build_null_audit():
+    from components.charts import null_audit_before_after
+    return null_audit_before_after()
+
+
+def _build_integration_yield():
+    from components.charts import integration_yield
+    return integration_yield()
+
+
+# ─── Cleaning / scraping diagnostics (per-source) ────────────────────
+def _build_metro_timeline():       from components.charts import metro_opening_timeline;     return metro_opening_timeline()
+def _build_lrt_backfill():         from components.charts import lrt_coordinate_backfill;    return lrt_coordinate_backfill()
+def _build_brt_diagnostic():       from components.charts import brt_scrape_diagnostic;      return brt_scrape_diagnostic()
+def _build_districts_cagr():       from components.charts import districts_cagr_distribution; return districts_cagr_distribution()
+def _build_manifest():             from components.charts import manifest_table;              return manifest_table()
+def _build_q19_chart():            from components.charts import q19_gtfs_coverage;          return q19_gtfs_coverage()
+
+
+PHASE2_CLEANING: List[Question] = [
+    Question(
+        id="P2-C1", phase="phase2", nav_label="◆ 8 SOURCES (S1–S8)",
+        kicker="PHASE 02 · CLEANING · DATA SOURCES",
+        headline="Eight external sources, scraped fresh and documented honestly",
+        question_text="Where does the Phase 2 data come from, and why these eight sources?",
+        why_it_matters=(
+            "Phase 2 has no government open-data feed for new infrastructure. "
+            "Every claim about Metro Line 3, the LRT, or the BRT depends on us "
+            "scraping, cleaning, and triangulating a believable dataset from "
+            "publicly available sources. The eight sources are chosen to be "
+            "**triangulating** — Wikipedia and Google Maps are independent of "
+            "OSM, and S6 (citypopulation.de) is independent of all of them."
+        ),
+        method="Per-source: define URL → check raw cache → fetch (Fetcher / DynamicFetcher / API) → parse → standardize → save → audit",
+        kpis=[("METRO STATIONS",  f"{SCRAPE['metro']['n']}", "S3 · WIKIPEDIA"),
+              ("LRT (with coords)", f"{SCRAPE['lrt']['with_coords']} of {SCRAPE['lrt']['n']}", f"S4 · {SCRAPE['lrt']['rescued_overpass']} OSM + {SCRAPE['lrt']['rescued_gmaps']} GMAPS"),
+              ("BRT STATIONS",    f"{SCRAPE['brt']['n']}", "S5 · GOOGLE MAPS"),
+              ("DISTRICTS",       "408 → 68", "S6 · CITYPOP → CAIRO")],
+        viz_html_paths=["Phase2/Exports/manifest_table.html"],
+        insight=(
+            "**S1 · TfC GTFS** — official bus + metro feeds (8 standard CSVs each).\n\n"
+            "**S3 · Wikipedia metro** — 89 stations, 100% coordinates, opening dates → "
+            "lets us derive 'post-2014' filter for Q14, Q22, H2.\n\n"
+            "**S4 · Wikipedia LRT** — 20 stations, **0% coordinates on the page**. "
+            "Backfilled to **16 with coordinates** via OSM Overpass (9) + Google Maps "
+            "fallback (7). 4 remain coordinate-less (planned but not yet on the ground).\n\n"
+            "**S5 · BRT via Google Maps** — no Wikipedia page exists. 10 viewport "
+            "queries via Playwright; regex aria-labels; uroman transliteration; "
+            "3-tier dedup → 12 stations.\n\n"
+            "**S6 · citypopulation.de** — 408 admin rows → filter to Greater Cairo (68 "
+            "districts) → CAGR 2006→2017 + Nominatim centroid per district. **The "
+            "Nominatim centroid is the methodological upgrade that turns H1's effect "
+            "size from 0.16 (small) into 0.83 (huge).**\n\n"
+            "**S7 · Vehicles** — Wikipedia + World Bank API. Used as background only.\n\n"
+            "**S8 · OSM Overpass** — independent transport-feature layer for "
+            "cross-verification (Stage 2 of the integration pipeline)."
+        ),
+        methodology=(
+            "Every source block follows the same 7-step pattern: define URL → check "
+            "whether a cached raw file exists in `RAW_DIR` → fetch (Fetcher for static, "
+            "DynamicFetcher for JS-rendered, REST for APIs) → parse (BeautifulSoup-style, "
+            "or regex for awkward fields like DMS coordinates) → standardize (reproject "
+            "to EPSG:32636, normalize column names) → save to `Phase2/CleanedData/` → "
+            "print row count + sample. This pattern makes every source independently "
+            "debuggable and re-runnable."
+        ),
+    ),
+
+    Question(
+        id="P2-S3", phase="phase2", nav_label="◆ S3 · METRO TIMELINE",
+        kicker="PHASE 02 · CLEANING · S3 · WIKIPEDIA METRO",
+        headline="Cairo Metro · 89 stations across three lines, parsed from Wikipedia",
+        question_text="What did the Wikipedia scrape (S3) actually give us?",
+        why_it_matters=(
+            "S3 is the cleanest source — Wikipedia ships per-line wikitables with "
+            "names, opening dates, and DMS coordinates. We strip footnotes, convert "
+            "DMS to decimal, and derive opening-phase labels from year thresholds. "
+            "The opening_year column is what enables Q14 (post-2014 metro filter) "
+            "and the animated metro-expansion visualization downstream."
+        ),
+        method="`pd.read_html` on List_of_Cairo_Metro_stations · 3 wikitables · DMS→decimal · opening date → year → phase label",
+        kpis=[("STATIONS", "89", "ALL WITH COORDS"),
+              ("LINES", "3", "L1 · L2 · L3"),
+              ("WINDOW", "1987–2024", "37 YEARS")],
+        viz_html_paths=["Phase2/Exports/metro_opening_timeline.html"],
+        insight=(
+            "**Three eras visible in the timeline.** Line 1 launches the system in "
+            "1987 with 14 stations on the Helwan–Marg corridor; opens slowly through "
+            "1989 (12 more stations). Line 2 extends through 1996–2005. Then a "
+            "long pause until **Line 3** starts in 2012 and pulses out in phases "
+            "(3A 2014, 3B 2018–2019, 3C 2020–2022, 3D 2024). The scrape captures "
+            "every station across all three lines with 100% coordinate coverage."
+        ),
+        methodology=(
+            "Each wikitable row is a station. `pd.read_html` returns the raw HTML "
+            "table; we normalize column names, strip Wikipedia footnotes (`[1]`, "
+            "`[2]`, …) from station names, parse DMS coordinates "
+            "(`30°02′00″N 31°14′17″E`) to decimal lat/lon, and derive the "
+            "opening_year from the dateparser-friendly opening-date string. The "
+            "phase column is bucketed from year thresholds (1987 = original L1; "
+            "2014+ for L3 = 'Phase 3+')."
+        ),
+    ),
+
+    Question(
+        id="P2-S4S5", phase="phase2", nav_label="◆ S4 · LRT + S5 · BRT",
+        kicker="PHASE 02 · CLEANING · S4 LRT + S5 BRT · THE HARD SOURCES",
+        headline="LRT has zero coords on Wikipedia · BRT has no Wikipedia page at all",
+        question_text="How do we get coordinates for the new modes when no clean source exists?",
+        why_it_matters=(
+            "S4 (LRT) and S5 (BRT) are the engineering challenge of Phase 2. "
+            "Wikipedia ships the LRT as 20 stations with **zero coordinates on "
+            "the page**. BRT has no Wikipedia page at all. Without these sources "
+            "Phase 2 has no way to compute the H2 catchment test or the H3 corridor "
+            "match. The backfill story is itself a project finding: when the world "
+            "doesn't publish data cleanly, you scrape, triangulate, and document "
+            "what you couldn't recover."
+        ),
+        method="LRT: OSM Overpass per-station name search + Google Maps fallback. BRT: 10 viewport queries via Playwright + uroman transliteration + 3-tier dedup.",
+        kpis=[("LRT TOTAL",          f"{SCRAPE['lrt']['n']}",                "STATIONS"),
+              ("LRT WITH COORDS",    f"{SCRAPE['lrt']['with_coords']}",      "AFTER BACKFILL"),
+              ("BRT STATIONS",       f"{SCRAPE['brt']['n']}",                "FROM GOOGLE MAPS"),
+              ("BRT METHOD",         "PLAYWRIGHT",                            "DYNAMIC FETCHER")],
+        viz_html_paths=["Phase2/Exports/lrt_coordinate_backfill.html", "Phase2/Exports/brt_scrape_diagnostic.html"],
+        insight=(
+            f"**LRT.** Wikipedia lists {SCRAPE['lrt']['n']} stations but ships "
+            f"**zero coordinates**. We rescue {SCRAPE['lrt']['rescued_overpass']} "
+            "via OSM Overpass per-station name search (the LRT names are unique "
+            "enough to query) and another "
+            f"{SCRAPE['lrt']['rescued_gmaps']} via Google Maps fallback. The CSV "
+            f"now carries **{SCRAPE['lrt']['with_coords']} valid coordinates**; "
+            "the rest are still planned-only.\n\n"
+            f"**BRT.** No Wikipedia article exists, so we run **10 Google Maps "
+            "viewport queries** in both English and Arabic via Playwright "
+            f"(scrapling.fetchers.DynamicFetcher). The diagnostic map shows the "
+            "same physical station discovered from different search languages — "
+            "uroman transliteration (المرج → 'almrj') makes the cross-script "
+            "dedup possible."
+        ),
+        methodology=(
+            "LRT uses **scrapling.fetchers.Fetcher** for the static Wikipedia page, "
+            "then **Overpass API** queries scoped to a Cairo bounding box, then "
+            "Google Maps as a last resort. BRT uses **scrapling.fetchers."
+            "DynamicFetcher** (Playwright-backed) because Google Maps results render "
+            "via JavaScript. We dedupe with a 3-tier hierarchy: spatial-near "
+            "(within 50 m), spatial-far + name match, then unique. Both sources "
+            "feed the 4-stage integration pipeline downstream."
+        ),
+    ),
+
+    Question(
+        id="P2-S6S7", phase="phase2", nav_label="◆ S6 · DEMOGRAPHICS",
+        kicker="PHASE 02 · CLEANING · S6 CITYPOPULATION + S7 VEHICLES",
+        headline="68 Greater Cairo districts · CAGR 2006→2017 · Nominatim centroids",
+        question_text="How do we connect transport infrastructure to the people who would actually use it?",
+        why_it_matters=(
+            "Without population we cannot ask 'did infrastructure go where people "
+            "are?' — the most basic question in Phase 2. citypopulation.de gives us "
+            "**68 Greater Cairo districts with population at 4 census points** "
+            "(1996, 2006, 2017, 2023) and Nominatim centroids per district. **The "
+            "Nominatim centroid upgrade is what turned H1's effect size from 0.16 "
+            "(small) into 0.83 (huge)** — the earlier draft used a 3-governorate "
+            "centroid proxy that smeared the spatial-weights graph."
+        ),
+        method="Scrape citypopulation.de Egypt admin hierarchy (408 rows) → filter to Greater Cairo (68 districts) → reshape wide→long → CAGR per district → Nominatim centroid",
+        kpis=[("DISTRICTS",       "68",         "GREATER CAIRO"),
+              ("CENSUS YEARS",    "1996/2006/2017/2023", "4 POINTS"),
+              ("MEDIAN CAGR",     "+1.2%",      "PER YEAR"),
+              ("FASTEST",         "≈+15%",      "NEW SATELLITE CITIES")],
+        viz_html_paths=["Phase2/Exports/districts_cagr_distribution.html"],
+        insight=(
+            "The CAGR distribution is **right-skewed**: the median district grows "
+            "around 1.2% per year, but the right tail — **New Cairo 1, 6th October "
+            "City 1 & 3, Ash-Shurūq, Sheikh Zayed** — grows at 10–15% per year. "
+            "These are deliberately-built-from-scratch suburbs in the desert. "
+            "**Demand is being created by planners, not by organic urbanization** "
+            "in the dense inner core (Imbaba, Shubra, Al-Matariyya — all under 1% "
+            "CAGR). Q22's worst-residual list comes directly out of this CAGR "
+            "tail meeting weak metro coverage."
+        ),
+        methodology=(
+            "Scraped via `Fetcher.get` on citypopulation.de's Egypt admin page; "
+            "the response is a 408-row table covering 27 governorates and their "
+            "subdivisions. We filter to (Cairo + Giza + Qalyubia) governorates → "
+            "68 districts. CAGR = `(pop_2017 / pop_2006) ^ (1/11) − 1`. Each "
+            "district is geocoded via Nominatim (OSM's free geocoder) to get a "
+            "centroid lat/lon — used by Q22 (residual regression), H1 (Moran's I "
+            "spatial weights), and Q24 (K-Means feature matrix)."
+        ),
+    ),
+
+    Question(
+        id="P2-S1S8", phase="phase2", nav_label="◆ S1 · GTFS + S8 · OSM",
+        kicker="PHASE 02 · CLEANING · S1 GTFS + S8 OSM",
+        headline="GTFS publishes 217 routes · OSM provides the cross-verification layer",
+        question_text="What does the formal feed publish, and what does OSM independently confirm?",
+        why_it_matters=(
+            "**S1 GTFS** is Cairo's published transit schedule — the closest the city "
+            "has to an official open-data feed. **S8 OSM** is the community-edited "
+            "cross-verification layer used in Stage 2 of the integration pipeline. "
+            "Together they let us compare what the network *says it is* (GTFS) with "
+            "what the world *thinks it is* (OSM)."
+        ),
+        method="S1: download two zip bundles (bus+metro, paratransit) from TfC GitHub. S8: Overpass API queries for `public_transport`, `railway`, `highway=bus_stop` inside Cairo bbox.",
+        kpis=[("GTFS STOPS",   "1,210", "S1"),
+              ("GTFS ROUTES",  "217",   "FORMAL + INFORMAL"),
+              ("GTFS FARES",   "3",     "ZONE-LEVEL"),
+              ("OSM SOURCE",   "OVERPASS", "INDEPENDENT")],
+        viz_html_paths=["Phase2/Exports/q19_gtfs_coverage.html", "Phase2/Exports/osm_cross_verification_map.html"],
+        insight=(
+            "**GTFS reveals the data asymmetry**: the formal CTA bus + Metro routes "
+            "(31 of 217) are published cleanly, but the bulk of the feed is "
+            "informal paratransit (170+ routes). This is the bridge to Q19's "
+            "finding — **GTFS gives Masari a strong formal backbone, but Phase 1 "
+            "shows many stops where informal demand dominates and the nearest GTFS "
+            "stop is too far to explain the trip**. Those stops are the "
+            "'crowdsourcing frontier.'\n\n"
+            "**OSM Overpass** provides an independent layer for the integration "
+            "pipeline. When a scraped Wikipedia or Google Maps coordinate sits more "
+            "than 50 m from the nearest OSM transport node, Stage 2 of the pipeline "
+            "flags it as suspect — that's how we catch DMS-conversion errors and "
+            "Google Maps approximations."
+        ),
+        methodology=(
+            "**GTFS** unpacks into 8 standard CSVs (`stops.txt`, `routes.txt`, "
+            "`trips.txt`, `shapes.txt`, `fare_attributes.txt`, …). We filter `stops` "
+            "to a Cairo bounding box and reproject to EPSG:32636. **OSM Overpass** "
+            "uses an XML query against `https://overpass-api.de` to pull all "
+            "transport features inside the Cairo bbox; output is a GeoJSON in "
+            "EPSG:32636 ready for Stage-2 cross-verification."
+        ),
+    ),
+
+    Question(
+        id="P2-C2", phase="phase2", nav_label="◆ 4-STAGE INTEGRATION",
+        kicker="PHASE 02 · CLEANING · INTEGRATION PIPELINE · SBERT MATCHING",
+        headline="KNN → OSM verify → RapidFuzz → SBERT — four stages, four problems solved",
+        question_text="How do we pair every scraped station with the most likely Phase 1 terminal?",
+        why_it_matters=(
+            "Phase 2's central question — *did the new stuff close any of the Phase 1 "
+            "gaps?* — depends on knowing which new station maps to which old terminal. "
+            "Naive nearest-neighbor matching gives false matches whenever two unrelated "
+            "stations are geographically close. The 4-stage pipeline solves what no "
+            "single stage can: each stage covers what the previous stage misses."
+        ),
+        method="Stage 1: spatial KNN · Stage 2: OSM cross-verify · Stage 3: RapidFuzz token_sort (τ=88) · Stage 4: multilingual SBERT (τ=0.65)",
+        kpis=[("STAGE 1", "KNN", "SPATIAL"),
+              ("STAGE 2", "OSM > 50 m", "FLAG"),
+              ("STAGE 3", f"τ = {SCRAPE['sbert']['tau']*100:.0f}", "RAPIDFUZZ"),
+              ("STAGE 4", f"SBERT τ = {SCRAPE['sbert']['tau']}", "SEMANTIC MATCH")],
+        viz_html_paths=["Phase2/Exports/integration_yield.html", "Phase2/Exports/osm_cross_verification_map.html"],
+        insight=(
+            "**Stage 1 — KNN (`sklearn.neighbors.NearestNeighbors`).** First-pass "
+            "pairing — for every scraped station, find the nearest Phase 1 terminal in "
+            "EPSG:32636. Fast and deterministic, but blind to names.\n\n"
+            "**Stage 2 — OSM cross-verification.** For every scraped station, look up "
+            "the nearest OSM transport node. If it's > 50 m away, **flag the "
+            "coordinates as suspect** — likely a Wikipedia or Google Maps error.\n\n"
+            "**Stage 3 — RapidFuzz token_sort (τ = 88).** Resolves spelling and "
+            "punctuation drift on same-script names ('Adly Mansur' ↔ 'Adly Mansour'). "
+            "But fails on cross-script (Arabic ↔ English).\n\n"
+            "**Stage 4 — SBERT semantic matching** "
+            f"(`{SCRAPE['sbert']['model']}`, threshold τ = {SCRAPE['sbert']['tau']}, "
+            "cosine on combined `station_en + station_ar`). The only stage that can "
+            "match المعادي ↔ Maadi semantically. Validated against a "
+            f"{SCRAPE['sbert']['gold_set_pairs']}-pair gold set; if any gold pair fails, "
+            "the threshold is re-tuned."
+        ),
+        methodology=(
+            "**Why staged?** Each stage solves what the previous can't. Stage 1 alone "
+            "produces false matches when two unrelated stations happen to be close. "
+            "Stage 2 catches scrape-coordinate errors that would silently corrupt "
+            "Stage 1. Stage 3 resolves typos but fails on Arabic↔English. Stage 4 is "
+            "the only stage that handles cross-script — and it does so without "
+            "translation (المرج → 'almrj' phonetically, not 'lawn' semantically). "
+            "Outputs persist to `Phase2/Integrated/matched_pairs.csv` and "
+            "`Phase2_integrated.geoparquet`."
+        ),
+    ),
+
+    Question(
+        id="P2-C3", phase="phase2", nav_label="◆ DATA QUALITY",
+        kicker="PHASE 02 · CLEANING · NULL AUDIT + FINAL GATE",
+        headline="Honest about the partial data — null audit before/after, final-gate manifest",
+        question_text="How do we report data-quality limitations without burying them?",
+        why_it_matters=(
+            "BRT data is partial. LRT coordinates are partly OSM/GMaps backfilled. "
+            "Some district centroids are Nominatim approximations. The project is "
+            "stronger when these compromises are explicit, not weaker — the null "
+            "audit and the final-gate manifest are how we make that explicit."
+        ),
+        method="Per-source null audit (grouped bar chart, % null per column) before and after cleaning; final assertion gate at the end of Notebook 3",
+        kpis=[("AUDIT", "BEFORE + AFTER", "PER SOURCE"),
+              ("LRT", f"{SCRAPE['lrt']['remaining']} planned", "STILL NO COORDS"),
+              ("BRT", "PARTIAL", "GMAPS-ONLY"),
+              ("GATE", "ASSERT FILE EXISTS", "BLOCKS NB4")],
+        viz_html_paths=["Phase2/Exports/null_audit_before_after.html"],
+        insight=(
+            "**Null audit.** Section 10 of Notebook 3 builds a per-source null-audit "
+            "table and renders it as a grouped bar chart (Plotly). After Cleaning Steps "
+            "01–04 run, the audit re-runs to verify cleaning worked — both versions "
+            "(`null_audit_before.csv` and `null_audit_after.csv`) ship in "
+            "`Phase2/CleanedData/`.\n\n"
+            "**Final gate.** Section 13 ends with an assertion that every "
+            "downstream-required output exists. If a CSV is missing — because a scrape "
+            "failed mid-run — Notebook 4 cannot run. This is a defensive contract "
+            "between the two notebooks.\n\n"
+            "**What's honestly partial.**\n"
+            f"- **LRT:** {SCRAPE['lrt']['remaining']} planned-only stations still lack coordinates.\n"
+            "- **BRT:** Google Maps is the only source; the 12 stations are likely the operational ones, but not guaranteed exhaustive.\n"
+            "- **District centroids:** Nominatim approximations, not true polygon centroids — so some Q22 residuals share a governorate-level value."
+        ),
+        methodology=(
+            "Why a grouped bar instead of a wide table? Because comparing many columns "
+            "across multiple sources is easier visually than scanning a CSV. Why "
+            "before-and-after? Because the value of cleaning is the **delta**, not the "
+            "post state."
+        ),
+    ),
+]
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  PHASE 2 · Q13-Q25
 # ═══════════════════════════════════════════════════════════════════════
 
 def _build_q13():
@@ -650,37 +1120,62 @@ def _build_q24_cagr():
     return q24_cagr_pop()
 
 
+def _build_q25_bridge():
+    from components.charts import q25_bridge_schematic
+    return q25_bridge_schematic()
+
+
+# Phase 2 question add-ons (mirror notebook "add-on" cells)
+def _build_q14_spatial():       from components.charts import q14_spatial_diagnostic;       return q14_spatial_diagnostic()
+def _build_q17_target_heatmap():from components.charts import q17_target_tier_heatmap;     return q17_target_tier_heatmap()
+def _build_q18_per_tier():      from components.charts import q18_per_tier_box;             return q18_per_tier_box()
+def _build_q19_pie():           from components.charts import q19_agency_pie;               return q19_agency_pie()
+def _build_q22_gov_box():       from components.charts import q22_governorate_box;          return q22_governorate_box()
+def _build_q23_pctile_hist():   from components.charts import q23_percentile_histogram;     return q23_percentile_histogram()
+def _build_q23_modal():         from components.charts import q23_modal_pie;                return q23_modal_pie()
+def _build_q24_parcoords():     from components.charts import q24_parallel_coords;          return q24_parallel_coords()
+def _build_q24_radar():         from components.charts import q24_radar;                    return q24_radar()
+def _build_q24_priority():      from components.charts import q24_priority_bar;             return q24_priority_bar()
+
+# Synthesis viz
+def _build_metro_animation():   from components.charts import metro_animation;              return metro_animation()
+def _build_sunburst():          from components.charts import sunburst_market;              return sunburst_market()
+def _build_market_sizing():     from components.charts import market_sizing_bar;            return market_sizing_bar()
+
+
 PHASE2_QUESTIONS: List[Question] = [
     Question(
         id="Q13", phase="phase2", nav_label="Q13 · METRO × DENSITY",
         kicker="PHASE 02 · Q13",
-        headline="Metro coverage × district density · does the network follow the people?",
-        question_text="Is there a monotonic relationship between district population density and metro-station count?",
+        headline="Metro openings read against population at the time they opened",
+        question_text="Did each metro line open into the population geography that existed at the time?",
         why_it_matters=(
-            "If station placement tracks density, the metro is a demand-responsive "
-            "network. If it doesn't, infrastructure policy is operating on logic "
-            "other than ridership — new-city expansion, political zoning, or pure "
-            "inertia — and downstream claims about 'unmet demand' become concrete."
+            "A station opened in 1987 should not be judged only against a 2018 "
+            "hex snapshot. This version compares each station to the nearest "
+            "district's closest available population year, then separately shows "
+            "today's 2023 context."
         ),
-        method="Per-district spatial join (3 km buffer) of integrated stations; Spearman rank correlation on (density, station count)",
+        method="Nearest district-centroid join: metro station opening year × closest available district population year",
         kpis=[("DISTRICTS", "68", "ANALYZED"),
               ("SAMPLE", "89+20+12", "METRO · LRT · BRT"),
               ("METHOD", "SPEARMAN", "MONOTONIC")],
-        viz_builders=[_build_q13],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q13_01_q13_metro_opening_year_vs_district_population_at_the_closest.html',
+            'Phase2/Exports/notebook_visuals/q13_02_q13_add_on_distribution_of_station_adjacent_district_populat.html',
+            'Phase2/Exports/notebook_visuals/q13_03_q13_add_on_population_observation_year_used_for_each_line.html'],
         insight=(
-            "The relationship is positive but surprisingly weak. Dense districts "
-            "like Imbaba and Shubra, each with 40k+ residents per km², have "
-            "comparatively few stations — while low-density New Cairo and 6th "
-            "October have many. Density alone doesn't predict coverage; the "
-            "planning signal is elsewhere. This finding directly motivates H1 "
-            "(formal testing) and Q22 (residual modelling)."
+            "Line 1 and Line 2 show modest density sorting: older stations are "
+            "centrally placed. Line 3, extended through 2024, shows the strongest "
+            "positive relationship between opening year and adjacent district "
+            "population, meaning the newer 3B/3C/3D stations did reach denser "
+            "districts such as Imbaba and Mohandessin. Q14 then tests whether "
+            "those new stations also reached Phase 1's ghost terminals."
         ),
         methodology=(
-            "Data: districts_wide.csv (68 rows from citypopulation.de S6) joined "
-            "with the integrated station dataset (metro + LRT + BRT). For each "
-            "district centroid, we count stations within a 3 km radius in "
-            "EPSG:32636. Spearman ρ chosen over Pearson because the relationship "
-            "is non-linear and the distributions are right-skewed."
+            "Data: `metro_stations.csv` with line, opening year, and coordinates "
+            "joined to `districts_wide.csv` district centroids and population "
+            "columns for 1996, 2006, 2017, and 2023. Because the district file "
+            "contains centroids and totals, not district polygons/areas, Q13 uses "
+            "district population exposure rather than true density."
         ),
     ),
 
@@ -698,7 +1193,8 @@ PHASE2_QUESTIONS: List[Question] = [
         kpis=[("GHOSTS", "115", "TOTAL"),
               ("WITHIN 1 KM", "9", "8%"),
               ("BEYOND 2 KM", "97", "84%")],
-        viz_builders=[_build_q14],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q14_01_q14_ghost_terminals_by_distance_to_nearest_post_2014_metro_s.html',
+            'Phase2/Exports/notebook_visuals/q14_02_q14_add_on_stranded_ghost_terminals_vs_post_2014_line_3_geog.html'],
         insight=(
             "The answer is unambiguous. Only 9 of the 115 Phase 1 ghost terminals "
             "sit within a 1-km walk of any post-2014 metro station. 97 of them "
@@ -715,96 +1211,97 @@ PHASE2_QUESTIONS: List[Question] = [
     ),
 
     Question(
-        id="Q15", phase="phase2", nav_label="Q15 · KM × TIME",
+        id="Q15", phase="phase2", nav_label="Q15 · METRO × TERMINAL INTEGRATION",
         kicker="PHASE 02 · Q15",
-        headline="Formal network length has tripled since 1987 · the informal network has not",
-        question_text="How has cumulative formal network length evolved against the fixed informal-terminal count?",
+        headline="Do metro stations connect to Cairo's bus / microbus terminal backbone?",
+        question_text="Is each metro station spatially close enough to the bus/microbus backbone for riders to actually transfer?",
         why_it_matters=(
-            "Charting time is the only way to see that transport investment is a "
-            "story of direction, not just scale. The formal network grew from "
-            "43 km in 1987 to ~148 km in 2026. The informal network counts — "
-            "280 terminals — have stayed flat across that same period."
+            "The product story is not just whether rail exists — it is whether formal rail gives "
+            "riders a clean transfer into the informal network they already use. A metro station "
+            "near a high-route Phase 1 terminal is where System A and System B can meet. A "
+            "station far from any high-route terminal is **stranded rail** — formally there but "
+            "functionally disconnected from how most Cairenes actually move."
         ),
-        method="Wikipedia opening-year extraction per station; cumulative km by opening date; terminals held constant from Phase 1",
-        kpis=[("1987 METRO", "43 km", "LINE 1 OPENS"),
-              ("2026", "148 km", "METRO"),
-              ("LRT", "68 km", "SINCE 2024"),
-              ("BRT", "110 km", "SINCE 2026")],
-        viz_builders=[_build_q15],
+        method="For each metro station: nearest Phase 1 terminal; attach route count + flow + ghost flag; plot opening_year × distance",
+        kpis=[("EASY TRANSFER", "≤ 250 m", "WALK-OUT BAND"),
+              ("WALKABLE", "≤ 500 m", "FRIENDLY"),
+              ("STRETCH", "≤ 1 KM", "TOLERABLE"),
+              ("STATIONS ANALYSED", f"{SCRAPE['metro']['n']}", "METRO ONLY")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q15_01_q15_did_new_metro_openings_land_near_the_existing_terminal_b.html',
+            'Phase2/Exports/notebook_visuals/q15_02_q15_transfer_distance_distribution_by_metro_line.html',
+            'Phase2/Exports/notebook_visuals/q15_03_q15_add_on_where_metro_can_act_as_the_bridge_into_system_b.html'],
         insight=(
-            "Three visible inflection points: **1987** (Line 1 opens), **2012** "
-            "(Line 3 Phase 1 Ataba–Abbassia), **2024** (LRT opens), **2026** "
-            "(BRT opens). Each jump adds formal km without changing the base of "
-            "280 informal terminals Phase 1 documented. Transport investment is "
-            "additive to the formal side only — System B is not on this time-axis."
+            "Stations close to high-route terminals are where System A and System B can meet — "
+            "they're the transfer points Masari should privilege in route planning. "
+            "**Most post-2014 Line 3 stations sit further from the existing terminal "
+            "backbone than older Line 1/2 stations did.** That widening gap means Cairo's "
+            "newest rail asks more of the rider's last mile, not less."
         ),
         methodology=(
-            "Cumulative km per mode interpolated from Wikipedia station opening "
-            "dates and per-segment length records. Line 3 segments staged by "
-            "phase (1A/1B/2/3A/3B/3C/3D) matching the scrape's derivation. The "
-            "280-terminal line from Phase 1 is held flat — the informal network "
-            "is not tracked longitudinally in public records, which is itself a "
-            "finding: informal transport becomes invisible the moment you try "
-            "to audit its history."
+            "Build a station-level table by joining each metro station to its nearest "
+            "Phase 1 terminal in EPSG:32636. Attach the terminal's route count, "
+            "passenger flow, and ghost-terminal status. Visualize as opening-year × "
+            "distance, coloured by line, with horizontal bands at 250 m / 500 m / 1 km "
+            "for practical transfer thresholds. (The earlier version of Q15 was a "
+            "dual-axis time series of cumulative km — superseded because that question "
+            "didn't speak to the actual transfer experience.)"
         ),
     ),
 
     Question(
         id="Q16", phase="phase2", nav_label="Q16 · CAGR",
         kicker="PHASE 02 · Q16",
-        headline="Fastest-growing districts are on the edges, not where people already live",
-        question_text="Which districts grew fastest between 2006 and 2023, and where do those districts sit in the coverage map?",
+        headline="Fastest-growing districts are desert satellite cities",
+        question_text="Which Greater Cairo districts grew fastest between 2006 and 2023, and did they get new-mode coverage?",
         why_it_matters=(
-            "Growth is a forward indicator of demand. If the highest-CAGR "
-            "districts are already over-served, planning is anticipating demand "
-            "correctly. If they're in dense under-served zones, the planning "
-            "pipeline is misaligned with the demographic momentum."
+            "If fast-growing districts received no new stations, Masari's "
+            "addressable market is the residual demand the state did not serve."
         ),
-        method="CAGR per district between 2006 and 2023 census points; sloped alongside 2006 / 2023 populations",
-        kpis=[("HOT-GROWTH CAGR", "10.78%", "NEW CITIES"),
-              ("ESTABLISHED CORE", "0.95%", "FLAT"),
-              ("PERIPHERAL GROWTH", "4.20%", "MEDIUM")],
-        viz_builders=[_build_q16],
+        method="District CAGR sorted descending, joined to metro/LRT/BRT station counts by spatial proximity",
+        kpis=[("FASTEST CAGR", "+15%", "NEW CAIRO"),
+              ("GROWTH AXIS", "DESERT", "SATELLITES"),
+              ("INNER CORE", "SLOWER", "STILL DENSE")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q16_01_q16_top_15_fastest_growing_districts_cagr_vs_new_mode_covera.html',
+            'Phase2/Exports/notebook_visuals/q16_02_q16_add_on_fast_growth_population_at_risk_when_coverage_is_z.html'],
         insight=(
-            "The fastest-growing districts are **New Cairo, 6th October, Shorouk** "
-            "— the desert-expansion new cities. These grow at **10.78% CAGR** "
-            "while dense inner districts like Imbaba grow at **under 1%**. Phase "
-            "2's metro and LRT programmes route to these same hot-growth districts, "
-            "which answers the earlier question of *what the planners were "
-            "optimizing for*: projected future demand in a new-capital geography, "
-            "not existing demand in the inner core."
+            "The fastest-growing districts between 2017 and 2023 are dominated by "
+            "new satellite cities: New Cairo, 6th October, Shorouk, and Sheikh "
+            "Zayed. Established dense districts such as El Marg and Warraq still "
+            "grow, but more slowly. Metro/LRT expansion follows the satellite-city "
+            "logic more than the slow-growth established districts where many "
+            "current informal trips still happen."
         ),
         methodology=(
-            "CAGR = (pop_2023 / pop_2006) ^ (1/17) − 1, computed per district "
-            "from citypopulation.de wide→long transformation. Districts with "
-            "missing 2006 data were imputed from 2017 * (1 + regional CAGR)^11 "
-            "— noted in the null audit. Slope chart is the right visual: two "
-            "time points, many districts, the angle encodes growth directly."
+            "CAGR is computed per district from the citypopulation.de wide table, "
+            "then the top districts are joined to nearby metro, LRT, and BRT "
+            "station counts. The notebook uses this to separate projected future "
+            "growth corridors from current dense demand corridors."
         ),
     ),
 
     Question(
         id="Q17", phase="phase2", nav_label="Q17 · DENSITY × UNDERSERVED",
         kicker="PHASE 02 · Q17",
-        headline="Density and underservedness correlate · the target quadrant is real",
-        question_text="Are high-density districts systematically more underserved?",
+        headline="Dense-and-underserved hexes are the launch-market target cells",
+        question_text="Is population density the main predictor of underservedness, or is coverage-need mismatch unrelated to density?",
         why_it_matters=(
-            "If underservedness is just a density by-product, we can't justify "
-            "targeting a specific segment. If the *combination* of high density "
-            "and high underservedness defines a distinct quadrant, we have a "
-            "precise market. This question produces the quadrant."
+            "If dense districts correlate positively with underserved score, "
+            "planning follows density but under-provisions. If the relationship is "
+            "weak, the mismatch is spatial rather than simply volumetric."
         ),
-        method="Population density × Underserved_Score scatter (Phase 1 Q9 hexes); target-quadrant shading",
+        method="Phase 1 q9_underserved hexes: population density × Underserved_Score with top-quartile target ranking",
         kpis=[("HEXES", "1,525", "ANALYZED"),
               ("UNDERSERVED", "79", "SCORE > 0.5"),
               ("TARGET QUADRANT", "DEF", "DENSE + UNDERSERVED")],
-        viz_builders=[_build_q17],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q17_01_q17_population_density_underserved_score_spearman_0_548_p_1e.html',
+            'Phase2/Exports/notebook_visuals/q17_02_q17_add_on_dense_and_underserved_target_zone_by_decile.html',
+            'Phase2/Exports/notebook_visuals/q17_03_q17_map.html'],
         insight=(
-            "There is a positive but noisy relationship between density and "
-            "underservedness. The **target quadrant** (coral rectangle) — high "
-            "density *and* high underserved score — is not a single cluster but "
-            "a clearly-populated region of the joint distribution. Masari's "
-            "market is people in this quadrant, not density generally."
+            "Q17 now names the target, not just the pattern. The dense-and-"
+            "underserved quadrant becomes a concrete H3 list: places where many "
+            "people live, boarding activity is not keeping up, and the underserved "
+            "score is in the top quartile. These are the first hexes Masari should "
+            "inspect, validate on the ground, and use as launch-market candidates."
         ),
         methodology=(
             "X-axis: hex population density (pop_18 / hex_area). Y-axis: "
@@ -819,25 +1316,27 @@ PHASE2_QUESTIONS: List[Question] = [
     Question(
         id="Q18", phase="phase2", nav_label="Q18 · INFORMAL SHARE",
         kicker="PHASE 02 · Q18",
-        headline="Informal share rises with density · informal transport is structural, not marginal",
-        question_text="Does informal-transport share concentrate only in dense areas, or is it structurally widespread?",
+        headline="Informal share is flat across density tiers · microbus is everywhere",
+        question_text="Does informal-transport modal share rise with density, or is it evenly distributed?",
         why_it_matters=(
             "If informal is a density-only phenomenon, formal metro expansion in "
             "dense cores would eventually replace it. If it's widespread regardless "
             "of density, informal is a permanent feature of Cairo's transport and "
             "any future-state model must include it."
         ),
-        method="Scatter of informal-share × density per district with OLS fit",
-        kpis=[("DISTRICTS", "68", "COVERED"),
-              ("RELATIONSHIP", "+", "POSITIVE"),
-              ("STRUCTURAL", "YES", "NOT MARGINAL")],
-        viz_builders=[_build_q18],
+        method="q4_formal_vs_informal stop-level formal share joined to population hex density tiers",
+        kpis=[("ρ", "0.025", "FLAT"),
+              ("MEAN SHARE", "47%", "INFORMAL"),
+              ("STRUCTURAL", "YES", "ALL DENSITIES")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q18_01_q18_informal_transport_share_vs_hex_population_0_025.html',
+            'Phase2/Exports/notebook_visuals/q18_02_q18_add_on_informal_share_distribution_across_density_tiers.html',
+            'Phase2/Exports/notebook_visuals/q18_03_q18b_do_the_new_modes_close_phase_1_gaps.html',
+            'Phase2/Exports/notebook_visuals/q18_04_q18b_add_on_percent_of_each_phase_1_gap_still_uncovered_by_e.html'],
         insight=(
-            "Informal share is high across the density spectrum. The OLS slope "
-            "is positive — denser districts do have higher informal share — but "
-            "no district sits below ~40% informal share. The informal network "
-            "isn't a 'last-mile' phenomenon or a residual of formal under-"
-            "coverage; it is the baseline transport system, in every part of Cairo."
+            "Informal share is statistically flat across density tiers. Microbus "
+            "and tomnaya are not a niche response to only dense neighborhoods; "
+            "they are background transport across the city. That is why a route "
+            "planner that ignores informal transport cannot explain Cairo trips."
         ),
         methodology=(
             "Informal share = (informal_boardings / total_boardings) per "
@@ -850,56 +1349,66 @@ PHASE2_QUESTIONS: List[Question] = [
     Question(
         id="Q18b", phase="phase2", nav_label="Q18b · GAP MATRIX",
         kicker="PHASE 02 · Q18b",
-        headline="The 4×3 gap-closure matrix: no cell above 25%",
+        headline="The 3×4 gap-closure matrix: only one cell hits 25% — BRT × Vehicle Mismatch",
         question_text="What share of each Phase 1 gap did each new mode close within 2 km?",
         why_it_matters=(
             "Q18b is the synthesis cell — one chart shows the whole Phase 2 "
-            "verdict. Twelve cells, none above 25%."
+            "verdict. Twelve cells, only one at 25% (BRT × G3 vehicle mismatch). "
+            "Every other cell is below 16%."
         ),
         method="Per (gap, mode) buffer overlap: % of gap sites within 2 km of any station of that mode",
-        kpis=[("MODES", "3", "METRO · LRT · BRT"),
-              ("GAPS", "4", "G1–G4"),
-              ("BEST CELL", "25%", "BRT × G3")],
-        viz_builders=[_build_q18b],
+        kpis=[("MODES",     "3",   "METRO L3 · LRT · BRT"),
+              ("GAPS",      "4",   "G1 · G2 · G3 · G4"),
+              ("BEST CELL", "25%", "BRT × VEHICLE MISMATCH"),
+              ("LIVE",      "✓",   "RECOMPUTED FROM CSVs")],
+        viz_html_paths=["Phase2/Exports/q18b_matrix.html"],
         insight=(
-            "The matrix tells one blunt story: infrastructure investment did not "
-            "move any cell above 25%. The single best cell (25%) is BRT closing "
-            "vehicle-mismatch gaps — which is only 25% because the BRT covers a "
-            "limited number of corridors. Everything else is lower. The $10B did "
-            "not close the Phase 1 gaps."
+            "This is the headline answer to Phase 2's central question. Best-case "
+            "in any cell: 25% (BRT and LRT on G3 vehicle-route mismatch). Every "
+            "other cell is below 16%. Metro L3 covers 15.7% of Phase-1 ghost "
+            "terminals but misses 84% of them. BRT is the broadest reach, but still "
+            "leaves most underserved hexes uncovered. Row-major read: no single "
+            "mode closed more than a quarter of any gap. Column-major read: every "
+            "Phase-1 gap category still has 75-100% of its instances uncovered."
         ),
         methodology=(
             "For each gap category, every gap-site has a point coordinate "
             "(ghost terminal, empty-return terminal, long-microbus-route midpoint, "
             "underserved hex centroid). For each mode, compute the % of those "
             "sites inside a 2-km haversine buffer of any station of that mode. "
-            "2-km chosen as Cairo commuter walkshed (World Bank 2019 study)."
+            "2-km chosen as Cairo commuter walkshed (World Bank 2019 study). "
+            "The notebook computes the matrix from the four Phase 1 gap layers and "
+            "the Phase 2 station layers. The Streamlit chart uses the same saved "
+            "Phase 2 export and keeps a live/fallback chart helper for rehearsal."
         ),
     ),
 
     Question(
         id="Q19", phase="phase2", nav_label="Q19 · GTFS COVERAGE",
         kicker="PHASE 02 · Q19",
-        headline="TfC publishes 217 formal routes · paratransit GTFS is empty",
-        question_text="How does GTFS published-route coverage compare across formal and informal operators?",
+        headline="GTFS gives the formal backbone · informal-heavy stops remain outside it",
+        question_text="Does the published GTFS feed cover the formal network we saw in Phase 1, and where does informal demand remain outside it?",
         why_it_matters=(
-            "If a route isn't in the GTFS, it isn't in any app. Formal has 217 "
-            "routes in the TfC feed. Informal has essentially zero — despite "
-            "carrying the majority of Cairo's commuters. That information gap "
-            "is the founding problem Masari exists to solve."
+            "GTFS is Masari's ready-made System A layer. Phase 1 tells us where "
+            "formal and informal demand actually appeared on the street. Merging "
+            "the two separates what is already legible from what Masari must infer "
+            "or crowdsource."
         ),
-        method="Direct count of published routes per operator / mode in loaded GTFS feeds",
+        method="GTFS routes/stops joined to Phase 1 route inventory and stop-level formal/informal boarding",
         kpis=[("FORMAL (TfC)", "217", "ROUTES"),
               ("STOPS", "1,210", "GTFS"),
               ("PARATRANSIT GTFS", "~0", "ROUTES"),
               ("UNDOCUMENTED", "≈1,500", "MICROBUS")],
-        viz_builders=[_build_q19],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q19_01_q19_published_gtfs_vs_phase_1_formal_informal_reality.html',
+            'Phase2/Exports/notebook_visuals/q19_02_q19_informal_heavy_stops_beyond_an_800m_gtfs_catchment.html',
+            'Phase2/Exports/notebook_visuals/q19_03_q19_add_on_published_gtfs_formal_routes_by_agency.html'],
         insight=(
-            "The data asymmetry is the problem. If you build a route planner only "
-            "on the TfC feed, you have a 13% of the real network. The other 87% "
-            "— the microbus and tomnaya routes that Phase 1 documented with 1,784 "
-            "route records — has no GTFS representation at all. **This is what "
-            "Masari replaces.**"
+            "Q19 tests the real product boundary. GTFS gives Masari a strong "
+            "formal backbone, but Phase 1 shows many stops where informal demand "
+            "dominates and the nearest GTFS stop is not close enough to explain "
+            "the trip. Those stops are the crowdsourcing frontier: the part of "
+            "Cairo that exists operationally but is still missing from the "
+            "published planning layer."
         ),
         methodology=(
             "Direct count of `routes.txt` rows per agency in the gtfs_bus_metro.zip "
@@ -912,26 +1421,24 @@ PHASE2_QUESTIONS: List[Question] = [
     Question(
         id="Q20", phase="phase2", nav_label="Q20 · BRT CORRIDOR",
         kicker="PHASE 02 · Q20",
-        headline="BRT stops ranked by pre-existing informal demand — the top-10 had riders already",
-        question_text="Which BRT stations sit on corridors that had the highest informal-transport demand before BRT opened?",
+        headline="BRT sits on a real informal corridor · some stations still need feeders",
+        question_text="Does the 2025 BRT corridor on the Ring Road lie over the same corridor that informal microbuses were already serving?",
         why_it_matters=(
-            "Q20 is the descriptive version of H3. It shows — per-station — how "
-            "much latent demand each BRT stop inherited. The ranking gives us "
-            "visual evidence that the BRT's alignment with demand is not a "
-            "statistical artefact."
+            "If yes, BRT is formalizing an existing demand. If no, BRT risks "
+            "running empty like the LRT. Q20 is the descriptive version of H3."
         ),
         method="Daily informal boardings per station within 500 m buffer; ranked horizontal bar",
         kpis=[("STATIONS", "12", "BRT SCRAPED"),
               ("TOP-RANK", "14,726", "AL-MARG (BOARDINGS/DAY)"),
               ("BUFFER", "500 m", "CORRIDOR")],
-        viz_builders=[_build_q20],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q20_01_q20_informal_phase_1_transit_demand_within_500_m_of_each_brt.html',
+            'Phase2/Exports/notebook_visuals/q20_02_q20_add_on_pareto_curve_of_informal_demand_near_brt_stations.html'],
         insight=(
-            "Every BRT station has a measurable non-zero informal-demand count. "
-            "The top BRT stations — **Al-Marg (14,726), Al-Salam (9,559), "
-            "Al-Khusus (7,979)** — sit on corridors that are already heavily "
-            "trafficked. The ranking visual is what makes the H3 Cliff's-δ "
-            "= +0.826 legible: it isn't one or two big corridors, it's "
-            "consistently matched across the whole BRT line."
+            "BRT station-level demand is uneven. Some stations bridge informal "
+            "demand well, while weaker stations still need feeder integration. "
+            "The ranking visual is what makes the H3 Cliff's-δ = +0.710 legible: "
+            "not every station is equally strong, but the corridor as a whole is "
+            "aligned with pre-existing informal movement."
         ),
         methodology=(
             "For each of the 12 BRT stations (brt_stations.csv), buffer 500 m "
@@ -944,130 +1451,291 @@ PHASE2_QUESTIONS: List[Question] = [
     Question(
         id="Q21", phase="phase2", nav_label="Q21 · FARE / KM",
         kicker="PHASE 02 · Q21",
-        headline="Microbus fare per km is roughly 3× the metro fare",
-        question_text="Do commuters pay different per-kilometer rates across transport modes?",
+        headline="Formal fare/km is measured · informal fare/km is an affordability scenario",
+        question_text="Which mode — formal or informal — offers the better fare per kilometer, and is the difference enough to explain Layla's choice?",
         why_it_matters=(
-            "Accessibility isn't only spatial. A mode is accessible only if its "
-            "per-km cost fits the rider's budget. Q21 quantifies the cost "
-            "dimension of the transport gap — the second component (after "
-            "coverage) of mode choice."
+            "Formal fares come from GTFS fare tables. Informal fares are estimated "
+            "with a simple EGP 7 proxy because exact route-level microbus fares are "
+            "not published. This makes Q21 an affordability scenario, not an exact "
+            "fare audit."
         ),
-        method="Box plot of fare/km across vehicle types from cleaned_routes.csv (KNN-imputed fares)",
-        kpis=[("METRO MEDIAN", "0.18", "LE/KM"),
-              ("MICROBUS MEDIAN", "0.55", "LE/KM"),
-              ("RATIO", "≈ 3×", "INFORMAL vs METRO")],
-        viz_builders=[_build_q21],
+        method="GTFS fare_attributes for formal modes plus Phase 1 vehicle-type route lengths with an EGP 7 informal fare proxy",
+        kpis=[("BUS · GTFS", f"{Q21['fares_egp_per_km']['bus']:.2f}", "EGP/KM · 214 ROUTES"),
+              ("METRO · GTFS", f"{Q21['fares_egp_per_km']['metro']:.2f}", "EGP/KM"),
+              ("MICROBUS", f"{Q21['fares_egp_per_km']['microbus']:.2f}", "EGP/KM · ≈3× FORMAL"),
+              ("TOMNAYA", f"{Q21['fares_egp_per_km']['tomnaya']:.2f}", "EGP/KM · ≈6× FORMAL")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q21_01_q21_fare_per_km_gtfs_derived_formal_blue_vs_phase_1_informal.html',
+            'Phase2/Exports/notebook_visuals/q21_02_q21_add_on_median_fare_km_formal_vs_informal.html'],
         insight=(
-            "Metro (0.18 LE/km) is by far the cheapest per-km option. Microbus "
-            "— the mode Layla actually uses — costs ~3× more per km (0.55 LE/km), "
-            "and tomnaya costs even more (0.62 LE/km). The economic penalty for "
-            "informal transport compounds with the time penalty (83 min vs an "
-            "estimated 45 min on a unified network)."
+            f"Real GTFS numbers: formal **Bus 0.22 EGP/km** (214 routes), formal "
+            f"**Metro 0.25 EGP/km**. Phase 1's informal distribution: "
+            f"**Microbus 0.62 EGP/km** (861 routes — about **3× formal**), "
+            f"**Tomnaya 1.30 EGP/km** (115 routes — about **6× formal**). "
+            "Q21 should be read as a scenario. Formal fare/km uses GTFS fares; "
+            "informal fare/km uses an EGP 7 proxy. The result still matters: "
+            "when formal service does not reach the rider, the cheaper formal "
+            "fare does not help. Coverage and affordability compound each other."
         ),
         methodology=(
-            "fare_per_km = fare / route_length_km from cleaned_routes.csv. "
-            "KNN-imputed fares for the 45.9% of routes with missing fare (k = 5, "
-            "distance-weighted). Plotted as a box plot because the distributions "
-            "are heavily right-skewed and the median is the right summary statistic "
-            "for commute-choice comparison."
+            "Formal fares pulled from GTFS `fare_attributes.txt` for the TfC bus "
+            "and Metro feeds. Informal fares from Phase 1 `cleaned_routes.csv` "
+            "with KNN-imputed missing fares (k=5, distance-weighted; 45.9% of "
+            "routes had null fare before imputation). Plotted as a box plot — "
+            "distributions are heavily right-skewed, so the median is the right "
+            "summary statistic."
         ),
     ),
 
     Question(
         id="Q22", phase="phase2", nav_label="Q22 · RESIDUAL",
         kicker="PHASE 02 · Q22",
-        headline="Metro under-performance · districts ranked by expected-minus-actual stations",
-        question_text="Which districts have fewer stations than population alone predicts?",
+        headline="Metro residuals rank the districts where population predicts more stations",
+        question_text="Given a district's population, how many metro stations should it have — and how far is reality from that?",
         why_it_matters=(
-            "Q22 turns the 'mismatch' story into a precise list of which districts "
-            "most need new coverage. It converts the H1 hypothesis test into an "
-            "actionable ranking for policy."
+            "The residual is the coverage-need gap per district. Positive residual "
+            "= over-served, negative = under-served. This is the single best "
+            "diagnostic for Masari's market map."
         ),
-        method="OLS regression of station count on population; residual = actual − predicted per district",
-        kpis=[("DISTRICTS", "68", "ANALYZED"),
-              ("SLOPE", "−6.07e-06", "STATIONS/PERSON"),
-              ("INTERCEPT", "11.35", "BASELINE"),
-              ("MOST UNDER", "IMBABA", "−9.6")],
-        viz_builders=[_build_q22_residual],
+        method="OLS residual: metro station count per district versus population_2023",
+        kpis=[("METHOD",   "OLS",      "stations ~ pop_2023"),
+              ("BUFFER",   "3 km",     "around centroid"),
+              ("DISTRICTS","68",       "with valid pop"),
+              ("LIVE",     "✓",       "RECOMPUTED FROM CSVs")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q22_01_q22_metro_coverage_residual_by_district_negative_under_serve.html',
+            'Phase2/Exports/notebook_visuals/q22_02_q22_top_15_under_served_districts_by_metro_coverage_residual.html',
+            'Phase2/Exports/notebook_visuals/q22_03_q22_add_on_distribution_of_metro_coverage_residuals_by_gover.html'],
         insight=(
-            "The ranking is unambiguous. **Imbaba has 9.6 fewer stations than "
-            "its population predicts**. Shubra, Matariyya, Ain Shams, Al-Warraq "
-            "form the coral group — the under-served neighborhoods where Masari's "
-            "market is structural, not speculative. Meanwhile New Cairo and "
-            "6th October — low-density outer suburbs — have *more* stations than "
-            "population predicts, by 10+ stations."
+            "The chart ranks the most under-served districts by metro-coverage "
+            "residual. Negative bars are districts where population predicts more "
+            "stations than actually exist. The notebook's closing summary reads "
+            "this as Masari's priority service-area list: the residual converts "
+            "the broad mismatch into named districts."
         ),
         methodology=(
-            "OLS of station_count on pop_2023 across 68 districts. Slope = "
-            "−6.07e-06 (negative because denser districts have fewer stations "
-            "— the core finding). Intercept = 11.35. Residuals sorted give the "
-            "under-served / over-served ranking; the p25 / p75 residuals are "
-            "−8.00 and +8.79, which calibrate the 'significant deviation' "
-            "threshold for policy."
+            "OLS of `n_stations ~ pop_2023` across 68 Greater Cairo districts. "
+            "`n_stations` = count of metro stations within a 3 km haversine radius "
+            "of each district's Nominatim centroid (S6). The residual is the gap "
+            "between observed and OLS-predicted stations. The current notebook "
+            "uses this residual ranking as the district-level priority list for "
+            "Masari service-area planning."
         ),
     ),
 
     Question(
         id="Q23", phase="phase2", nav_label="Q23 · ADLY MANSOUR",
         kicker="PHASE 02 · Q23 · CASE STUDY",
-        headline="Adly Mansour — the densest multi-modal hub in the country",
-        question_text="How does the Adly Mansour interchange compare to other Cairo clusters?",
+        headline=f"Adly Mansour sits at the {Q23_ADLY['percentile']}st percentile of random Cairo clusters · strategically important, demographically modest",
+        question_text="How does the Adly Mansour interchange compare to other Cairo station clusters?",
         why_it_matters=(
             "Adly Mansour is the symbolic centerpiece of the new infrastructure — "
-            "where Metro L3, LRT, BRT, and OSM bus facilities converge. It's 30 km "
-            "from Imbaba. Is it actually the densest cluster, or only the most "
-            "photographed?"
+            "where Metro L3, LRT, BRT, and OSM bus facilities converge. It is "
+            "described publicly as the 'seventh mode' interchange. The question "
+            "is whether the data backs the political framing."
         ),
-        method="1-km radius station count around Adly Mansour vs 150 random Cairo 1-km clusters",
-        kpis=[("MODES WITHIN 2.5 KM", "4", "M+L+B+OSM"),
-              ("STATIONS WITHIN 1 KM", "9", "ABOVE PEER"),
-              ("PERCENTILE", "83rd", "OF RANDOM CLUSTERS")],
-        viz_html_paths=["Phase2/adly_mansour_zoom.html"],
+        method="2.5-km station/terminal count around Adly Mansour vs 150 random Cairo 2.5-km clusters",
+        kpis=[("MODES WITHIN 2.5 KM", f"{Q23_ADLY['modes_within_2_5km']}", "M+L+B+OSM"),
+              ("NODES WITHIN 2.5 KM", f"{Q23_ADLY['total_stations_within_2_5km']}", "STATIONS + TERMINALS"),
+              ("PERCENTILE", f"{Q23_ADLY['percentile']}st", "OF 150 RANDOM CLUSTERS")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q23_01_q23_map.html',
+            'Phase2/Exports/notebook_visuals/q23_02_q23_adly_mansour_rank_vs_random_cairo_2_5_km_clusters_p21.html',
+            'Phase2/Exports/notebook_visuals/q23_03_q23_add_on_what_makes_adly_mansour_multimodal.html'],
         insight=(
-            "Adly Mansour is the single densest multi-modal node in the country. "
-            "4 modes within 2.5 km, 83rd percentile of 150 random Cairo 1-km "
-            "clusters by station density. It's real. It's also 30 km from Imbaba. "
-            "The bulk of the new multi-modality was built for the new capital, "
-            "not the existing city."
+            f"Adly Mansour sits around the **{Q23_ADLY['percentile']}st percentile** "
+            "of the random 2.5-km cluster sample. It proves multimodal convergence, "
+            "but it is not Greater Cairo's strongest demand hub. Inside the same "
+            "2.5-km catchment four modes co-exist: Metro Line 3 (terminus), Cairo "
+            "LRT (origin toward NAC), Cairo BRT (Ring Road), and Phase-1 informal "
+            "terminals. This makes it a strategic interchange, not the whole market."
         ),
         methodology=(
-            "Count all formal stations (Phase 2 metro + LRT + BRT + OSM bus hubs) "
-            "inside a 1-km radius of the Adly Mansour centroid. Generate 150 random "
-            "1-km clusters uniformly over the Cairo governorate bbox; compute "
-            "station density per cluster; rank Adly Mansour in that distribution."
+            "Count formal stations and Phase 1 informal terminals inside a 2.5-km "
+            "buffer around the Adly Mansour coordinate. Generate 150 random 2.5-km "
+            "clusters from the integrated station layer; compute comparable station "
+            "+ terminal density per cluster; rank Adly Mansour in that distribution."
         ),
     ),
 
     Question(
         id="Q24", phase="phase2", nav_label="Q24 · K-MEANS",
-        kicker="PHASE 02 · Q24 · SEGMENTATION",
-        headline="K-Means · k = 4 · ARI = 1.00 · Masari market = 18M",
+        kicker="PHASE 02 · Q24 · SEGMENTATION · K-MEANS",
+        headline=f"K-Means · k = {Q24['k']} · ARI = {Q24['ARI']:.2f} (across {Q24['n_seeds_for_stability']} seeds) · Masari market = {MARKET['target_population_millions']}M",
         question_text="Can we cluster Cairo districts into coherent transport-demand segments?",
         why_it_matters=(
             "Q24 is the bridge from analysis to product. A market size is only "
             "defensible if it sits on a segmentation that is statistically stable."
         ),
-        method="K-Means on (density, CAGR, station count per 100k, informal share); k chosen by elbow + silhouette",
-        kpis=[("K", "4", "CLUSTERS"),
-              ("ARI", "1.00", "PERFECT STABILITY"),
-              ("TARGET", "45", "DISTRICTS"),
-              ("MARKET", "18M", "RESIDENTS")],
-        viz_builders=[_build_q24_sizes, _build_q24_cagr],
+        method="K-Means on 5 standardized district features; k=4 selected by silhouette and policy granularity",
+        kpis=[("K",      f"{Q24['k']}",                                  "CLUSTERS"),
+              ("ARI",    f"{Q24['ARI']:.2f}",                            f"OVER {Q24['n_seeds_for_stability']} SEEDS"),
+              ("TARGET", f"{MARKET['target_districts']}",                "DISTRICTS"),
+              ("MARKET", f"{MARKET['target_population_millions']}M",      "RESIDENTS")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q24_01_k_means_model_selection_selected_k_4_policy_granularity.html',
+            'Phase2/Exports/notebook_visuals/q24_02_q24_k_means_segmentation_k_4_mean_ari_1_00.html',
+            'Phase2/Exports/notebook_visuals/q24_03_q24_add_on_cluster_opportunity_score_informal_stops_minus_fo.html',
+            'Phase2/Exports/notebook_visuals/q24_04_q24_parallel_coordinates_of_district_features_colored_by_k_m.html',
+            'Phase2/Exports/notebook_visuals/q24_05_q24_radar_feature_z_score_signatures_per_cluster.html'],
         insight=(
-            "**ARI = 1.00 across 10 random seeds** — the clusters are perfectly "
-            "stable. Four distinct groups: **Hot Growth** (New Cairo, 6th October; "
-            "n = 4; 10.78% CAGR), **Established Cairo Core** (n = 23; 0.95% CAGR; "
-            "mean pop 290k), **Peripheral Growth** (n = 22; 4.2% CAGR; mean pop "
-            "95k), and **Low-Activity Outskirts** (n = 19). The Masari addressable "
-            "market = Established Core + Peripheral Growth = **45 districts ≈ "
-            "18 million residents**."
+            f"**ARI = {Q24['ARI']:.2f} across {Q24['n_seeds_for_stability']} random "
+            "seeds** — the clusters are stable in the current notebook. The four "
+            "groups are **Formal-Served Core** (31 districts, 5.59M residents), "
+            "**Peripheral Growth** (19 districts, 9.18M residents), "
+            "**Mixed (cluster 2)** (12 districts, 4.15M residents), and "
+            "**Low-Activity Outskirts** (6 districts). Masari's practical market is "
+            "the three non-outskirt groups: "
+            f"**{MARKET['target_districts']} districts ≈ {MARKET['target_population_millions']}M residents**."
         ),
         methodology=(
-            "Features: population density, CAGR 2006→2017, stations per 100k "
-            "residents, informal share. Standardized (z-score) before clustering. "
-            "Elbow suggests k = 2; silhouette peaks at k = 2 (0.63); we forced "
-            "k = 4 for policy granularity. Cross-validated by running 10 random "
-            "seeds and computing pairwise ARI — all 10 agree perfectly (ARI = 1.00)."
+            f"**Features (5):** {', '.join(Q24['features'])}. Standardized (z-score) "
+            f"before clustering. **n_init = {Q24['n_init']}**. Elbow + silhouette "
+            f"over k ∈ [2, 8]; the current run selects k=4 "
+            f"(silhouette ≈ {Q24['silhouette_k4']}). Cross-validated with "
+            f"**{Q24['n_seeds_for_stability']} random seeds** — adjusted Rand index = 1.00 across all of them."
+        ),
+    ),
+
+    Question(
+        id="Q25", phase="phase2", nav_label="Q25 · MASARI BRIDGE",
+        kicker="PHASE 02 · Q25 · THE PRODUCT IN ONE FIGURE",
+        headline="Masari Bridge — connect every informal-heavy stop to its nearest formal node",
+        question_text="Where should Masari connect informal demand into the formal network?",
+        why_it_matters=(
+            "The app is not only a map of missing places. It is a **routing bridge**. "
+            "This question identifies the actual first-/last-mile connectors — the "
+            "edges Masari needs to render to give Layla a unified trip."
+        ),
+        method="Build formal layer (GTFS + Metro + LRT + BRT) and informal layer (Phase 1 stops where informal > formal); for each informal stop find nearest formal node; score = demand × inverse distance",
+        kpis=[("FORMAL LAYER",   "GTFS + M + L + B", "SYSTEM A"),
+              ("INFORMAL LAYER", "PHASE 1 STOPS",    "WHERE INFORMAL > FORMAL"),
+              ("SCORING",        "DEMAND × 1/DIST",  "BRIDGE PRIORITY")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/q25_01_q25_masari_bridge_map_informal_demand_stops_connected_to_for.html',
+            'Phase2/Exports/notebook_visuals/q25_02_q25_how_much_informal_demand_is_already_bridgeable.html'],
+        insight=(
+            "**This is Masari in one figure.** Red points are the informal system "
+            "people already use. Blue/gold/green points are the formal system apps "
+            "can already read. **Connector lines are the missing product layer.** "
+            "Short connectors become immediate routing wins (Imbaba mawfaq → "
+            "Shubra Metro). Long connectors flag where Masari's value is not just "
+            "connection but rider-contributed routing (deep-Giza informal stops "
+            "with no formal node within walking distance)."
+        ),
+        methodology=(
+            "**Formal-node layer:** union of GTFS stops, Phase 2 metro stations, "
+            "LRT stations (16 with coordinates), and BRT stations. **Informal-demand "
+            "layer:** Phase 1 stops filtered to those where `informal_daily_boarding "
+            "> formal_daily_boarding`. For each informal stop, nearest-neighbour "
+            "search against the formal layer (Haversine in EPSG:32636). Each pair "
+            "is scored by `demand × 1/distance` — the score ranks which connectors "
+            "Masari should render first. Schematic shown above; the full geographic "
+            "version lives in the Phase 2 notebook."
+        ),
+    ),
+
+    Question(
+        id="P2-X1", phase="phase2", nav_label="◆ ANIMATED · METRO 1987→2026",
+        kicker="PHASE 02 · SYNTHESIS · ANIMATED EXPANSION",
+        headline="Fourteen years in 30 seconds — Cairo's metro expansion timeline",
+        question_text="How did the formal rail network spread across Cairo over time?",
+        why_it_matters=(
+            "A scatter map per opening year shows the **direction** of investment, "
+            "not just the count. Line 1 (1987) traces the original Helwan–Marg "
+            "corridor. Line 2 (1996–2005) extends west. After a long pause, Line 3 "
+            "(2014→2024) pulses out east and west in phases 3A/3B/3C/3D. Animation "
+            "reveals what a static map can't: time as a second axis."
+        ),
+        method="px.scatter_map · cumulative frames per opening year · color = line",
+        kpis=[("PERIOD", "1987 → 2026", "39 YEARS"),
+              ("STATIONS", f"{SCRAPE['metro']['n']}", "TOTAL"),
+              ("LINES", "3 (+L4 planned)", "L1 · L2 · L3")],
+        viz_html_paths=["Phase2/Exports/metro_animation.html"],
+        insight=(
+            "**Long pause from 2005 to 2014** — almost a decade with no metro openings. "
+            "Then Line 3 pulses out east toward Adly Mansour (Phase 3A, 2014–2017), "
+            "south to Heliopolis (3B, 2018–2019), west to Kit Kat (3C, 2020–2022), "
+            "and the final westward extension (3D, 2024). The eastward bias toward "
+            "the New Administrative Capital is visible in motion."
+        ),
+        methodology=(
+            "Mirrors notebook cell 201. Replicates each station into every year ≥ "
+            "its opening year to build cumulative frames. Plotly's animation_frame "
+            "renders as a play-button slider on the scatter map."
+        ),
+    ),
+
+    Question(
+        id="P2-X2", phase="phase2", nav_label="◆ MARKET SIZING",
+        kicker="PHASE 02 · SYNTHESIS · MASARI MARKET SIZING",
+        headline=f"{MARKET['target_population_millions']} million residents · {MARKET['target_districts']} districts · non-outskirt Masari market",
+        question_text="Once we have stable K-Means clusters, how big is the addressable market?",
+        why_it_matters=(
+            "A market size is only defensible if it's the sum of districts that share "
+            "a transport-demand signature — not an arbitrary headline. This page "
+            "converts the Q24 cluster output into the addressable population."
+        ),
+        method="Sum 2023 population per K-Means cluster; market = Formal-Served Core + Peripheral Growth + Mixed",
+        kpis=[("MARKET",  f"{MARKET['target_districts']} districts", "NON-OUTSKIRT"),
+              ("POP",      f"{MARKET['target_population_millions']}M",  "RESIDENTS"),
+              ("CLUSTERS", "3 of 4",                                    "OF GREATER CAIRO")],
+        viz_html_paths=["Phase2/Exports/market_sizing_bar.html"],
+        insight=(
+            "Market sizing now follows the latest Q24 clusters. **Formal-Served Core** "
+            "is the transfer-density market, **Peripheral Growth** is the coverage "
+            "expansion market, and **Mixed (cluster 2)** captures the remaining "
+            "under-connected Cairo cases. Together they cover 62 of 68 districts "
+            "and about 18.9M residents. Low-Activity Outskirts is kept out of the "
+            "primary launch market because its signal is thinner."
+        ),
+        methodology="See Q24 methodology. Mirrors notebook cell 208.",
+    ),
+
+    Question(
+        id="P2-X3", phase="phase2", nav_label="◆ SUNBURST · GOV → CLUSTER",
+        kicker="PHASE 02 · SYNTHESIS · NOVEL VISUALIZATION",
+        headline="Sunburst — governorate → cluster → district (arc ≈ 2023 population)",
+        question_text="How do the K-Means clusters distribute across administrative geography?",
+        why_it_matters=(
+            "A flat bar chart cannot show how the same cluster logic sits inside "
+            "governorates and individual districts. "
+            "A hierarchy needs a hierarchical visual."
+        ),
+        method="3-level sunburst · arc length weighted by 2023 population",
+        kpis=[("LEVELS", "3", "GOV → CLUSTER → DISTRICT"),
+              ("WEIGHT", "POP_2023", "ARC LENGTH")],
+        viz_html_paths=["Phase2/Exports/sunburst_market.html"],
+        insight=(
+            "**Cairo** is dominated by the Formal-Served Core and Mixed districts. "
+            "**Giza** carries much of the Peripheral Growth population. **Qalyubia** "
+            "appears as an outer-growth edge. The drill-down makes the Masari market "
+            "visible district by district."
+        ),
+        methodology="Mirrors notebook cell 212.",
+    ),
+
+    Question(
+        id="P2-X4", phase="phase2", nav_label="◆ ALL NOTEBOOK VISUALS",
+        kicker="PHASE 02 · FULL NOTEBOOK VISUAL INVENTORY",
+        headline="All Phase 2 notebook visualizations · 47 Plotly charts + 4 maps",
+        question_text="Where can we review every visualization saved in the latest Phase 2 analysis notebook?",
+        why_it_matters=(
+            "The curated evidence pages tell the story question by question. This "
+            "page is the full notebook visual appendix: every saved Plotly chart "
+            "and Folium/Leaflet map from the latest executed Phase 2 analysis "
+            "notebook, in notebook order."
+        ),
+        method="Generated from Phase2_Analysis_Hypothesis.ipynb outputs after rerun; includes saved Plotly MIME outputs and Folium/Leaflet HTML maps",
+        kpis=[("PLOTLY", "47", "CHARTS"),
+              ("MAPS", "4", "FOLIUM/LEAFLET"),
+              ("TOTAL", "51", "VISUALS")],
+        viz_html_paths=["Phase2/Exports/phase2_analysis_all_visualizations.html"],
+        insight=(
+            "This appendix keeps Streamlit synchronized with the notebook. If a TA "
+            "asks for a chart that is not part of the shorter narrative page, it is "
+            "still available here in the exact notebook order."
+        ),
+        methodology=(
+            "A custom exporter reads the executed notebook JSON, extracts every "
+            "`application/vnd.plotly.v1+json` output and every Folium/Leaflet HTML "
+            "map output, then writes one self-contained HTML appendix under "
+            "`Phase2/Exports/phase2_analysis_all_visualizations.html`."
         ),
     ),
 ]
@@ -1097,6 +1765,12 @@ def _build_h3_bar():
     return h3_bar()
 
 
+def _build_h1_continuous(): from components.charts import h1_continuous_scatter; return h1_continuous_scatter()
+def _build_h2_ranked():     from components.charts import h2_ranked_bar;          return h2_ranked_bar()
+def _build_h2_cumulative(): from components.charts import h2_cumulative_curves;   return h2_cumulative_curves()
+def _build_h3_violin():     from components.charts import h3_violin;              return h3_violin()
+
+
 def _build_osm_cross_verify():
     from components.charts import osm_cross_verification_map
     return osm_cross_verification_map()
@@ -1110,103 +1784,122 @@ def _build_q24_cluster_map():
 HYPOTHESIS_QUESTIONS: List[Question] = [
     Question(
         id="H1", phase="hypothesis", nav_label="H1 · COVERAGE",
-        kicker="HYPOTHESIS H1 · COVERAGE-NEED MISMATCH",
-        headline="Dense districts systematically get fewer stations per capita",
+        kicker="HYPOTHESIS H1 · COVERAGE-NEED MISMATCH · MORAN'S I",
+        headline=f"Dense districts get ~12× fewer stations per capita · ε² = {H1['eps_sq']:.3f} (huge effect)",
         question_text="Does coverage (stations/100k) differ across population-density tertiles?",
         why_it_matters=(
             "H1 is the central quantitative claim of the project. If coverage and "
             "density align, every headline collapses. If they don't, the story is "
             "intact and testable."
         ),
-        method="Kruskal-Wallis H-test across 3 density tertiles · Moran's I spatial autocorrelation (999 perms)",
-        kpis=[("H", "12.506", "KRUSKAL-WALLIS"),
-              ("p", "0.002", "< 0.01"),
-              ("ε²", "0.162", "SMALL-TO-MEDIUM"),
-              ("MORAN'S I", "0.087", "WEAK CLUSTERING")],
-        viz_builders=[_build_h1_box, _build_h1_moran],
+        method="Kruskal-Wallis H + Mann-Whitney post-hoc · Chi-square + Welch t-test robustness · Moran's I (999 perms) on real Nominatim centroids",
+        kpis=[("H",         f"{H1['H']:.1f}",       "KRUSKAL-WALLIS"),
+              ("p",         "< 0.001",              "STRONGLY SIGNIFICANT"),
+              ("ε²",        f"{H1['eps_sq']:.3f}",  "HUGE EFFECT"),
+              ("MORAN'S I", f"{H1['morans_I']:.3f}", "SPATIAL CLUSTERING")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/h1_01_h1_coverage_need_mismatch_global_moran_s_i_0_214_p_0_002.html',
+            'Phase2/Exports/notebook_visuals/h1_02_h1_add_on_continuous_density_penalty_population_vs_stations_.html'],
         insight=(
-            "Coverage per 100k differs significantly across density tertiles. "
-            "**Low-density districts get a median of 19.6 stations per 100k; "
-            "medium-density get 4.08; high-density get 1.47** — a 13× gap between "
-            "the top and bottom tertiles. The spatial dimension is real but "
-            "weaker: **Moran's I = 0.087, p = 0.0500** at the edge of "
-            "significance with 999 permutations."
+            f"Coverage per 100k differs significantly across density tertiles. "
+            f"**Low-density districts get a median of {H1['tertile_medians']['low']:.1f} "
+            f"stations per 100k; high-density get {H1['tertile_medians']['high']:.2f}** "
+            f"— roughly a **{H1['tertile_medians']['low']/H1['tertile_medians']['high']:.0f}× "
+            f"gap** between the top and bottom tertiles. **Effect size ε² = "
+            f"{H1['eps_sq']:.3f}** is huge. The spatial dimension is also real: "
+            f"**Moran's I = {H1['morans_I']:.3f}, p = {H1['morans_p']:.3f}** "
+            "with 999 permutations."
         ),
         methodology=(
             "Kruskal-Wallis is the non-parametric analogue of one-way ANOVA, "
-            "appropriate when the group distributions are not normal (verified "
-            "with Shapiro-Wilk on each tertile). Effect size = ε² (epsilon-"
-            "squared) = (H − k + 1) / (n − k), where k = 3 groups, n = 68. "
-            "Moran's I uses Queen-contiguity weights on district centroids and "
-            "999 random permutations for the empirical null distribution. We "
-            "cross-ran pairwise Mann-Whitney with Bonferroni correction; all "
-            "three pairs significant after correction."
+            "appropriate when the group distributions are not normal. Effect size "
+            "= ε² (epsilon-squared) = (H − k + 1) / (n − k), where k = 3 groups, "
+            "n = 68. **Robustness layer:** Chi-square independence + Welch t-test "
+            "cross-checks both confirm the same direction. **Methodology upgrade "
+            "(this version):** Moran's I now uses real Nominatim district centroids "
+            "from S6 (not the earlier 3-governorate-centroid proxy) — that upgrade "
+            "is what turned the small-to-medium effect into the huge effect. "
+            "Spatial weights = KNN-as-contiguity on district centroids; 999 "
+            "permutations for the empirical null distribution."
         ),
     ),
 
     Question(
         id="H2", phase="hypothesis", nav_label="H2 · LRT CATCHMENT",
         kicker="HYPOTHESIS H2 · LRT CATCHMENT DEFICIT",
-        headline="LRT median 2-km catchment is zero residents",
+        headline=f"LRT median 2-km catchment is {H2['medians']['lrt']:,} residents · Cliff's δ = {H2['cliffs_delta']:.3f}",
         question_text="Do LRT stations serve weaker surrounding populations than recent metro stations?",
         why_it_matters=(
             "H2 isolates the specific claim about the new LRT — the single most "
             "photographed piece of Phase 2 infrastructure. The answer has "
             "implications for ridership forecasts that the state has publicly used."
         ),
-        method="Mann-Whitney U · Cliff's delta on 2-km population catchments · OSM cross-verification",
-        kpis=[("U", "2", "MANN-WHITNEY"),
-              ("p", "< 0.0001", "SIGNIFICANT"),
-              ("δ", "−0.993", "NEAR-MAX NEGATIVE"),
-              ("LRT MEDIAN", "0", "RESIDENTS")],
-        viz_builders=[_build_h2_bar, _build_osm_cross_verify],
+        method="Mann-Whitney U · Cliff's delta on 2-km population catchments · sensitivity at 1/2/3 km",
+        kpis=[("U",          f"{H2['U']}",                                "MANN-WHITNEY"),
+              ("p",          "< 0.0001",                                  "SIGNIFICANT"),
+              ("δ",          f"{H2['cliffs_delta']:.3f}",                 "NEAR-MAX NEGATIVE"),
+              ("LRT n",      f"{H2['n_by_group']['lrt']}",                "OSM + GMAPS BACKFILL"),
+              ("METRO L3 n", f"{H2['n_by_group']['metro_l3']}",            "POST-2012")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/h2_01_h2_2_km_catchment_population_mann_whitney_p_0_000_cliff_0_99.html',
+            'Phase2/Exports/notebook_visuals/h2_02_h2_every_station_s_2_km_catchment_population_lrt_coral_vs_me.html',
+            'Phase2/Exports/notebook_visuals/h2_03_h2_add_on_cumulative_catchment_population_curves.html'],
         insight=(
-            "LRT median 2-km catchment: **zero residents**. Post-2012 Metro L3 "
-            "median: **634,333 residents**. **Cliff's delta = −0.993** — within "
-            "0.7% of the theoretical maximum of −1. This is not a marginal result. "
-            "The LRT passes through empty desert waiting for future development."
+            f"LRT median 2-km catchment: **{H2['medians']['lrt']:,} residents**. "
+            f"Post-2012 Metro L3 median: **{H2['medians']['metro_l3_post_2012']:,} "
+            f"residents**. **Cliff's delta = {H2['cliffs_delta']:.3f}** — an "
+            "extreme negative effect. This is not a marginal result. "
+            f"Now with **{H2['n_by_group']['lrt']} LRT stations** (OSM + Google Maps "
+            "coordinate backfill from S4) the result is unambiguous. The LRT "
+            "serves a future-growth corridor far more than today's population."
         ),
         methodology=(
             "2-km buffer around each operational station (EPSG:32636); dissolve "
             "the Phase 1 population hex grid inside each buffer; sum `pop_18`. "
             "Mann-Whitney U is non-parametric, appropriate for these highly-skewed "
             "small-sample distributions. Cliff's delta = (wins − losses) / n·m. "
-            "Sensitivity: tested at 1, 2, 3 km radii; δ stays below −0.95 in "
-            "every case."
+            f"**Sensitivity:** tested at {H2['sensitivity_radii_km']} km radii; "
+            f"{H2['sensitivity_note']}."
         ),
     ),
 
     Question(
         id="H3", phase="hypothesis", nav_label="H3 · BRT MATCH",
         kicker="HYPOTHESIS H3 · BRT CORRIDOR MATCH",
-        headline="BRT aligns with real informal demand · Cliff's δ = +0.83",
+        headline=f"BRT aligns with real informal demand · Cliff's δ = +{H3['cliffs_delta']:.3f}",
         question_text="Do BRT corridors sit on corridors that already have high informal-transport demand?",
         why_it_matters=(
             "Without H3 the story becomes one-note: all new infrastructure is "
             "equally bad. H3 lets us argue with nuance: some investments hit. "
             "The BRT is the one that did."
         ),
-        method="Wilcoxon signed-rank on matched (BRT corridor, control) pairs; informal demand in 500 m buffer",
-        kpis=[("δ", "+0.826", "LARGE POSITIVE"),
-              ("BRT MEDIAN", "1,576", "DAILY BOARDINGS"),
-              ("CONTROL MEDIAN", "0", "ZERO"),
-              ("PAIRS", "12", "MATCHED")],
-        viz_builders=[_build_h3_bar],
+        method="Mann-Whitney U on BRT corridor (n=12) vs random urbanized non-Ring-Road controls; 500 m buffer",
+        kpis=[("δ",              f"+{H3['cliffs_delta']:.3f}",        "LARGE POSITIVE"),
+              ("BRT MEDIAN",     f"{H3['medians']['brt']:,}",          "DAILY INFORMAL"),
+              ("CONTROL MEDIAN", f"{H3['medians']['control']}",        "ZERO"),
+              ("BRT n",          f"{H3['n_brt']}",                     "STATIONS")],
+        viz_html_paths=['Phase2/Exports/notebook_visuals/h3_01_h3_pre_brt_informal_demand_in_500_m_buffers_p_0_000_cliff_0_.html',
+            'Phase2/Exports/notebook_visuals/h3_02_h3_add_on_individual_buffer_demand_brt_stations_vs_random_co.html',
+            'Phase2/Exports/notebook_visuals/h3_03_h3_map.html',
+            'Phase2/Exports/notebook_visuals/h3_04_cairo_metro_expansion_1987_2026.html',
+            'Phase2/Exports/notebook_visuals/h3_05_masari_cluster_populations_primary_market_formal_served_core.html',
+            'Phase2/Exports/notebook_visuals/h3_06_sunburst_governorate_cluster_district_arc_2023_population.html'],
         insight=(
             "The BRT was built on top of existing demand. **Median daily informal "
-            "boardings inside a 500-m BRT corridor buffer: 1,576. Matched control "
-            "(same road class, same density, no BRT): zero.** Cliff's delta = "
-            "+0.826. This is the single positive planning finding in the whole "
-            "Phase 2 infrastructure pipeline."
+            f"boardings inside a 500-m BRT corridor buffer: {H3['medians']['brt']:,}. "
+            "Matched non-Ring-Road control (random urbanized sample at similar "
+            f"distance-to-center): {H3['medians']['control']}.** Cliff's delta = "
+            f"+{H3['cliffs_delta']:.3f}. This is the single positive planning "
+            "finding in the whole Phase 2 infrastructure pipeline."
         ),
         methodology=(
-            "Matched-pairs design. Each of the 12 BRT stations paired with a "
-            "control point at similar road-network position (same road class, "
-            "same distance-to-nearest-Phase-1-terminal quintile, same density "
-            "quintile) but outside any BRT 500 m buffer. Wilcoxon signed-rank: "
-            "Z = 3.88, p = 0.0001. Permutation test (10,000 iterations) "
-            "cross-confirmed. Informal demand from Phase 1 boarding dataset "
-            "aggregated to road segments."
+            "**Test (current notebook):** Mann-Whitney U on the BRT-corridor "
+            "distribution vs a random control distribution. The control sample "
+            "is built by drawing random points from the urbanized area at "
+            "similar distance-to-center, then computing informal boardings in "
+            "the same 500 m buffer. **Cross-validation:** "
+            f"{H3['cross_validation']}. Informal demand from Phase 1 boarding "
+            "dataset aggregated to road segments. (Earlier drafts framed this "
+            "as a Wilcoxon paired test on 12 hand-matched controls; the current "
+            "notebook uses Mann-Whitney with a random urbanized control sample.)"
         ),
     ),
 ]
@@ -1249,26 +1942,29 @@ HERO_MAPS: List[Question] = [
         kpis=[("DISTRICTS", "68", "CLASSIFIED"),
               ("CLUSTERS", "4", "K-MEANS"),
               ("TARGET", "18M", "RESIDENTS")],
-        viz_html_paths=["Phase2/headline_coverage_need_map.html"],
-        viz_builders=[_build_q24_cluster_map],
+        viz_html_paths=[
+            "Phase2/headline_coverage_need_map.html",
+            "Phase2/Exports/q24_cluster_choropleth.html",
+        ],
         insight=(
             "Underserved (coral) districts cluster in the dense inner core. "
             "Over-served (teal) districts sit in the low-density outer suburbs. "
             "The mismatch is spatial, statistical, and large. The K-Means "
-            "overlay groups districts into four cohorts: **Hot Growth** (new "
-            "desert cities, 4 districts), **Established Core** (the dense "
-            "inner-city, 23 districts, ~290k residents each), **Peripheral "
-            "Growth** (where Masari's addressable demand lives, 22 districts), "
-            "and **Low-Activity Outskirts** (19 districts with weak signal)."
+            "overlay groups districts into four current cohorts: **Formal-Served "
+            "Core** (31 districts), **Peripheral Growth** (19 districts), "
+            "**Mixed (cluster 2)** (12 districts), and **Low-Activity Outskirts** "
+            "(6 districts). The first three cohorts are the non-outskirt Masari "
+            "market: 62 districts and about 18.9M residents."
         ),
         methodology="Described in H1 methodology; synthesis visual built on the H1 residuals + Q24 clusters.",
     ),
 ]
 
 
-# Index by phase
+# Index by phase — cleaning sections come first so the reader sees the
+# data engineering before the analysis it enables.
 QUESTIONS_BY_PHASE = {
-    "phase1": PHASE1_QUESTIONS + GAP_QUESTIONS,
-    "phase2": PHASE2_QUESTIONS,
+    "phase1":     PHASE1_CLEANING + PHASE1_QUESTIONS + GAP_QUESTIONS,
+    "phase2":     PHASE2_CLEANING + PHASE2_QUESTIONS + HYPOTHESIS_QUESTIONS + HERO_MAPS,
     "hypothesis": HYPOTHESIS_QUESTIONS + HERO_MAPS,
 }

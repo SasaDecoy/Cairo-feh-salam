@@ -19,9 +19,9 @@ Then open <http://localhost:8501>.
 ## Layout
 
 - **Story mode** — 14-chapter narrative with animated PyDeck map and Layla node
-- **Evidence mode** — one page per research question (Phase 1 Q1–Q12, Phase 2 Q13–Q24, Hypotheses H1–H3, Gaps G1–G4)
+- **Evidence mode** — one page per research question (Phase 1 Q1–Q12 + gaps, Phase 2 cleaning + Q13–Q25 + H1–H3 + synthesis maps)
 
-Top nav: `[ STORY ] [ PHASE 1 ] [ PHASE 2 ] [ HYPOTHESES ]`.
+Top nav: `[ STORY ] [ PHASE 1 ] [ PHASE 2 ]`.
 
 ## Data sources
 

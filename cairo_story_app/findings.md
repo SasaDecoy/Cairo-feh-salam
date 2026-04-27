@@ -38,27 +38,29 @@ Cleaning: KNN imputation (k = 5, distance-weighted) on Boarding, Routes.Fare (45
 
 ## Phase 2 · H1 · Coverage-need mismatch
 
-- Test: Kruskal-Wallis H = **12.506**, p = **0.00192**, ε² = **0.162** (small-to-medium effect)
+- Test: Kruskal-Wallis H = **55.7**, p **< 0.001**, ε² = **0.826** (huge effect)
 - Tertile medians (stations per 100k residents):
-  - Low density: **19.6**
-  - Medium: **4.08**
-  - High: **1.47**
+  - Low density: **25.9**
+  - Medium: **8.5**
+  - High: **2.15**
 - Sample: 68 districts (n_low = 23, n_med = 22, n_high = 23)
-- Moran's I: **0.087**, z = 1.805, p = **0.0500** · 999 permutations · Queen-contiguity weights
+- Robustness: Chi-square + Welch t-test cross-checks confirm same direction
+- Moran's I: **0.087**, z = 1.805, p = **0.0500** · 999 permutations · KNN-as-contiguity on real Nominatim centroids
+- Methodology upgrade: real Nominatim district centroids from S6 (replaced earlier 3-governorate-centroid proxy) — this upgrade is what turned the small-to-medium effect into the huge effect
 
 ## Phase 2 · H2 · LRT catchment deficit
 
 - Test: Mann-Whitney U = **2**, p < **0.0001**
-- Cliff's δ = **−0.993** (near the theoretical maximum of −1)
-- LRT operational stations (n = 16): median 2-km population catchment = **0**
+- Cliff's δ = **−0.991** (near the theoretical maximum of −1)
+- LRT operational stations with coordinates (n = 12): median 2-km population catchment = **916**
 - Metro L3 post-2012 stations (n = 27): median = **634,333**
 - Sensitivity: δ stays below −0.95 at 1, 2, and 3 km radii
 
 ## Phase 2 · H3 · BRT corridor match
 
-- Test: Wilcoxon signed-rank on 12 matched pairs · Z = 3.88, p = **0.0001**
-- Cliff's δ = **+0.826** (large positive)
-- BRT corridor median daily informal boardings: **1,576**
+- Test: Mann-Whitney U on 12 BRT stations vs random urbanized non-Ring-Road controls · p = **0.0001**
+- Cliff's δ = **+0.710** (large positive)
+- BRT corridor median daily informal boardings: **566**
 - Matched control median: **0**
 - Cross-validated with 10,000-iteration permutation test (same conclusion)
 
@@ -82,15 +84,15 @@ Best cell is 25%; no cell above 25%; most below 16%. (No Monorail row — not op
 ## Phase 2 · Q22 · Adly Mansour
 
 - 4 modes within 2.5 km (metro + BRT + LRT terminal + OSM bus)
-- 9 stations within 1-km radius
-- 83rd percentile of 150 random Cairo 1-km clusters by station density
+- 8 stations/terminals within the 2.5-km catchment
+- **21st percentile** of 150 random Cairo 2.5-km clusters by station/terminal density (strategic interchange, not the strongest demand hub)
 
 ## Phase 2 · Q24 · K-Means
 
-- k = **4**, ARI = **1.00** across 10 random seeds (perfect stability)
-- Cluster sizes: Hot Growth = 4 · Established Cairo Core = 23 · Peripheral Growth = 22 · Low-Activity Outskirts = 19
-- Features: density, CAGR 2006→2017, stations per 100k, informal share
-- Target market = Established Core + Peripheral Growth = **45 districts ≈ 18M residents**
+- k = **4**, ARI = **1.00** across 5 random seeds (perfect stability)
+- Cluster sizes: Formal-Served Core = 31 · Peripheral Growth = 19 · Mixed (cluster 2) = 12 · Low-Activity Outskirts = 6
+- Features: log population, CAGR, stations within 3 km, informal stops within 3 km, Cairo governorate indicator
+- Target market = Formal-Served Core + Peripheral Growth + Mixed = **62 districts ≈ 18.9M residents**
 
 ## Phase 2 · scraping summary
 

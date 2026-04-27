@@ -2356,8 +2356,8 @@ const SCENES = [
     kicker: 'STAGE 08 · HYPOTHESIS H1',
     headline: 'Dense districts get 12× fewer stations per capita',
     arabic: 'عدم التوافق · ح١',
-    body: 'We divided Cairo\'s 68 districts into three density tertiles and counted stations per 100,000 residents. Low-density districts get a median of 19.6 stations per 100k. High-density districts get 1.47. Kruskal-Wallis H = 12.5, p < 0.01, ε² = 0.16.',
-    metric: { label: 'EFFECT SIZE · ε²', value: 0.162, unit: 'KW H = 12.5 · p = 0.002', decimals: 3 },
+    body: 'We divided Cairo\'s 68 districts into three density tertiles and counted stations per 100,000 residents. Low-density districts get a median of 25.9 stations per 100k. High-density districts get 2.15 — roughly a 12× gap. Kruskal-Wallis H = 55.7, p < 0.001, ε² = 0.826 (huge effect, after upgrading to real Nominatim centroids).',
+    metric: { label: 'EFFECT SIZE · ε²', value: 0.826, unit: 'KW H = 55.7 · p < 0.001', decimals: 3 },
     center: [31.27, 30.05], zoom: 11.4, pitch: 44, bearing: 0,
     visible: ['districts-choropleth', 'districts-outline',
               'metro-icons', 'metro-dots', 'metro-dot-halo',
@@ -2370,10 +2370,10 @@ const SCENES = [
   {
     id: 9, chapter: 'Evidence', chapterIdx: 3,
     kicker: 'STAGE 09 · HYPOTHESIS H2',
-    headline: 'LRT median 2-km catchment is zero residents',
+    headline: 'LRT median 2-km catchment is 916 residents',
     arabic: 'قطار خفيف في الصحراء · ح٢',
-    body: 'We drew 2-kilometer circles around each LRT station and asked: how many people live inside? The median answer is zero. Cliff\'s δ = −0.993 — within a hair of the theoretical maximum. Planning built for a city that does not yet exist.',
-    metric: { label: "CLIFF'S δ", value: -0.993, unit: 'NEAR-MAX NEGATIVE', decimals: 3 },
+    body: 'We drew 2-kilometer circles around each LRT station and asked: how many people live inside? The median answer is 916. Cliff\'s δ = −0.991 — within a hair of the theoretical maximum. Planning built for a city that does not yet exist.',
+    metric: { label: "CLIFF'S δ", value: -0.991, unit: 'NEAR-MAX NEGATIVE', decimals: 3 },
     center: [31.60, 30.11], zoom: 10.3, pitch: 58, bearing: 22,
     visible: ['lrt-line-layer', 'lrt-dot-halo', 'lrt-dots', 'lrt-icons',
               'lrt-catchment-fill', 'lrt-catchment-line'],
@@ -2386,8 +2386,8 @@ const SCENES = [
     kicker: 'STAGE 10 · HYPOTHESIS H3',
     headline: 'The BRT is the one thing they got right',
     arabic: 'النقل السريع · ح٣',
-    body: 'Not all of the $10B missed. Median daily informal boardings inside a 500-metre BRT corridor buffer: 1,576. Matched control: zero. Cliff\'s δ = +0.826. The BRT was built on top of real demand.',
-    metric: { label: "CLIFF'S δ", value: 0.826, unit: 'THE ONE PLANNING WIN', decimals: 3 },
+    body: 'Not all of the $10B missed. Median daily informal boardings inside a 500-metre BRT corridor buffer: 566. Matched control: zero. Cliff\'s δ = +0.710. The BRT was built on top of real demand.',
+    metric: { label: "CLIFF'S δ", value: 0.710, unit: 'THE ONE PLANNING WIN', decimals: 3 },
     center: [31.33, 30.14], zoom: 11.5, pitch: 54, bearing: -12,
     visible: ['brt-icons', 'brt-dots', 'brt-demand-halo', 'brt-catchment-fill',
               'informal-layer', 'informal-halo'],
@@ -2415,7 +2415,7 @@ const SCENES = [
     headline: 'Masari · one route planner for both systems',
     arabic: 'مَسَارِي · تطبيق واحد',
     body: 'Masari does not invent a new railway. It stitches the commute into one readable chain: microbus out of Imbaba, Metro Line 3 into the core, a transfer at Sadat, then the final connection into Maadi. The route becomes one journey instead of three guesses.',
-    metric: { label: 'ADDRESSABLE MARKET', value: 18, unit: 'MILLION · EST. CORE + PERIPHERAL GROWTH' },
+    metric: { label: 'ADDRESSABLE MARKET', value: 18.9, unit: 'MILLION · FORMAL CORE + PERIPHERAL + MIXED', decimals: 1 },
     tripPlan: MASARI_LEGS,
     // Open on Imbaba then chase the microbus south. The full transit network
     // (metro + BRT pins) is visible as Masari's "guide" — the formal stops it
@@ -2513,12 +2513,12 @@ function ChartH1() {
     <div className="card chart-card" key="h1">
       <div className="bl"></div><div className="br"></div>
       <div className="chart-title">H1 · STATIONS PER 100K BY DENSITY TERTILE</div>
-      <BarRow label="LOW DENSITY"   value={19.6} max={22} color="#2A9D8F" valueText="19.60" />
-      <BarRow label="MEDIUM"        value={4.08} max={22} color="#E9C46A" valueText="4.08"  />
-      <BarRow label="HIGH DENSITY"  value={1.47} max={22} color="#E86F51" valueText="1.47"  />
+      <BarRow label="LOW DENSITY"   value={25.9} max={28} color="#2A9D8F" valueText="25.90" />
+      <BarRow label="MEDIUM"        value={8.50} max={28} color="#E9C46A" valueText="8.50"  />
+      <BarRow label="HIGH DENSITY"  value={2.15} max={28} color="#E86F51" valueText="2.15"  />
       <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
                     letterSpacing: '0.06em', marginTop: 14 }}>
-        KRUSKAL-WALLIS H = 12.506 · p = 0.002 · ε² = 0.162 · MORAN'S I = 0.087
+        KRUSKAL-WALLIS H = 55.7 · p &lt; 0.001 · ε² = 0.826 · MORAN'S I = 0.087
       </div>
     </div>
   );
@@ -2529,11 +2529,11 @@ function ChartH2() {
     <div className="card chart-card" key="h2">
       <div className="bl"></div><div className="br"></div>
       <div className="chart-title">H2 · MEDIAN 2-KM CATCHMENT · LRT vs METRO</div>
-      <BarRow label="LRT · n=16"                 value={1}      max={700000} color="#7B2D8E" valueText="0"       />
+      <BarRow label="LRT · n=12"                 value={916}    max={700000} color="#7B2D8E" valueText="916"     />
       <BarRow label="METRO L3 POST-2012 · n=27"  value={634333} max={700000} color="#58A6FF" valueText="634,333" />
       <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#E86F51',
                     letterSpacing: '0.06em', marginTop: 14 }}>
-        MANN-WHITNEY U = 2 · p &lt; 0.0001 · CLIFF'S δ = −0.993
+        MANN-WHITNEY U = 2 · p &lt; 0.0001 · CLIFF'S δ = −0.991
       </div>
     </div>
   );
@@ -2544,11 +2544,11 @@ function ChartH3() {
     <div className="card chart-card" key="h3">
       <div className="bl"></div><div className="br"></div>
       <div className="chart-title">H3 · INFORMAL DEMAND · BRT vs MATCHED CONTROL</div>
-      <BarRow label="BRT CORRIDOR · n=12"  value={1576} max={2000} color="#E9C46A" valueText="1,576" />
+      <BarRow label="BRT CORRIDOR · n=12"  value={566} max={2000} color="#E9C46A" valueText="566" />
       <BarRow label="CONTROL · n=12"       value={1}    max={2000} color="#8B949E" valueText="0"     />
       <div style={{ fontFamily: 'Share Tech Mono, monospace', fontSize: 10, color: '#2A9D8F',
                     letterSpacing: '0.06em', marginTop: 14 }}>
-        WILCOXON · p = 0.0001 · CLIFF'S δ = +0.826 · THE ONE POSITIVE
+        MANN-WHITNEY · p = 0.0001 · CLIFF'S δ = +0.710 · THE ONE POSITIVE
       </div>
     </div>
   );
@@ -2651,7 +2651,6 @@ function NarrativePanel({ scene, onGoPhase1, onGoPhase2, onGoHypotheses, onRepla
           <button className="cta" onClick={onReplay}>REPLAY STORY</button>
           <button className="cta" onClick={onGoPhase1}>EVIDENCE · PHASE 1</button>
           <button className="cta" onClick={onGoPhase2}>EVIDENCE · PHASE 2</button>
-          <button className="cta" onClick={onGoHypotheses}>HYPOTHESES</button>
         </div>
       )}
     </div>

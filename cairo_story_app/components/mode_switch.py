@@ -1,4 +1,4 @@
-"""Top-nav mode switch: STORY · PHASE 1 · PHASE 2 · HYPOTHESES."""
+"""Top-nav mode switch: STORY · PHASE 1 · PHASE 2."""
 from __future__ import annotations
 
 import streamlit as st
@@ -8,7 +8,6 @@ MODES = [
     ("story",      "STORY"),
     ("phase1",     "PHASE 1"),
     ("phase2",     "PHASE 2"),
-    ("hypothesis", "HYPOTHESES"),
 ]
 
 
@@ -17,7 +16,7 @@ def render_top_nav():
     current = st.session_state.get("mode", "story")
 
     # Top row: brand + progress + counter
-    header_col, *btn_cols = st.columns([3, 1, 1, 1, 1])
+    header_col, *btn_cols = st.columns([4, 1, 1, 1])
     with header_col:
         st.markdown(
             '<div class="cairo-brand">CAIRO · LAYLA · MASARI</div>',

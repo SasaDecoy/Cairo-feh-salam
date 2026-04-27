@@ -1,0 +1,998 @@
+<!doctype html><html><head><meta charset="utf-8" />
+<style>html,body{margin:0;background:#0D1117;overflow:hidden;}.wrap{width:100vw;height:100vh;}.wrap iframe{width:100%!important;height:100%!important;border:0!important;}</style>
+</head><body><div class="wrap"><div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656"></span><iframe srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    
+    &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot; /&gt;
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://code.jquery.com/jquery-3.7.1.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js&quot;&gt;&lt;/script&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css&quot;/&gt;
+    
+            &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
+            &lt;style&gt;
+                #map_e7218b1a40f67a1e4d0b1ac9dc7d371b {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            &lt;/style&gt;
+
+            &lt;style&gt;html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            &lt;/style&gt;
+
+            &lt;style&gt;#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            &lt;/style&gt;
+
+            &lt;script&gt;
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            &lt;/script&gt;
+
+        
+    
+                    &lt;style&gt;
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    &lt;/style&gt;
+            
+&lt;/head&gt;
+&lt;body&gt;
+    
+    
+&lt;div style=&quot;position:fixed;bottom:24px;left:24px;z-index:9999;background:rgba(13,17,23,.88);color:#C9D1D9;padding:12px 14px;border:1px solid rgba(233,196,106,.35);border-radius:8px;font-family:Share Tech Mono,monospace;font-size:12px;&quot;&gt;
+ &lt;div style=&quot;color:#E9C46A;margin-bottom:6px;&quot;&gt;Q17 TARGET HEXES&lt;/div&gt;
+ &lt;div&gt;&lt;span style=&quot;display:inline-block;width:10px;height:10px;background:#E86F51;margin-right:6px;&quot;&gt;&lt;/span&gt;Top population quartile + top underserved quartile&lt;/div&gt;
+ &lt;div&gt;&lt;span style=&quot;display:inline-block;width:10px;height:10px;background:#58A6FF;border-radius:50%;margin-right:6px;&quot;&gt;&lt;/span&gt;Top 15 priority centroids&lt;/div&gt;
+&lt;/div&gt;
+    
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_e7218b1a40f67a1e4d0b1ac9dc7d371b&quot; &gt;&lt;/div&gt;
+        
+&lt;/body&gt;
+&lt;script&gt;
+    
+    
+            var map_e7218b1a40f67a1e4d0b1ac9dc7d371b = L.map(
+                &quot;map_e7218b1a40f67a1e4d0b1ac9dc7d371b&quot;,
+                {
+                    center: [30.05, 31.25],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  &quot;zoom&quot;: 10,
+  &quot;zoomControl&quot;: true,
+  &quot;preferCanvas&quot;: false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_bd9785d110bd5909af2b1f6dd095c88b = L.tileLayer(
+                &quot;https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 20,
+  &quot;maxNativeZoom&quot;: 20,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\&quot;https://carto.com/attributions\&quot;\u003eCARTO\u003c/a\u003e&quot;,
+  &quot;subdomains&quot;: &quot;abcd&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_bd9785d110bd5909af2b1f6dd095c88b.addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        function geo_json_9e7f75162db2f68d03f5666c711142e1_styler(feature) {
+            switch(feature.id) {
+                case &quot;137&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.66865, &quot;weight&quot;: 0.7};
+                case &quot;112&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.66565, &quot;weight&quot;: 0.7};
+                case &quot;142&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6626500000000001, &quot;weight&quot;: 0.7};
+                case &quot;108&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.65965, &quot;weight&quot;: 0.7};
+                case &quot;100&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6566500000000001, &quot;weight&quot;: 0.7};
+                case &quot;15&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6496000000000001, &quot;weight&quot;: 0.7};
+                case &quot;128&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.64525, &quot;weight&quot;: 0.7};
+                case &quot;140&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6422500000000001, &quot;weight&quot;: 0.7};
+                case &quot;143&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6392500000000001, &quot;weight&quot;: 0.7};
+                case &quot;105&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.63625, &quot;weight&quot;: 0.7};
+                case &quot;25&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.63325, &quot;weight&quot;: 0.7};
+                case &quot;107&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6289, &quot;weight&quot;: 0.7};
+                case &quot;136&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6259, &quot;weight&quot;: 0.7};
+                case &quot;28&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6215499999999999, &quot;weight&quot;: 0.7};
+                case &quot;138&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6185499999999999, &quot;weight&quot;: 0.7};
+                case &quot;134&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.6142, &quot;weight&quot;: 0.7};
+                case &quot;64&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.60985, &quot;weight&quot;: 0.7};
+                case &quot;22&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.60685, &quot;weight&quot;: 0.7};
+                case &quot;29&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.60385, &quot;weight&quot;: 0.7};
+                case &quot;18&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.60085, &quot;weight&quot;: 0.7};
+                case &quot;69&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.59785, &quot;weight&quot;: 0.7};
+                case &quot;70&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5935, &quot;weight&quot;: 0.7};
+                case &quot;76&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5905, &quot;weight&quot;: 0.7};
+                case &quot;68&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.586825, &quot;weight&quot;: 0.7};
+                case &quot;34&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5824750000000001, &quot;weight&quot;: 0.7};
+                case &quot;130&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.57745, &quot;weight&quot;: 0.7};
+                case &quot;43&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.57445, &quot;weight&quot;: 0.7};
+                case &quot;129&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5714500000000001, &quot;weight&quot;: 0.7};
+                case &quot;14&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5684500000000001, &quot;weight&quot;: 0.7};
+                case &quot;90&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5641, &quot;weight&quot;: 0.7};
+                case &quot;116&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.55975, &quot;weight&quot;: 0.7};
+                case &quot;49&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5567500000000001, &quot;weight&quot;: 0.7};
+                case &quot;97&quot;: case &quot;98&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5509, &quot;weight&quot;: 0.7};
+                case &quot;19&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.54505, &quot;weight&quot;: 0.7};
+                case &quot;33&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5407, &quot;weight&quot;: 0.7};
+                case &quot;66&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5377, &quot;weight&quot;: 0.7};
+                case &quot;27&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.53335, &quot;weight&quot;: 0.7};
+                case &quot;77&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.53035, &quot;weight&quot;: 0.7};
+                case &quot;71&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5273500000000001, &quot;weight&quot;: 0.7};
+                case &quot;82&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5243500000000001, &quot;weight&quot;: 0.7};
+                case &quot;32&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.52135, &quot;weight&quot;: 0.7};
+                case &quot;103&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.51835, &quot;weight&quot;: 0.7};
+                case &quot;5&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5153500000000001, &quot;weight&quot;: 0.7};
+                case &quot;75&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5123500000000001, &quot;weight&quot;: 0.7};
+                case &quot;121&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.50935, &quot;weight&quot;: 0.7};
+                case &quot;96&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5063500000000001, &quot;weight&quot;: 0.7};
+                case &quot;81&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.5033500000000001, &quot;weight&quot;: 0.7};
+                case &quot;31&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.50035, &quot;weight&quot;: 0.7};
+                case &quot;93&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.49734999999999996, &quot;weight&quot;: 0.7};
+                case &quot;21&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.49434999999999996, &quot;weight&quot;: 0.7};
+                case &quot;9&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.49, &quot;weight&quot;: 0.7};
+                case &quot;117&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.487, &quot;weight&quot;: 0.7};
+                case &quot;35&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.484, &quot;weight&quot;: 0.7};
+                case &quot;84&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4810000000000001, &quot;weight&quot;: 0.7};
+                case &quot;120&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.478, &quot;weight&quot;: 0.7};
+                case &quot;146&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4750000000000001, &quot;weight&quot;: 0.7};
+                case &quot;114&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4720000000000001, &quot;weight&quot;: 0.7};
+                case &quot;60&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.469, &quot;weight&quot;: 0.7};
+                case &quot;106&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4660000000000001, &quot;weight&quot;: 0.7};
+                case &quot;94&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.463, &quot;weight&quot;: 0.7};
+                case &quot;40&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4600000000000001, &quot;weight&quot;: 0.7};
+                case &quot;78&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.45699999999999996, &quot;weight&quot;: 0.7};
+                case &quot;12&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.45099999999999996, &quot;weight&quot;: 0.7};
+                case &quot;132&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.44799999999999995, &quot;weight&quot;: 0.7};
+                case &quot;79&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.44500000000000006, &quot;weight&quot;: 0.7};
+                case &quot;118&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.442, &quot;weight&quot;: 0.7};
+                case &quot;110&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.44125000000000003, &quot;weight&quot;: 0.7};
+                case &quot;72&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.43900000000000006, &quot;weight&quot;: 0.7};
+                case &quot;37&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.436, &quot;weight&quot;: 0.7};
+                case &quot;65&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.43495000000000006, &quot;weight&quot;: 0.7};
+                case &quot;122&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.43420000000000003, &quot;weight&quot;: 0.7};
+                case &quot;39&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.43300000000000005, &quot;weight&quot;: 0.7};
+                case &quot;38&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.43, &quot;weight&quot;: 0.7};
+                case &quot;111&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4273, &quot;weight&quot;: 0.7};
+                case &quot;3&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.42700000000000005, &quot;weight&quot;: 0.7};
+                case &quot;73&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4267, &quot;weight&quot;: 0.7};
+                case &quot;144&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.42474999999999996, &quot;weight&quot;: 0.7};
+                case &quot;42&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.42400000000000004, &quot;weight&quot;: 0.7};
+                case &quot;16&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4222, &quot;weight&quot;: 0.7};
+                case &quot;124&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.42100000000000004, &quot;weight&quot;: 0.7};
+                case &quot;55&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.41800000000000004, &quot;weight&quot;: 0.7};
+                case &quot;46&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.41500000000000004, &quot;weight&quot;: 0.7};
+                case &quot;80&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.41200000000000003, &quot;weight&quot;: 0.7};
+                case &quot;20&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.40900000000000003, &quot;weight&quot;: 0.7};
+                case &quot;53&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.406, &quot;weight&quot;: 0.7};
+                case &quot;23&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.40390000000000004, &quot;weight&quot;: 0.7};
+                case &quot;101&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.403, &quot;weight&quot;: 0.7};
+                case &quot;50&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.4, &quot;weight&quot;: 0.7};
+                case &quot;109&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.39849999999999997, &quot;weight&quot;: 0.7};
+                case &quot;7&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.397, &quot;weight&quot;: 0.7};
+                case &quot;74&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3961, &quot;weight&quot;: 0.7};
+                case &quot;149&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.394, &quot;weight&quot;: 0.7};
+                case &quot;36&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3934, &quot;weight&quot;: 0.7};
+                case &quot;30&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.391825, &quot;weight&quot;: 0.7};
+                case &quot;62&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.391, &quot;weight&quot;: 0.7};
+                case &quot;123&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.38995, &quot;weight&quot;: 0.7};
+                case &quot;67&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.388525, &quot;weight&quot;: 0.7};
+                case &quot;41&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.388, &quot;weight&quot;: 0.7};
+                case &quot;139&quot;: case &quot;57&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3835, &quot;weight&quot;: 0.7};
+                case &quot;113&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3793, &quot;weight&quot;: 0.7};
+                case &quot;126&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.379, &quot;weight&quot;: 0.7};
+                case &quot;95&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.37705, &quot;weight&quot;: 0.7};
+                case &quot;24&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3766, &quot;weight&quot;: 0.7};
+                case &quot;45&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.376, &quot;weight&quot;: 0.7};
+                case &quot;92&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.373, &quot;weight&quot;: 0.7};
+                case &quot;63&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.37, &quot;weight&quot;: 0.7};
+                case &quot;86&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.367, &quot;weight&quot;: 0.7};
+                case &quot;17&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3664, &quot;weight&quot;: 0.7};
+                case &quot;26&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3646, &quot;weight&quot;: 0.7};
+                case &quot;133&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.364, &quot;weight&quot;: 0.7};
+                case &quot;47&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.361, &quot;weight&quot;: 0.7};
+                case &quot;88&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.358, &quot;weight&quot;: 0.7};
+                case &quot;48&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.355, &quot;weight&quot;: 0.7};
+                case &quot;141&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.35200000000000004, &quot;weight&quot;: 0.7};
+                case &quot;87&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.34900000000000003, &quot;weight&quot;: 0.7};
+                case &quot;56&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.34600000000000003, &quot;weight&quot;: 0.7};
+                case &quot;115&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.34299999999999997, &quot;weight&quot;: 0.7};
+                case &quot;102&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.33999999999999997, &quot;weight&quot;: 0.7};
+                case &quot;13&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.3382, &quot;weight&quot;: 0.7};
+                case &quot;59&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.337, &quot;weight&quot;: 0.7};
+                case &quot;83&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.334, &quot;weight&quot;: 0.7};
+                case &quot;11&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.331, &quot;weight&quot;: 0.7};
+                case &quot;85&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.328, &quot;weight&quot;: 0.7};
+                case &quot;91&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.325, &quot;weight&quot;: 0.7};
+                case &quot;147&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.322, &quot;weight&quot;: 0.7};
+                case &quot;8&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.319, &quot;weight&quot;: 0.7};
+                case &quot;4&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.316, &quot;weight&quot;: 0.7};
+                case &quot;2&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.313, &quot;weight&quot;: 0.7};
+                case &quot;1&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.31000000000000005, &quot;weight&quot;: 0.7};
+                case &quot;89&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.30700000000000005, &quot;weight&quot;: 0.7};
+                case &quot;58&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.30400000000000005, &quot;weight&quot;: 0.7};
+                case &quot;131&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.301, &quot;weight&quot;: 0.7};
+                case &quot;148&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.298, &quot;weight&quot;: 0.7};
+                case &quot;52&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.295, &quot;weight&quot;: 0.7};
+                case &quot;145&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.29200000000000004, &quot;weight&quot;: 0.7};
+                case &quot;125&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.28900000000000003, &quot;weight&quot;: 0.7};
+                case &quot;44&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.28600000000000003, &quot;weight&quot;: 0.7};
+                case &quot;51&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.28300000000000003, &quot;weight&quot;: 0.7};
+                case &quot;127&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.28, &quot;weight&quot;: 0.7};
+                case &quot;135&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.277, &quot;weight&quot;: 0.7};
+                case &quot;119&quot;: case &quot;0&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.2725, &quot;weight&quot;: 0.7};
+                case &quot;10&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.268, &quot;weight&quot;: 0.7};
+                case &quot;6&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.265, &quot;weight&quot;: 0.7};
+                case &quot;54&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.262, &quot;weight&quot;: 0.7};
+                case &quot;104&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.259, &quot;weight&quot;: 0.7};
+                case &quot;61&quot;: 
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.256, &quot;weight&quot;: 0.7};
+                default:
+                    return {&quot;color&quot;: &quot;#E9C46A&quot;, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.45399999999999996, &quot;weight&quot;: 0.7};
+            }
+        }
+
+        function geo_json_9e7f75162db2f68d03f5666c711142e1_onEachFeature(feature, layer) {
+
+            layer.on({
+            });
+        };
+        var geo_json_9e7f75162db2f68d03f5666c711142e1 = L.geoJson(null, {
+                onEachFeature: geo_json_9e7f75162db2f68d03f5666c711142e1_onEachFeature,
+            
+                style: geo_json_9e7f75162db2f68d03f5666c711142e1_styler,
+            ...{
+}
+        });
+
+        function geo_json_9e7f75162db2f68d03f5666c711142e1_add (data) {
+            geo_json_9e7f75162db2f68d03f5666c711142e1
+                .addData(data);
+        }
+            geo_json_9e7f75162db2f68d03f5666c711142e1_add({&quot;features&quot;: [{&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.17827626, 29.994936299999992], [31.18423367, 29.995363469999994], [31.187653790000002, 29.991073789999994], [31.185116800000003, 29.986357100000006], [31.179159919999996, 29.985929870000003], [31.17573951, 29.990219390000004], [31.17827626, 29.994936299999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;137&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f25fffff&quot;, &quot;Population_2018&quot;: 81621, &quot;Underserved_Score&quot;: 0.6675409836065573, &quot;masari_priority_score&quot;: 99.69999999999999}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.24214177, 29.98589907], [31.24809747, 29.98632342], [31.251513829999997, 29.982032639999996], [31.248974780000005, 29.97731767], [31.243019619999995, 29.97689325], [31.23960296, 29.98118387], [31.24214177, 29.98589907]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;112&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628c67fffff&quot;, &quot;Population_2018&quot;: 77149, &quot;Underserved_Score&quot;: 0.6649180327868852, &quot;masari_priority_score&quot;: 99.03333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.17474008, 30.0309615], [31.180699610000005, 30.031388409999995], [31.184121110000003, 30.02709871], [31.18158336, 30.022382260000004], [31.17562436, 30.021955290000008], [31.172202570000003, 30.026244830000003], [31.17474008, 30.0309615]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;142&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f69fffff&quot;, &quot;Population_2018&quot;: 76908, &quot;Underserved_Score&quot;: 0.6642622950819672, &quot;masari_priority_score&quot;: 98.36666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.26088485, 29.978165659999995], [31.26683975, 29.978589239999998], [31.27025484, 29.97429815], [31.26771532, 29.969583640000003], [31.26176095, 29.969159990000005], [31.25834557, 29.973450920000005], [31.26088485, 29.978165659999995]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;108&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628c2bfffff&quot;, &quot;Population_2018&quot;: 76440, &quot;Underserved_Score&quot;: 0.6622950819672131, &quot;masari_priority_score&quot;: 97.7}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.17385564, 30.03996766], [31.17981571, 30.04039451], [31.18323754, 30.0361048], [31.180699610000005, 30.031388409999995], [31.17474008, 30.0309615], [31.17131795, 30.03525105], [31.17385564, 30.03996766]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;100&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628a93fffff&quot;, &quot;Population_2018&quot;: 74517, &quot;Underserved_Score&quot;: 0.6609836065573771, &quot;masari_priority_score&quot;: 97.03333333333335}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.26648999, 30.10550652], [31.272452070000003, 30.105928340000002], [31.27587103, 30.101636840000005], [31.2733282, 30.096923700000005], [31.26736665, 30.096501820000004], [31.263947400000003, 30.100793149999987], [31.26648999, 30.10550652]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;15&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6280b9fffff&quot;, &quot;Population_2018&quot;: 71564, &quot;Underserved_Score&quot;: 0.6570491803278689, &quot;masari_priority_score&quot;: 95.46666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.28112347, 30.047608199999992], [31.28708196, 30.04803003], [31.29049822, 30.043738419999997], [31.28795629, 30.039025130000002], [31.281998340000005, 30.038603229999993], [31.27858178, 30.042894690000004], [31.28112347, 30.047608199999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;128&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628e15fffff&quot;, &quot;Population_2018&quot;: 69546, &quot;Underserved_Score&quot;: 0.6544262295081967, &quot;masari_priority_score&quot;: 94.5}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.18500451, 30.018092559999992], [31.190963119999996, 30.018519149999996], [31.19438363, 30.014229289999996], [31.19184583, 30.00951301], [31.18588776, 30.00908636], [31.18246695, 30.013376049999998], [31.18500451, 30.018092559999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;140&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f63fffff&quot;, &quot;Population_2018&quot;: 67737, &quot;Underserved_Score&quot;: 0.6531147540983606, &quot;masari_priority_score&quot;: 93.83333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.184121110000003, 30.02709871], [31.190080239999997, 30.02752523], [31.1935011, 30.02323536999999], [31.190963119999996, 30.018519149999996], [31.18500451, 30.018092559999992], [31.18158336, 30.022382260000004], [31.184121110000003, 30.02709871]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;143&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f6bfffff&quot;, &quot;Population_2018&quot;: 67664, &quot;Underserved_Score&quot;: 0.6524590163934426, &quot;masari_priority_score&quot;: 93.16666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.260008600000003, 29.987171289999996], [31.26596403, 29.987594799999997], [31.26937946, 29.983303700000004], [31.26683975, 29.978589239999998], [31.26088485, 29.978165659999995], [31.25746913, 29.98245659999999], [31.260008600000003, 29.987171289999996]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;105&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628c05fffff&quot;, &quot;Population_2018&quot;: 67202, &quot;Underserved_Score&quot;: 0.6518032786885246, &quot;masari_priority_score&quot;: 92.5}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.180585930000003, 30.06312274], [31.18654719, 30.063549000000002], [31.189969429999998, 30.059259120000004], [31.18743069, 30.054543140000003], [31.18146996, 30.05411681], [31.178047430000003, 30.05840653], [31.180585930000003, 30.06312274]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;25&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281a1fffff&quot;, &quot;Population_2018&quot;: 67119, &quot;Underserved_Score&quot;: 0.6511475409836066, &quot;masari_priority_score&quot;: 91.83333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.2523908, 29.973026889999993], [31.25834557, 29.973450920000005], [31.26176095, 29.969159990000005], [31.259221860000004, 29.96444518], [31.253267619999995, 29.964021089999992], [31.249851949999996, 29.968311860000004], [31.2523908, 29.973026889999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;107&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628c21fffff&quot;, &quot;Population_2018&quot;: 63950, &quot;Underserved_Score&quot;: 0.6465573770491804, &quot;masari_priority_score&quot;: 90.86666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.186770849999995, 30.000080100000005], [31.192728400000004, 30.000506820000005], [31.19614822, 29.99621698], [31.193610800000002, 29.991500580000004], [31.187653790000002, 29.991073789999994], [31.18423367, 29.995363469999994], [31.186770849999995, 30.000080100000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;136&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f21fffff&quot;, &quot;Population_2018&quot;: 62824, &quot;Underserved_Score&quot;: 0.6445901639344263, &quot;masari_priority_score&quot;: 90.2}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.18146996, 30.05411681], [31.18743069, 30.054543140000003], [31.19085258, 30.050253260000005], [31.188314030000004, 30.045537219999996], [31.182353830000004, 30.045110830000002], [31.178931650000003, 30.04940055], [31.18146996, 30.05411681]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;28&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281a7fffff&quot;, &quot;Population_2018&quot;: 58615, &quot;Underserved_Score&quot;: 0.6386885245901639, &quot;masari_priority_score&quot;: 89.23333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.182353830000004, 30.045110830000002], [31.188314030000004, 30.045537219999996], [31.19173557, 30.04124734999999], [31.189197210000003, 30.03653125], [31.18323754, 30.0361048], [31.17981571, 30.04039451], [31.182353830000004, 30.045110830000002]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;138&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f4dfffff&quot;, &quot;Population_2018&quot;: 57707, &quot;Underserved_Score&quot;: 0.6360655737704918, &quot;masari_priority_score&quot;: 88.56666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.1935011, 30.02323536999999], [31.199459839999996, 30.02366150000001], [31.202880070000003, 30.019371489999997], [31.20034184, 30.014655489999996], [31.19438363, 30.014229289999996], [31.190963119999996, 30.018519149999996], [31.1935011, 30.02323536999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;134&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f0dfffff&quot;, &quot;Population_2018&quot;: 56859, &quot;Underserved_Score&quot;: 0.6340983606557377, &quot;masari_priority_score&quot;: 87.6}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.31578381, 30.154312369999992], [31.32174775, 30.154731339999998], [31.325165629999997, 30.15043887], [31.32261987, 30.14572761], [31.316656459999997, 30.145308580000002], [31.31323828, 30.149600879999994], [31.31578381, 30.154312369999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;64&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628701fffff&quot;, &quot;Population_2018&quot;: 53686, &quot;Underserved_Score&quot;: 0.6288524590163934, &quot;masari_priority_score&quot;: 86.63333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.19670413, 30.08241196], [31.202666190000002, 30.082837260000005], [31.206088190000003, 30.078547050000005], [31.20354841, 30.073831710000007], [31.19758687, 30.07340635], [31.19416458, 30.0776964], [31.19670413, 30.08241196]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;22&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628181fffff&quot;, &quot;Population_2018&quot;: 53159, &quot;Underserved_Score&quot;: 0.6281967213114754, &quot;masari_priority_score&quot;: 85.96666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.17970174, 30.072128599999992], [31.18566354, 30.0725548], [31.18908612, 30.068264909999993], [31.18654719, 30.063549000000002], [31.180585930000003, 30.06312274], [31.177163060000005, 30.06741246], [31.17970174, 30.072128599999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;29&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281a9fffff&quot;, &quot;Population_2018&quot;: 53158, &quot;Underserved_Score&quot;: 0.6275409836065574, &quot;masari_priority_score&quot;: 85.3}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.25359618, 30.145394150000005], [31.25956079, 30.14581608], [31.26298176, 30.141524739999998], [31.260438419999996, 30.136811620000003], [31.254474350000002, 30.13638962], [31.251053080000002, 30.14068081000001], [31.25359618, 30.145394150000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;18&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6280cbfffff&quot;, &quot;Population_2018&quot;: 52629, &quot;Underserved_Score&quot;: 0.6255737704918033, &quot;masari_priority_score&quot;: 84.63333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.34305599, 30.151693759999993], [31.34901926, 30.152111499999997], [31.352435560000004, 30.14781856], [31.3498889, 30.14310805], [31.34392616, 30.142690240000004], [31.34050956, 30.14698302], [31.34305599, 30.151693759999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;69&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628711fffff&quot;, &quot;Population_2018&quot;: 51645, &quot;Underserved_Score&quot;: 0.6249180327868853, &quot;masari_priority_score&quot;: 83.96666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.34218566, 30.160697229999993], [31.34814946, 30.161114899999998], [31.351566109999997, 30.156821949999994], [31.34901926, 30.152111499999997], [31.34305599, 30.151693759999993], [31.339639040000005, 30.15598655], [31.34218566, 30.160697229999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;70&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628719fffff&quot;, &quot;Population_2018&quot;: 51387, &quot;Underserved_Score&quot;: 0.6229508196721312, &quot;masari_priority_score&quot;: 83.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.314038050000004, 30.172319789999992], [31.320003060000005, 30.172738609999993], [31.32342163, 30.168446140000004], [31.320875480000005, 30.16373501], [31.31491101, 30.16331611], [31.31149214, 30.16760842], [31.314038050000004, 30.172319789999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;76&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628743fffff&quot;, &quot;Population_2018&quot;: 51317, &quot;Underserved_Score&quot;: 0.6216393442622951, &quot;masari_priority_score&quot;: 82.33333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.30640095, 30.15818532999999], [31.31236529, 30.158604679999993], [31.31578381, 30.154312369999992], [31.31323828, 30.149600879999994], [31.307274470000003, 30.149181470000006], [31.30385566, 30.15347361], [31.30640095, 30.15818532999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;68&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62870dfffff&quot;, &quot;Population_2018&quot;: 51306, &quot;Underserved_Score&quot;: 0.62, &quot;masari_priority_score&quot;: 81.51666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.20344165, 30.10556333], [31.209404920000004, 30.105988039999996], [31.21282731, 30.101697659999985], [31.210286719999996, 30.09698273], [31.20432398, 30.09655795999999], [31.200901299999998, 30.10084817], [31.20344165, 30.10556333]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;34&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281ddfffff&quot;, &quot;Population_2018&quot;: 51295, &quot;Underserved_Score&quot;: 0.6186885245901639, &quot;masari_priority_score&quot;: 80.55000000000001}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.25974008, 30.082361170000002], [31.265700960000004, 30.08278357], [31.26911953, 30.078492249999996], [31.26657751, 30.073778690000005], [31.260617159999995, 30.073356230000005], [31.2571983, 30.077647390000006], [31.25974008, 30.082361170000002]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;130&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628e4bfffff&quot;, &quot;Population_2018&quot;: 50588, &quot;Underserved_Score&quot;: 0.6137704918032787, &quot;masari_priority_score&quot;: 79.43333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.35330486, 30.138815109999996], [31.3592672, 30.139232530000005], [31.36268253, 30.134939440000004], [31.36013581, 30.13022909], [31.35417401, 30.1298116], [31.35075839, 30.134104530000002], [31.35330486, 30.138815109999996]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;43&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628469fffff&quot;, &quot;Population_2018&quot;: 49327, &quot;Underserved_Score&quot;: 0.6118032786885246, &quot;masari_priority_score&quot;: 78.76666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.29049822, 30.043738419999997], [31.29645631, 30.044159859999994], [31.299871940000003, 30.03986809], [31.297329770000005, 30.035155030000006], [31.291372220000003, 30.034733519999993], [31.28795629, 30.039025130000002], [31.29049822, 30.043738419999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;129&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628e17fffff&quot;, &quot;Population_2018&quot;: 47130, &quot;Underserved_Score&quot;: 0.6078688524590163, &quot;masari_priority_score&quot;: 78.10000000000001}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.25886284, 30.09136606], [31.26482426, 30.091788389999998], [31.268243169999998, 30.087497060000008], [31.265700960000004, 30.08278357], [31.25974008, 30.082361170000002], [31.256320870000003, 30.086652339999997], [31.25886284, 30.09136606]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;14&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6280b5fffff&quot;, &quot;Population_2018&quot;: 46480, &quot;Underserved_Score&quot;: 0.6052459016393442, &quot;masari_priority_score&quot;: 77.43333333333335}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.169782239999996, 29.989791769999993], [31.17573951, 29.990219390000004], [31.179159919999996, 29.985929870000003], [31.17662335, 29.981212889999995], [31.17066661, 29.98078521], [31.16724591, 29.985074570000002], [31.169782239999996, 29.989791769999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;90&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628899fffff&quot;, &quot;Population_2018&quot;: 46396, &quot;Underserved_Score&quot;: 0.6039344262295082, &quot;masari_priority_score&quot;: 76.46666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.20640576, 29.983347139999992], [31.212361980000004, 29.98377315999999], [31.21578019, 29.97948301], [31.21324248, 29.97476701], [31.20728679, 29.974340929999993], [31.20386828, 29.978630910000003], [31.20640576, 29.983347139999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;116&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628d4bfffff&quot;, &quot;Population_2018&quot;: 45234, &quot;Underserved_Score&quot;: 0.600655737704918, &quot;masari_priority_score&quot;: 75.5}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.35069651, 30.165825280000004], [31.35666044, 30.166242499999996], [31.360076799999998, 30.161949399999994], [31.35752952, 30.157239240000006], [31.351566109999997, 30.156821949999994], [31.34814946, 30.161114899999998], [31.35069651, 30.165825280000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;49&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628625fffff&quot;, &quot;Population_2018&quot;: 45208, &quot;Underserved_Score&quot;: 0.599344262295082, &quot;masari_priority_score&quot;: 74.83333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.15863256, 30.01166623], [31.16459129, 30.01209409999999], [31.168013020000004, 30.007804729999993], [31.165476320000003, 30.003087640000007], [31.159518120000005, 30.002659710000003], [31.156096090000002, 30.006948919999992], [31.15863256, 30.01166623]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;97&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288d9fffff&quot;, &quot;Population_2018&quot;: 44970, &quot;Underserved_Score&quot;: 0.5970491803278688, &quot;masari_priority_score&quot;: 73.53333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.1501375, 30.0065206], [31.156096090000002, 30.006948919999992], [31.159518120000005, 30.002659710000003], [31.156981839999997, 29.99794234], [31.151023780000003, 29.99751394999999], [31.14760147, 30.001803000000002], [31.1501375, 30.0065206]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;98&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288ddfffff&quot;, &quot;Population_2018&quot;: 44970, &quot;Underserved_Score&quot;: 0.5970491803278688, &quot;masari_priority_score&quot;: 73.53333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.23570183, 30.144126690000007], [31.2416667, 30.144549450000003], [31.245088610000003, 30.140258429999992], [31.24254593, 30.135544790000004], [31.23658159, 30.135121950000002], [31.233159390000004, 30.139412820000004], [31.23570183, 30.144126690000007]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;19&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6280cdfffff&quot;, &quot;Population_2018&quot;: 43700, &quot;Underserved_Score&quot;: 0.5940983606557377, &quot;masari_priority_score&quot;: 72.23333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.19405496, 30.109428449999992], [31.20001863, 30.10985355], [31.20344165, 30.10556333], [31.200901299999998, 30.10084817], [31.19493817, 30.10042301], [31.19151485, 30.104713070000003], [31.19405496, 30.109428449999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;33&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281cbfffff&quot;, &quot;Population_2018&quot;: 40095, &quot;Underserved_Score&quot;: 0.5822950819672131, &quot;masari_priority_score&quot;: 71.26666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.307274470000003, 30.149181470000006], [31.31323828, 30.149600879999994], [31.316656459999997, 30.145308580000002], [31.31411112, 30.140597019999998], [31.30814784, 30.140177539999996], [31.304729370000004, 30.144469680000004], [31.307274470000003, 30.149181470000006]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;66&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628705fffff&quot;, &quot;Population_2018&quot;: 38205, &quot;Underserved_Score&quot;: 0.5757377049180328, &quot;masari_priority_score&quot;: 70.6}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.1720863, 30.057979820000003], [31.178047430000003, 30.05840653], [31.18146996, 30.05411681], [31.178931650000003, 30.04940055], [31.172971049999997, 30.048973769999996], [31.16954823, 30.05326333], [31.1720863, 30.057979820000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;27&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281a5fffff&quot;, &quot;Population_2018&quot;: 37294, &quot;Underserved_Score&quot;: 0.5731147540983607, &quot;masari_priority_score&quot;: 69.63333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.31316494, 30.1813234], [31.31913048, 30.181742159999995], [31.32254939, 30.177449689999992], [31.320003060000005, 30.172738609999993], [31.314038050000004, 30.172319789999992], [31.31061885, 30.176612099999993], [31.31316494, 30.1813234]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;77&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62874bfffff&quot;, &quot;Population_2018&quot;: 36988, &quot;Underserved_Score&quot;: 0.5724590163934427, &quot;masari_priority_score&quot;: 68.96666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.351566109999997, 30.156821949999994], [31.35752952, 30.157239240000006], [31.36094553, 30.152946139999997], [31.358398430000005, 30.14823592], [31.352435560000004, 30.14781856], [31.34901926, 30.152111499999997], [31.351566109999997, 30.156821949999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;71&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62871bfffff&quot;, &quot;Population_2018&quot;: 36868, &quot;Underserved_Score&quot;: 0.5711475409836065, &quot;masari_priority_score&quot;: 68.30000000000001}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.279998280000004, 30.15179273], [31.285962759999997, 30.15221337], [31.289382510000003, 30.14792153999999], [31.286838070000005, 30.14320924], [31.280874130000004, 30.142788529999994], [31.27745409, 30.14708020000001], [31.279998280000004, 30.15179273]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;82&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628765fffff&quot;, &quot;Population_2018&quot;: 36838, &quot;Underserved_Score&quot;: 0.5704918032786885, &quot;masari_priority_score&quot;: 67.63333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.186435260000003, 30.09528196], [31.19239825, 30.09570757], [31.19582123, 30.09141752], [31.193281500000005, 30.086702009999986], [31.18731903, 30.086276330000004], [31.18389577, 30.090566229999997], [31.186435260000003, 30.09528196]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;32&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281c7fffff&quot;, &quot;Population_2018&quot;: 35143, &quot;Underserved_Score&quot;: 0.5645901639344262, &quot;masari_priority_score&quot;: 66.96666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.14925107, 30.01552719], [31.155210190000002, 30.015955449999993], [31.15863256, 30.01166623], [31.156096090000002, 30.006948919999992], [31.1501375, 30.0065206], [31.146714839999998, 30.010809650000002], [31.14925107, 30.01552719]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;103&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628ab7fffff&quot;, &quot;Population_2018&quot;: 34321, &quot;Underserved_Score&quot;: 0.5626229508196722, &quot;masari_priority_score&quot;: 66.3}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.31817516, 29.85075585], [31.32412171, 29.85117833], [31.327529520000002, 29.84688658], [31.324991080000004, 29.842172509999997], [31.31904506, 29.841749969999995], [31.31563695, 29.84604155999999], [31.31817516, 29.85075585]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;5&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621469fffff&quot;, &quot;Population_2018&quot;: 33551, &quot;Underserved_Score&quot;: 0.5606557377049181, &quot;masari_priority_score&quot;: 65.63333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.304653439999996, 30.176192890000003], [31.31061885, 30.176612099999993], [31.314038050000004, 30.172319789999992], [31.31149214, 30.16760842], [31.30552727, 30.167189139999994], [31.302107770000003, 30.17148129999999], [31.304653439999996, 30.176192890000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;75&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628741fffff&quot;, &quot;Population_2018&quot;: 33197, &quot;Underserved_Score&quot;: 0.5593442622950819, &quot;masari_priority_score&quot;: 64.96666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.294230300000002, 29.912528040000005], [31.30018083, 29.91295087], [31.303591949999998, 29.908659369999988], [31.30105285, 29.903945189999998], [31.295102859999997, 29.903522280000004], [31.291691440000005, 29.907813629999985], [31.294230300000002, 29.912528040000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;121&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628dbbfffff&quot;, &quot;Population_2018&quot;: 33028, &quot;Underserved_Score&quot;: 0.5586885245901639, &quot;masari_priority_score&quot;: 64.3}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.160403529999996, 29.99365312999999], [31.166361190000003, 29.99408113000001], [31.169782239999996, 29.989791769999993], [31.16724591, 29.985074570000002], [31.16128878, 29.9846465], [31.157867439999997, 29.988935699999995], [31.160403529999996, 29.99365312999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;96&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288d7fffff&quot;, &quot;Population_2018&quot;: 30489, &quot;Underserved_Score&quot;: 0.5527868852459017, &quot;masari_priority_score&quot;: 63.63333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.29789145, 30.153053809999996], [31.30385566, 30.15347361], [31.307274470000003, 30.149181470000006], [31.304729370000004, 30.144469680000004], [31.29876569, 30.14404981], [31.295346579999997, 30.1483418], [31.29789145, 30.153053809999996]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;81&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628763fffff&quot;, &quot;Population_2018&quot;: 30323, &quot;Underserved_Score&quot;: 0.5521311475409836, &quot;masari_priority_score&quot;: 62.966666666666676}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.177048259999996, 30.09914585000001], [31.183011650000005, 30.099571849999993], [31.186435260000003, 30.09528196], [31.18389577, 30.090566229999997], [31.17793291, 30.090140160000004], [31.17450901, 30.094429900000012], [31.177048259999996, 30.09914585000001]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;31&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281c5fffff&quot;, &quot;Population_2018&quot;: 29705, &quot;Underserved_Score&quot;: 0.5495081967213115, &quot;masari_priority_score&quot;: 62.3}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.132261219999997, 30.00523396], [31.138220060000002, 30.005663120000005], [31.14164302, 30.00137422000001], [31.13910741, 29.996656340000012], [31.133149090000003, 29.996227119999997], [31.12972585, 30.00051585], [31.132261219999997, 30.00523396]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;93&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288c1fffff&quot;, &quot;Population_2018&quot;: 29317, &quot;Underserved_Score&quot;: 0.5475409836065573, &quot;masari_priority_score&quot;: 61.633333333333326}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.280874130000004, 30.142788529999994], [31.286838070000005, 30.14320924], [31.290257479999998, 30.138917409999998], [31.28771323, 30.134205039999998], [31.281749819999998, 30.133784269999992], [31.27833012, 30.13807593], [31.280874130000004, 30.142788529999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;21&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6280dbfffff&quot;, &quot;Population_2018&quot;: 29250, &quot;Underserved_Score&quot;: 0.5468852459016393, &quot;masari_priority_score&quot;: 60.96666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.308819769999996, 29.85462459], [31.31476672, 29.855047450000004], [31.31817516, 29.85075585], [31.31563695, 29.84604155999999], [31.309690540000002, 29.845618629999993], [31.306281800000004, 29.849910070000004], [31.308819769999996, 29.85462459]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;9&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621717fffff&quot;, &quot;Population_2018&quot;: 27980, &quot;Underserved_Score&quot;: 0.5429508196721311, &quot;masari_priority_score&quot;: 60.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.188536570000004, 29.982067429999994], [31.19449305, 29.982494279999997], [31.1979122, 29.978204450000007], [31.195375150000004, 29.97348793], [31.1894192, 29.97306101], [31.18599977, 29.97735068], [31.188536570000004, 29.982067429999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;117&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628d4dfffff&quot;, &quot;Population_2018&quot;: 27713, &quot;Underserved_Score&quot;: 0.5422950819672131, &quot;masari_priority_score&quot;: 59.33333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.169431119999995, 30.084997630000004], [31.17539385, 30.085424139999997], [31.178817400000003, 30.081134410000004], [31.17627853, 30.076418329999992], [31.170316340000003, 30.075991750000004], [31.166892489999995, 30.080281319999994], [31.169431119999995, 30.084997630000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;35&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6281e1fffff&quot;, &quot;Population_2018&quot;: 27549, &quot;Underserved_Score&quot;: 0.5416393442622951, &quot;masari_priority_score&quot;: 58.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.28763211, 30.16592962], [31.29359725, 30.166349739999998], [31.297017050000004, 30.162057750000002], [31.294472, 30.1573458], [31.288507390000003, 30.15692560999999], [31.2850873, 30.161217450000006], [31.28763211, 30.16592962]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;84&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628769fffff&quot;, &quot;Population_2018&quot;: 26973, &quot;Underserved_Score&quot;: 0.539672131147541, &quot;masari_priority_score&quot;: 58.00000000000001}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.295102859999997, 29.903522280000004], [31.30105285, 29.903945189999998], [31.304463640000005, 29.899653689999997], [31.30192473, 29.89493945000001], [31.295975260000002, 29.894516479999993], [31.29256418, 29.89880782], [31.295102859999997, 29.903522280000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;120&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628db3fffff&quot;, &quot;Population_2018&quot;: 26748, &quot;Underserved_Score&quot;: 0.5377049180327869, &quot;masari_priority_score&quot;: 57.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.33783172, 30.20571361], [31.343798190000005, 30.206130939999998], [31.34721655, 30.201837989999994], [31.344668750000004, 30.197127859999995], [31.33870281, 30.196710459999995], [31.335284149999996, 30.201003260000004], [31.33783172, 30.20571361]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;146&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e629597fffff&quot;, &quot;Population_2018&quot;: 26216, &quot;Underserved_Score&quot;: 0.5357377049180327, &quot;masari_priority_score&quot;: 56.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.1979122, 29.978204450000007], [31.20386828, 29.978630910000003], [31.20728679, 29.974340929999993], [31.204749500000002, 29.96962462999999], [31.198793949999995, 29.9691981], [31.195375150000004, 29.97348793], [31.1979122, 29.978204450000007]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;114&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628d41fffff&quot;, &quot;Population_2018&quot;: 25988, &quot;Underserved_Score&quot;: 0.5337704918032787, &quot;masari_priority_score&quot;: 56.00000000000001}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.439284230000002, 30.18105642], [31.445247320000004, 30.181469380000003], [31.44865934, 30.177174690000005], [31.446108559999995, 30.17246721], [31.44014599, 30.172054190000004], [31.43673368, 30.17634871], [31.439284230000002, 30.18105642]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;60&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6286c3fffff&quot;, &quot;Population_2018&quot;: 25579, &quot;Underserved_Score&quot;: 0.5311475409836065, &quot;masari_priority_score&quot;: 55.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.26762824, 30.00131464], [31.27358433, 30.001737639999998], [31.27699981, 29.997446369999995], [31.27445949, 29.99273226], [31.26850392, 29.992309200000008], [31.265088150000004, 29.9966003], [31.26762824, 30.00131464]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;106&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628c09fffff&quot;, &quot;Population_2018&quot;: 25309, &quot;Underserved_Score&quot;: 0.5304918032786885, &quot;masari_priority_score&quot;: 54.66666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.12376714, 30.000086239999995], [31.12972585, 30.00051585], [31.133149090000003, 29.996227119999997], [31.130613909999997, 29.99150894], [31.12465573, 29.991079270000007], [31.121232199999998, 29.99536784], [31.12376714, 30.000086239999995]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;94&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288c5fffff&quot;, &quot;Population_2018&quot;: 25268, &quot;Underserved_Score&quot;: 0.5298360655737705, &quot;masari_priority_score&quot;: 54.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.36094553, 30.152946139999997], [31.36690853, 30.153363040000002], [31.3703239, 30.14906979], [31.36777657, 30.14435979], [31.361814100000004, 30.143942820000003], [31.358398430000005, 30.14823592], [31.36094553, 30.152946139999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;40&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62844dfffff&quot;, &quot;Population_2018&quot;: 25217, &quot;Underserved_Score&quot;: 0.5291803278688525, &quot;masari_priority_score&quot;: 53.33333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.33193281, 30.173575430000007], [31.337897540000004, 30.173993419999995], [31.34131518, 30.16970063], [31.33876837, 30.16499001], [31.332804160000002, 30.164571959999996], [31.329386229999997, 30.168864580000005], [31.33193281, 30.173575430000007]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;78&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628751fffff&quot;, &quot;Population_2018&quot;: 23950, &quot;Underserved_Score&quot;: 0.5252459016393443, &quot;masari_priority_score&quot;: 52.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.16447271, 30.043829989999992], [31.170433170000003, 30.04425722], [31.17385564, 30.03996766], [31.17131795, 30.03525105], [31.16535802, 30.034823759999995], [31.161935260000003, 30.03911314999999], [31.16447271, 30.043829989999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;99&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628a91fffff&quot;, &quot;Population_2018&quot;: 23212, &quot;Underserved_Score&quot;: 0.5226229508196721, &quot;masari_priority_score&quot;: 51.99999999999999}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.295975260000002, 29.894516479999993], [31.30192473, 29.89493945000001], [31.30533517, 29.89064796], [31.302796450000002, 29.88593367], [31.296847519999996, 29.885510629999988], [31.293436779999997, 29.88980196], [31.295975260000002, 29.894516479999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;12&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621759fffff&quot;, &quot;Population_2018&quot;: 23062, &quot;Underserved_Score&quot;: 0.5219672131147541, &quot;masari_priority_score&quot;: 51.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.34324846, 30.056525629999996], [31.349206280000004, 30.0569445], [31.35261946, 30.05265178], [31.35007511, 30.047940339999997], [31.344117829999995, 30.047521399999994], [31.34070436, 30.051813959999993], [31.34324846, 30.056525629999996]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;132&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628ed9fffff&quot;, &quot;Population_2018&quot;: 22596, &quot;Underserved_Score&quot;: 0.520655737704918, &quot;masari_priority_score&quot;: 50.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.32254939, 30.177449689999992], [31.32851453, 30.177868059999998], [31.33193281, 30.173575430000007], [31.329386229999997, 30.168864580000005], [31.32342163, 30.168446140000004], [31.320003060000005, 30.172738609999993], [31.32254939, 30.177449689999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;79&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62875dfffff&quot;, &quot;Population_2018&quot;: 21934, &quot;Underserved_Score&quot;: 0.5180327868852459, &quot;masari_priority_score&quot;: 50.00000000000001}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.21578019, 29.97948301], [31.22173602, 29.97990864], [31.2251536, 29.975618339999997], [31.222615639999997, 29.97090256], [31.21666035, 29.97047686000001], [31.21324248, 29.97476701], [31.21578019, 29.97948301]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;118&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628d5dfffff&quot;, &quot;Population_2018&quot;: 21292, &quot;Underserved_Score&quot;: 0.5154098360655738, &quot;masari_priority_score&quot;: 49.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.241263770000003, 29.994904839999993], [31.24721999, 29.995329129999995], [31.2506367, 29.991038329999995], [31.24809747, 29.98632342], [31.24214177, 29.98589907], [31.23872477, 29.9901897], [31.241263770000003, 29.994904839999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;110&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 650.0, &quot;H3_Hex_ID&quot;: &quot;883e628c61fffff&quot;, &quot;Population_2018&quot;: 72964, &quot;Underserved_Score&quot;: 0.2577049180327868, &quot;masari_priority_score&quot;: 49.16666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.29876569, 30.14404981], [31.304729370000004, 30.144469680000004], [31.30814784, 30.140177539999996], [31.305602929999996, 30.13546569], [31.299639789999997, 30.13504575], [31.29622102, 30.13933772999999], [31.29876569, 30.14404981]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;72&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628729fffff&quot;, &quot;Population_2018&quot;: 21036, &quot;Underserved_Score&quot;: 0.5134426229508197, &quot;masari_priority_score&quot;: 48.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.3703239, 30.14906979], [31.3762865, 30.149486300000003], [31.379701230000002, 30.14519289], [31.37715367, 30.140483119999992], [31.371191599999996, 30.140066540000003], [31.36777657, 30.14435979], [31.3703239, 30.14906979]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;37&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628441fffff&quot;, &quot;Population_2018&quot;: 20640, &quot;Underserved_Score&quot;: 0.5121311475409837, &quot;masari_priority_score&quot;: 48.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.325165629999997, 30.15043887], [31.33112917, 30.150857450000004], [31.334546420000002, 30.146564830000003], [31.33200041, 30.141853789999995], [31.3260374, 30.141435149999992], [31.32261987, 30.14572761], [31.325165629999997, 30.15043887]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;65&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1014.0, &quot;H3_Hex_ID&quot;: &quot;883e628703fffff&quot;, &quot;Population_2018&quot;: 72912, &quot;Underserved_Score&quot;: 0.2337704918032787, &quot;masari_priority_score&quot;: 47.76666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.26351269, 29.951148479999997], [31.269466, 29.95157226], [31.272880059999995, 29.94728119], [31.27034111, 29.942566500000005], [31.264388330000003, 29.942142649999997], [31.260973970000002, 29.946433559999996], [31.26351269, 29.951148479999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;122&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1665.0, &quot;H3_Hex_ID&quot;: &quot;883e628dc1fffff&quot;, &quot;Population_2018&quot;: 84399, &quot;Underserved_Score&quot;: 0.2042622950819672, &quot;masari_priority_score&quot;: 47.6}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.378834260000005, 30.154196000000002], [31.384796990000005, 30.154612059999998], [31.38821142, 30.15031849], [31.38566343, 30.145609019999995], [31.379701230000002, 30.14519289], [31.3762865, 30.149486300000003], [31.378834260000005, 30.154196000000002]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;39&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62844bfffff&quot;, &quot;Population_2018&quot;: 20571, &quot;Underserved_Score&quot;: 0.5114754098360655, &quot;masari_priority_score&quot;: 47.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.361814100000004, 30.143942820000003], [31.36777657, 30.14435979], [31.371191599999996, 30.140066540000003], [31.36864446, 30.135356480000002], [31.36268253, 30.134939440000004], [31.3592672, 30.139232530000005], [31.361814100000004, 30.143942820000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;38&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628445fffff&quot;, &quot;Population_2018&quot;: 20433, &quot;Underserved_Score&quot;: 0.5101639344262295, &quot;masari_priority_score&quot;: 46.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.2506367, 29.991038329999995], [31.25659253, 29.991462230000003], [31.260008600000003, 29.987171289999996], [31.25746913, 29.98245659999999], [31.251513829999997, 29.982032639999996], [31.24809747, 29.98632342], [31.2506367, 29.991038329999995]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;111&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1192.0, &quot;H3_Hex_ID&quot;: &quot;883e628c63fffff&quot;, &quot;Population_2018&quot;: 71402, &quot;Underserved_Score&quot;: 0.219672131147541, &quot;masari_priority_score&quot;: 46.06666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.33688284, 29.84301677], [31.34282859, 29.843438490000004], [31.346235130000004, 29.839146439999997], [31.343696220000005, 29.83443283], [31.337751000000004, 29.83401105], [31.334344160000004, 29.838302940000002], [31.33688284, 29.84301677]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;3&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62140dfffff&quot;, &quot;Population_2018&quot;: 20025, &quot;Underserved_Score&quot;: 0.5088524590163934, &quot;masari_priority_score&quot;: 46.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.32690902, 30.13243136000001], [31.332871499999996, 30.13285007], [31.33628805, 30.128557459999993], [31.333742429999997, 30.12384629], [31.32778049, 30.123427510000003], [31.32436363, 30.127719960000004], [31.32690902, 30.13243136000001]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;73&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1400.0, &quot;H3_Hex_ID&quot;: &quot;883e628731fffff&quot;, &quot;Population_2018&quot;: 71868, &quot;Underserved_Score&quot;: 0.2104918032786885, &quot;masari_priority_score&quot;: 45.93333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.16624318, 30.025817470000007], [31.172202570000003, 30.026244830000003], [31.17562436, 30.021955290000008], [31.17308704, 30.01723855], [31.16712818, 30.016811130000008], [31.1637061, 30.021100499999992], [31.16624318, 30.025817470000007]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;144&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 782.0, &quot;H3_Hex_ID&quot;: &quot;883e628f6dfffff&quot;, &quot;Population_2018&quot;: 65653, &quot;Underserved_Score&quot;: 0.2386885245901638, &quot;masari_priority_score&quot;: 45.49999999999999}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.38821142, 30.15031849], [31.394173750000004, 30.150734170000003], [31.39758755, 30.14644044], [31.39503932, 30.14173119999999], [31.38907753, 30.14131545], [31.38566343, 30.145609019999995], [31.38821142, 30.15031849]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;42&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62845dfffff&quot;, &quot;Population_2018&quot;: 19968, &quot;Underserved_Score&quot;: 0.5075409836065574, &quot;masari_priority_score&quot;: 45.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.245967490000005, 30.13125376], [31.25193143, 30.13167620999999], [31.25535236, 30.127385030000003], [31.252809629999998, 30.122671549999993], [31.24684622, 30.122249039999993], [31.243424999999995, 30.126540059999996], [31.245967490000005, 30.13125376]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;16&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 116.0, &quot;H3_Hex_ID&quot;: &quot;883e6280c7fffff&quot;, &quot;Population_2018&quot;: 56480, &quot;Underserved_Score&quot;: 0.2849180327868852, &quot;masari_priority_score&quot;: 44.93333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.2822464, 29.943413360000005], [31.288198910000002, 29.943836380000008], [31.2916117, 29.93954500000001], [31.28907227, 29.93483077000001], [31.283120290000003, 29.934407679999985], [31.27970721, 29.9386989], [31.2822464, 29.943413360000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;124&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628dd5fffff&quot;, &quot;Population_2018&quot;: 19711, &quot;Underserved_Score&quot;: 0.5055737704918033, &quot;masari_priority_score&quot;: 44.66666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.387345169999996, 30.159321470000005], [31.39330803, 30.15973708], [31.39672217, 30.155443350000002], [31.394173750000004, 30.150734170000003], [31.38821142, 30.15031849], [31.384796990000005, 30.154612059999998], [31.387345169999996, 30.159321470000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;55&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628637fffff&quot;, &quot;Population_2018&quot;: 19472, &quot;Underserved_Score&quot;: 0.5042622950819672, &quot;masari_priority_score&quot;: 44.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.35088202, 30.070659929999994], [31.356840510000005, 30.07107828], [31.360253729999997, 30.06678539], [31.357708769999995, 30.062074300000003], [31.35175082, 30.061655880000004], [31.348337299999997, 30.065948610000003], [31.35088202, 30.070659929999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;46&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6285edfffff&quot;, &quot;Population_2018&quot;: 19330, &quot;Underserved_Score&quot;: 0.5022950819672131, &quot;masari_priority_score&quot;: 43.33333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.288507390000003, 30.15692560999999], [31.294472, 30.1573458], [31.29789145, 30.153053809999996], [31.295346579999997, 30.1483418], [31.289382510000003, 30.14792153999999], [31.285962759999997, 30.15221337], [31.288507390000003, 30.15692560999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;80&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628761fffff&quot;, &quot;Population_2018&quot;: 19260, &quot;Underserved_Score&quot;: 0.5009836065573771, &quot;masari_priority_score&quot;: 42.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.273242720000002, 30.128650379999996], [31.279206, 30.12907161], [31.282625349999996, 30.124779949999994], [31.280081719999995, 30.12006722], [31.27411898, 30.11964593], [31.270699330000003, 30.123937429999998], [31.273242720000002, 30.128650379999996]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;20&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6280d7fffff&quot;, &quot;Population_2018&quot;: 19225, &quot;Underserved_Score&quot;: 0.5003278688524591, &quot;masari_priority_score&quot;: 42.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.395856640000005, 30.1644462], [31.40181962, 30.164861349999992], [31.40523347, 30.160567460000006], [31.40268462, 30.15585857], [31.39672217, 30.155443350000002], [31.39330803, 30.15973708], [31.395856640000005, 30.1644462]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;53&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628633fffff&quot;, &quot;Population_2018&quot;: 19195, &quot;Underserved_Score&quot;: 0.4996721311475409, &quot;masari_priority_score&quot;: 41.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.19582123, 30.09141752], [31.20178383, 30.091842740000008], [31.205206159999996, 30.08755253], [31.202666190000002, 30.082837260000005], [31.19670413, 30.08241196], [31.193281500000005, 30.086702009999986], [31.19582123, 30.09141752]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;23&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 72.0, &quot;H3_Hex_ID&quot;: &quot;883e628189fffff&quot;, &quot;Population_2018&quot;: 51199, &quot;Underserved_Score&quot;: 0.2767213114754098, &quot;masari_priority_score&quot;: 40.86666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.16358724, 30.05283615999999], [31.16954823, 30.05326333], [31.172971049999997, 30.048973769999996], [31.170433170000003, 30.04425722], [31.16447271, 30.043829989999992], [31.161049600000002, 30.048119380000003], [31.16358724, 30.05283615999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;101&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628a99fffff&quot;, &quot;Population_2018&quot;: 19170, &quot;Underserved_Score&quot;: 0.4990163934426229, &quot;masari_priority_score&quot;: 40.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.360076799999998, 30.161949399999994], [31.36604033, 30.16236622999999], [31.36945605, 30.158072969999992], [31.36690853, 30.153363040000002], [31.36094553, 30.152946139999997], [31.35752952, 30.157239240000006], [31.360076799999998, 30.161949399999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;50&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628627fffff&quot;, &quot;Population_2018&quot;: 19164, &quot;Underserved_Score&quot;: 0.4983606557377049, &quot;masari_priority_score&quot;: 40.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.243019619999995, 29.97689325], [31.248974780000005, 29.97731767], [31.2523908, 29.973026889999993], [31.249851949999996, 29.968311860000004], [31.24389731, 29.967887369999996], [31.240480999999996, 29.97217798999999], [31.243019619999995, 29.97689325]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;109&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1444.5558432666255, &quot;H3_Hex_ID&quot;: &quot;883e628c2dfffff&quot;, &quot;Population_2018&quot;: 62356, &quot;Underserved_Score&quot;: 0.1934426229508197, &quot;masari_priority_score&quot;: 39.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.307948849999995, 29.863630499999992], [31.31389633, 29.86405329], [31.317305110000003, 29.859761689999992], [31.31476672, 29.855047450000004], [31.308819769999996, 29.85462459], [31.305410690000002, 29.85891604], [31.307948849999995, 29.863630499999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;7&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621711fffff&quot;, &quot;Population_2018&quot;: 18617, &quot;Underserved_Score&quot;: 0.4937704918032787, &quot;masari_priority_score&quot;: 39.33333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.32778049, 30.123427510000003], [31.333742429999997, 30.12384629], [31.33715864, 30.119553679999992], [31.334613210000004, 30.114842449999994], [31.328651800000003, 30.114423609999992], [31.32523529, 30.118716049999996], [31.32778049, 30.123427510000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;74&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1269.0, &quot;H3_Hex_ID&quot;: &quot;883e628737fffff&quot;, &quot;Population_2018&quot;: 57013, &quot;Underserved_Score&quot;: 0.1940983606557377, &quot;masari_priority_score&quot;: 39.13333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[30.91282776, 29.948397849999992], [30.91878733, 29.948837720000007], [30.922220240000005, 29.944552880000003], [30.919693870000003, 29.93982834], [30.913734829999996, 29.93938841], [30.910301630000003, 29.943673080000003], [30.91282776, 29.948397849999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;149&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62d5bbfffff&quot;, &quot;Population_2018&quot;: 18511, &quot;Underserved_Score&quot;: 0.4918032786885246, &quot;masari_priority_score&quot;: 38.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.262104319999995, 30.150529140000003], [31.26806906, 30.15095062], [31.27148974, 30.14665911], [31.268945970000004, 30.141946279999996], [31.26298176, 30.141524739999998], [31.25956079, 30.14581608], [31.262104319999995, 30.150529140000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;36&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 13.0, &quot;H3_Hex_ID&quot;: &quot;883e6282b7fffff&quot;, &quot;Population_2018&quot;: 45400, &quot;Underserved_Score&quot;: 0.2727868852459016, &quot;masari_priority_score&quot;: 38.53333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.19493817, 30.10042301], [31.200901299999998, 30.10084817], [31.20432398, 30.09655795999999], [31.20178383, 30.091842740000008], [31.19582123, 30.09141752], [31.19239825, 30.09570757], [31.19493817, 30.10042301]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;30&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 771.0, &quot;H3_Hex_ID&quot;: &quot;883e6281c3fffff&quot;, &quot;Population_2018&quot;: 51295, &quot;Underserved_Score&quot;: 0.2108196721311475, &quot;masari_priority_score&quot;: 38.18333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.420530860000003, 30.18881826], [31.42649477, 30.18923198999999], [31.429908059999995, 30.18493761], [31.427357750000002, 30.180229670000003], [31.42139438, 30.179815880000003], [31.41798078, 30.184110099999995], [31.420530860000003, 30.18881826]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;62&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6286cdfffff&quot;, &quot;Population_2018&quot;: 18231, &quot;Underserved_Score&quot;: 0.4885245901639344, &quot;masari_priority_score&quot;: 38.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.272880059999995, 29.94728119], [31.27883297, 29.947704589999997], [31.2822464, 29.943413360000005], [31.27970721, 29.9386989], [31.27375483, 29.93827543], [31.27034111, 29.942566500000005], [31.272880059999995, 29.94728119]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;123&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 1003.0, &quot;H3_Hex_ID&quot;: &quot;883e628dc3fffff&quot;, &quot;Population_2018&quot;: 51391, &quot;Underserved_Score&quot;: 0.200655737704918, &quot;masari_priority_score&quot;: 37.766666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.31491101, 30.16331611], [31.320875480000005, 30.16373501], [31.32429371, 30.15944254], [31.32174775, 30.154731339999998], [31.31578381, 30.154312369999992], [31.31236529, 30.158604679999993], [31.31491101, 30.16331611]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;67&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 872.0, &quot;H3_Hex_ID&quot;: &quot;883e628709fffff&quot;, &quot;Population_2018&quot;: 51306, &quot;Underserved_Score&quot;: 0.2039344262295082, &quot;masari_priority_score&quot;: 37.449999999999996}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.406098130000004, 30.151564689999994], [31.41206018, 30.151979529999995], [31.41547304, 30.14768548], [31.41292415, 30.14297676], [31.40696263, 30.142561850000003], [31.403549470000005, 30.146855739999996], [31.406098130000004, 30.151564689999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;41&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62845bfffff&quot;, &quot;Population_2018&quot;: 17352, &quot;Underserved_Score&quot;: 0.4839344262295082, &quot;masari_priority_score&quot;: 37.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.228372750000002, 30.03479364], [31.2343315, 30.035218040000004], [31.23775021, 30.030927379999998], [31.235210460000005, 30.026212489999992], [31.229252240000005, 30.025788020000004], [31.225833240000004, 30.030078520000004], [31.228372750000002, 30.03479364]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;139&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f53fffff&quot;, &quot;Population_2018&quot;: 17062, &quot;Underserved_Score&quot;: 0.481639344262295, &quot;masari_priority_score&quot;: 36.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.36337679, 30.22109354], [31.369343650000005, 30.221509510000008], [31.372761130000004, 30.21721607], [31.37021204, 30.212506829999995], [31.36424571, 30.212090789999994], [31.36082794, 30.216384069999986], [31.36337679, 30.22109354]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;57&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628649fffff&quot;, &quot;Population_2018&quot;: 17062, &quot;Underserved_Score&quot;: 0.481639344262295, &quot;masari_priority_score&quot;: 36.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.249759410000003, 30.000043979999997], [31.25571578, 30.000467810000004], [31.25913219, 29.99617686], [31.25659253, 29.991462230000003], [31.2506367, 29.991038329999995], [31.24721999, 29.995329129999995], [31.249759410000003, 30.000043979999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;113&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 78.0, &quot;H3_Hex_ID&quot;: &quot;883e628c6bfffff&quot;, &quot;Population_2018&quot;: 43248, &quot;Underserved_Score&quot;: 0.2501639344262295, &quot;masari_priority_score&quot;: 35.400000000000006}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.28962408, 30.052743260000003], [31.295582700000004, 30.05316463999999], [31.298998670000003, 30.048872860000003], [31.29645631, 30.044159859999994], [31.29049822, 30.043738419999997], [31.28708196, 30.04803003], [31.28962408, 30.052743260000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;126&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628e11fffff&quot;, &quot;Population_2018&quot;: 17020, &quot;Underserved_Score&quot;: 0.480655737704918, &quot;masari_priority_score&quot;: 35.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.140755860000002, 30.01038094], [31.146714839999998, 30.010809650000002], [31.1501375, 30.0065206], [31.14760147, 30.001803000000002], [31.14164302, 30.00137422000001], [31.138220060000002, 30.005663120000005], [31.140755860000002, 30.01038094]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;95&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 269.0, &quot;H3_Hex_ID&quot;: &quot;883e6288cbfffff&quot;, &quot;Population_2018&quot;: 44862, &quot;Underserved_Score&quot;: 0.2275409836065574, &quot;masari_priority_score&quot;: 34.9}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.233354780000003, 30.07595432], [31.23931579, 30.076378], [31.24273558, 30.07208716], [31.24019465, 30.067372800000005], [31.23423417, 30.06694904], [31.23081409, 30.07123972], [31.233354780000003, 30.07595432]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;24&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 676.0, &quot;H3_Hex_ID&quot;: &quot;883e628193fffff&quot;, &quot;Population_2018&quot;: 46472, &quot;Underserved_Score&quot;: 0.201967213114754, &quot;masari_priority_score&quot;: 34.8}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.33387643, 30.060398950000003], [31.33983465, 30.06081821], [31.34324846, 30.056525629999996], [31.34070436, 30.051813959999993], [31.334746669999998, 30.05139464], [31.33133256, 30.05568704999999], [31.33387643, 30.060398950000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;45&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628537fffff&quot;, &quot;Population_2018&quot;: 16204, &quot;Underserved_Score&quot;: 0.4760655737704918, &quot;masari_priority_score&quot;: 34.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.14519008, 29.965346819999997], [31.151146409999996, 29.965775849999993], [31.15456735, 29.96148683], [31.152032250000005, 29.956768929999996], [31.14607645, 29.95633983999999], [31.14265522, 29.960628699999994], [31.14519008, 29.965346819999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;92&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288bdfffff&quot;, &quot;Population_2018&quot;: 15968, &quot;Underserved_Score&quot;: 0.4727868852459016, &quot;masari_priority_score&quot;: 34.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.423120949999998, 30.161810930000005], [31.42908326, 30.16222487], [31.43249553, 30.1579305], [31.429945780000004, 30.15322237], [31.42398401, 30.15280837], [31.42057144, 30.15710256999999], [31.423120949999998, 30.161810930000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;63&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6286e3fffff&quot;, &quot;Population_2018&quot;: 15678, &quot;Underserved_Score&quot;: 0.4708196721311475, &quot;masari_priority_score&quot;: 33.33333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.144303550000004, 29.974353750000006], [31.150260409999998, 29.974782720000007], [31.15368169, 29.970493689999998], [31.151146409999996, 29.965775849999993], [31.14519008, 29.965346819999997], [31.141768500000005, 29.969635690000004], [31.144303550000004, 29.974353750000006]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;86&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628887fffff&quot;, &quot;Population_2018&quot;: 15657, &quot;Underserved_Score&quot;: 0.4695081967213115, &quot;masari_priority_score&quot;: 32.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.244209570000002, 30.149263030000004], [31.25017457, 30.149685339999994], [31.25359618, 30.145394150000005], [31.251053080000002, 30.14068081000001], [31.245088610000003, 30.140258429999992], [31.2416667, 30.144549450000003], [31.244209570000002, 30.149263030000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;17&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 620.0, &quot;H3_Hex_ID&quot;: &quot;883e6280c9fffff&quot;, &quot;Population_2018&quot;: 45074, &quot;Underserved_Score&quot;: 0.1993442622950819, &quot;masari_priority_score&quot;: 32.53333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.189969429999998, 30.059259120000004], [31.19593029, 30.05968499], [31.199351890000003, 30.055394949999986], [31.196812909999995, 30.050679200000005], [31.19085258, 30.050253260000005], [31.18743069, 30.054543140000003], [31.189969429999998, 30.059259120000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;26&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 260.0, &quot;H3_Hex_ID&quot;: &quot;883e6281a3fffff&quot;, &quot;Population_2018&quot;: 37489, &quot;Underserved_Score&quot;: 0.2065573770491803, &quot;masari_priority_score&quot;: 32.13333333333333}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.299871940000003, 30.03986809], [31.305829630000005, 30.040289150000003], [31.309244629999995, 30.03599721999999], [31.30670222, 30.03128439], [31.30074506, 30.03086326], [31.297329770000005, 30.035155030000006], [31.299871940000003, 30.03986809]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;133&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628ee9fffff&quot;, &quot;Population_2018&quot;: 15460, &quot;Underserved_Score&quot;: 0.4681967213114754, &quot;masari_priority_score&quot;: 32.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.40263858, 30.187575409999994], [31.408602770000005, 30.187989979999994], [31.412017, 30.183695919999998], [31.409467350000003, 30.178987460000005], [31.4035037, 30.17857282], [31.40008917, 30.182866720000003], [31.40263858, 30.187575409999994]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;47&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628611fffff&quot;, &quot;Population_2018&quot;: 15107, &quot;Underserved_Score&quot;: 0.4662295081967212, &quot;masari_priority_score&quot;: 31.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.18004342, 29.976923379999995], [31.18599977, 29.97735068], [31.1894192, 29.97306101], [31.186882579999995, 29.968344209999994], [31.180926769999996, 29.967916840000004], [31.177507040000002, 29.97220635], [31.18004342, 29.976923379999995]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;88&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628893fffff&quot;, &quot;Population_2018&quot;: 14949, &quot;Underserved_Score&quot;: 0.4649180327868852, &quot;masari_priority_score&quot;: 30.666666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.411152610000002, 30.19269837], [31.41711692, 30.19311248], [31.420530860000003, 30.18881826], [31.41798078, 30.184110099999995], [31.412017, 30.183695919999998], [31.408602770000005, 30.187989979999994], [31.411152610000002, 30.19269837]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;48&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62861bfffff&quot;, &quot;Population_2018&quot;: 14912, &quot;Underserved_Score&quot;: 0.4642622950819672, &quot;masari_priority_score&quot;: 30.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.16712818, 30.016811130000008], [31.17308704, 30.01723855], [31.176508479999995, 30.01294901], [31.173971350000002, 30.00823221999999], [31.168013020000004, 30.007804729999993], [31.16459129, 30.01209409999999], [31.16712818, 30.016811130000008]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;141&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f65fffff&quot;, &quot;Population_2018&quot;: 14824, &quot;Underserved_Score&quot;: 0.4636065573770491, &quot;masari_priority_score&quot;: 29.33333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.134036809999998, 29.987220220000008], [31.139994600000005, 29.987649509999994], [31.143416860000002, 29.98336063], [31.14088163, 29.97864262], [31.134924370000004, 29.978213269999998], [31.13150182, 29.982501989999992], [31.134036809999998, 29.987220220000008]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;87&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62888dfffff&quot;, &quot;Population_2018&quot;: 14805, &quot;Underserved_Score&quot;: 0.4629508196721311, &quot;masari_priority_score&quot;: 28.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.394990950000004, 30.173448980000003], [31.40095447, 30.17386407], [31.40436866, 30.169570169999997], [31.40181962, 30.164861349999992], [31.395856640000005, 30.1644462], [31.392442150000004, 30.168739930000005], [31.394990950000004, 30.173448980000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;56&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62863bfffff&quot;, &quot;Population_2018&quot;: 14758, &quot;Underserved_Score&quot;: 0.4622950819672131, &quot;masari_priority_score&quot;: 28.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.20728679, 29.974340929999993], [31.21324248, 29.97476701], [31.21666035, 29.97047686000001], [31.214122829999997, 29.965760800000005], [31.208167670000005, 29.965334650000003], [31.204749500000002, 29.96962462999999], [31.20728679, 29.974340929999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;115&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628d43fffff&quot;, &quot;Population_2018&quot;: 14657, &quot;Underserved_Score&quot;: 0.461639344262295, &quot;masari_priority_score&quot;: 27.333333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.130485, 30.02324748], [31.13644491, 30.023676509999998], [31.139868549999996, 30.0193876], [31.13733256, 30.014669839999993], [31.13137319, 30.014240749999992], [31.12794926, 30.018529480000005], [31.130485, 30.02324748]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;102&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628aa3fffff&quot;, &quot;Population_2018&quot;: 14427, &quot;Underserved_Score&quot;: 0.4590163934426229, &quot;masari_priority_score&quot;: 26.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.26561316, 30.114511170000004], [31.271575770000002, 30.114932909999997], [31.274995080000004, 30.110641420000007], [31.272452070000003, 30.105928340000002], [31.26648999, 30.10550652], [31.26307039, 30.109797859999986], [31.26561316, 30.114511170000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;13&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 103.0, &quot;H3_Hex_ID&quot;: &quot;883e628083fffff&quot;, &quot;Population_2018&quot;: 29221, &quot;Underserved_Score&quot;: 0.2, &quot;masari_priority_score&quot;: 26.266666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.33870281, 30.196710459999995], [31.344668750000004, 30.197127859999995], [31.34808677, 30.1928349], [31.34553916, 30.18812471000001], [31.339573749999996, 30.187707239999998], [31.336155430000005, 30.192000039999996], [31.33870281, 30.196710459999995]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;59&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62866dfffff&quot;, &quot;Population_2018&quot;: 14198, &quot;Underserved_Score&quot;: 0.4583606557377049, &quot;masari_priority_score&quot;: 26.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.289382510000003, 30.14792153999999], [31.295346579999997, 30.1483418], [31.29876569, 30.14404981], [31.29622102, 30.13933772999999], [31.290257479999998, 30.138917409999998], [31.286838070000005, 30.14320924], [31.289382510000003, 30.14792153999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;83&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628767fffff&quot;, &quot;Population_2018&quot;: 14012, &quot;Underserved_Score&quot;: 0.4550819672131148, &quot;masari_priority_score&quot;: 25.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.296847519999996, 29.885510629999988], [31.302796450000002, 29.88593367], [31.30620655, 29.881642189999997], [31.30366802, 29.87692784000001], [31.29771961, 29.876504729999986], [31.294309220000002, 29.880796049999997], [31.296847519999996, 29.885510629999988]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;11&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621751fffff&quot;, &quot;Population_2018&quot;: 13914, &quot;Underserved_Score&quot;: 0.4537704918032786, &quot;masari_priority_score&quot;: 24.666666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.152795880000003, 29.97950049], [31.15875288, 29.97992901], [31.162173870000004, 29.975639819999998], [31.15963816, 29.970922269999992], [31.15368169, 29.970493689999998], [31.150260409999998, 29.974782720000007], [31.152795880000003, 29.97950049]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;85&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628883fffff&quot;, &quot;Population_2018&quot;: 13911, &quot;Underserved_Score&quot;: 0.4531147540983606, &quot;masari_priority_score&quot;: 24.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.15368169, 29.970493689999998], [31.15963816, 29.970922269999992], [31.16305881, 29.96663308], [31.16052328, 29.96191547], [31.15456735, 29.96148683], [31.151146409999996, 29.965775849999993], [31.15368169, 29.970493689999998]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;91&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6288b9fffff&quot;, &quot;Population_2018&quot;: 13907, &quot;Underserved_Score&quot;: 0.4524590163934426, &quot;masari_priority_score&quot;: 23.333333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.329317809999996, 30.200585469999993], [31.335284149999996, 30.201003260000004], [31.33870281, 30.196710459999995], [31.336155430000005, 30.192000039999996], [31.330189629999996, 30.191582189999995], [31.326770670000002, 30.195874819999997], [31.329317809999996, 30.200585469999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;147&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6295bbfffff&quot;, &quot;Population_2018&quot;: 13735, &quot;Underserved_Score&quot;: 0.4518032786885245, &quot;masari_priority_score&quot;: 22.666666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.317305110000003, 29.859761689999992], [31.32325219, 29.8601841], [31.32666034, 29.85589233], [31.32412171, 29.85117833], [31.31817516, 29.85075585], [31.31476672, 29.855047450000004], [31.317305110000003, 29.859761689999992]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;8&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621713fffff&quot;, &quot;Population_2018&quot;: 13509, &quot;Underserved_Score&quot;: 0.4478688524590164, &quot;masari_priority_score&quot;: 22.000000000000004}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.33601454, 29.852022450000003], [31.341960820000004, 29.852444099999992], [31.3453677, 29.848152040000002], [31.34282859, 29.843438490000004], [31.33688284, 29.84301677], [31.33347567, 29.84730867], [31.33601454, 29.852022450000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;4&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621447fffff&quot;, &quot;Population_2018&quot;: 13482, &quot;Underserved_Score&quot;: 0.4472131147540983, &quot;masari_priority_score&quot;: 21.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.3453677, 29.848152040000002], [31.351313580000003, 29.848573309999995], [31.354719830000004, 29.84428109], [31.35218049, 29.83956777], [31.346235130000004, 29.839146439999997], [31.34282859, 29.843438490000004], [31.3453677, 29.848152040000002]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;2&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621409fffff&quot;, &quot;Population_2018&quot;: 13433, &quot;Underserved_Score&quot;: 0.4465573770491803, &quot;masari_priority_score&quot;: 20.666666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.346235130000004, 29.839146439999997], [31.35218049, 29.83956777], [31.35558639, 29.835275569999997], [31.353047239999995, 29.8305622], [31.34710242, 29.83014079000001], [31.343696220000005, 29.83443283], [31.346235130000004, 29.839146439999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;1&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621401fffff&quot;, &quot;Population_2018&quot;: 13432, &quot;Underserved_Score&quot;: 0.4459016393442623, &quot;masari_priority_score&quot;: 20.000000000000004}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.162173870000004, 29.975639819999998], [31.168130470000005, 29.97606795], [31.171550830000005, 29.971778599999993], [31.16901488, 29.967061279999992], [31.16305881, 29.96663308], [31.15963816, 29.970922269999992], [31.162173870000004, 29.975639819999998]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;89&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628895fffff&quot;, &quot;Population_2018&quot;: 13189, &quot;Underserved_Score&quot;: 0.4439344262295082, &quot;masari_priority_score&quot;: 19.33333333333334}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.348956840000003, 30.183831759999993], [31.354921840000003, 30.18424884000001], [31.358338879999998, 30.17995572999999], [31.355791219999997, 30.175245699999998], [31.34982675, 30.17482855], [31.34640941, 30.179121499999994], [31.348956840000003, 30.183831759999993]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;58&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628667fffff&quot;, &quot;Population_2018&quot;: 13096, &quot;Underserved_Score&quot;: 0.441967213114754, &quot;masari_priority_score&quot;: 18.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.338226080000002, 30.015376860000003], [31.34418164, 30.015796449999993], [31.347593740000004, 30.01150391], [31.34505057, 30.006791939999996], [31.33909555, 30.00637227], [31.335683150000005, 30.010664649999995], [31.338226080000002, 30.015376860000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;131&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628eb9fffff&quot;, &quot;Population_2018&quot;: 13082, &quot;Underserved_Score&quot;: 0.440655737704918, &quot;masari_priority_score&quot;: 18.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[30.921313880000003, 29.953562199999997], [30.927273600000003, 29.954001620000003], [30.930706230000002, 29.949716619999993], [30.92817943, 29.94499236], [30.922220240000005, 29.944552880000003], [30.91878733, 29.948837720000007], [30.921313880000003, 29.953562199999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;148&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62d597fffff&quot;, &quot;Population_2018&quot;: 13021, &quot;Underserved_Score&quot;: 0.4393442622950819, &quot;masari_priority_score&quot;: 17.333333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.36771988, 30.176079159999997], [31.373684080000004, 30.17649547], [31.37709984, 30.172202050000003], [31.37455171, 30.167492469999985], [31.368588040000002, 30.167076099999996], [31.36517198, 30.171369359999993], [31.36771988, 30.176079159999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;52&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62862bfffff&quot;, &quot;Population_2018&quot;: 13004, &quot;Underserved_Score&quot;: 0.4386885245901639, &quot;masari_priority_score&quot;: 16.666666666666664}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.34634618, 30.210841000000002], [31.35231278, 30.211257880000005], [31.35573085, 30.206964759999995], [31.35318262, 30.202254929999988], [31.34721655, 30.201837989999994], [31.343798190000005, 30.206130939999998], [31.34634618, 30.210841000000002]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;145&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e629593fffff&quot;, &quot;Population_2018&quot;: 12817, &quot;Underserved_Score&quot;: 0.4360655737704918, &quot;masari_priority_score&quot;: 16.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.24740654, 29.93186336000001], [31.25335905, 29.932288110000002], [31.256773360000004, 29.92799737000001], [31.254235440000002, 29.92328204], [31.24828346, 29.92285723], [31.244868859999997, 29.9271478], [31.24740654, 29.93186336000001]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;125&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628de1fffff&quot;, &quot;Population_2018&quot;: 12585, &quot;Underserved_Score&quot;: 0.4340983606557377, &quot;masari_priority_score&quot;: 15.333333333333336}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.31425712, 30.07714837], [31.32021667, 30.077568320000005], [31.3236321, 30.073276049999993], [31.321088270000004, 30.068563989999994], [31.315129260000003, 30.06814396999999], [31.311713529999995, 30.072436079999992], [31.31425712, 30.07714837]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;44&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62852bfffff&quot;, &quot;Population_2018&quot;: 12369, &quot;Underserved_Score&quot;: 0.4334426229508197, &quot;masari_priority_score&quot;: 14.666666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.358338879999998, 30.17995572999999], [31.36430348, 30.180372430000002], [31.36771988, 30.176079159999997], [31.36517198, 30.171369359999993], [31.35920792, 30.170952599999993], [31.355791219999997, 30.175245699999998], [31.358338879999998, 30.17995572999999]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;51&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628629fffff&quot;, &quot;Population_2018&quot;: 12356, &quot;Underserved_Score&quot;: 0.4327868852459016, &quot;masari_priority_score&quot;: 14.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.298998670000003, 30.048872860000003], [31.304956890000003, 30.049293850000005], [31.30837223, 30.04500191], [31.305829630000005, 30.040289150000003], [31.299871940000003, 30.03986809], [31.29645631, 30.044159859999994], [31.298998670000003, 30.048872860000003]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;127&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628e13fffff&quot;, &quot;Population_2018&quot;: 12345, &quot;Underserved_Score&quot;: 0.4321311475409836, &quot;masari_priority_score&quot;: 13.333333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.2395073, 30.012916219999997], [31.245464590000005, 30.013340370000005], [31.24888198, 30.00904957], [31.246342369999997, 30.004334780000004], [31.24038561, 30.00391056], [31.23696793, 30.00820119999999], [31.2395073, 30.012916219999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;135&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628f13fffff&quot;, &quot;Population_2018&quot;: 12303, &quot;Underserved_Score&quot;: 0.4308196721311476, &quot;masari_priority_score&quot;: 12.666666666666668}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.259401039999997, 29.90097905], [31.26535156, 29.901403609999992], [31.268764210000004, 29.897112749999998], [31.266226620000005, 29.892397479999996], [31.260276620000003, 29.89197285], [31.25686369, 29.89626355], [31.259401039999997, 29.90097905]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;119&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628da7fffff&quot;, &quot;Population_2018&quot;: 12233, &quot;Underserved_Score&quot;: 0.4291803278688524, &quot;masari_priority_score&quot;: 11.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.2509133, 29.895838539999996], [31.25686369, 29.89626355], [31.260276620000003, 29.89197285], [31.257739460000003, 29.887257289999997], [31.251789599999995, 29.886832209999994], [31.24837637, 29.891122750000005], [31.2509133, 29.895838539999996]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;0&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e62129bfffff&quot;, &quot;Population_2018&quot;: 12233, &quot;Underserved_Score&quot;: 0.4291803278688524, &quot;masari_priority_score&quot;: 11.66666666666667}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.268764210000004, 29.897112749999998], [31.27471433, 29.897536930000005], [31.27812634, 29.893245909999987], [31.275588520000003, 29.888530869999997], [31.26963892, 29.88810662], [31.266226620000005, 29.892397479999996], [31.268764210000004, 29.897112749999998]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;10&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621749fffff&quot;, &quot;Population_2018&quot;: 12232, &quot;Underserved_Score&quot;: 0.4281967213114754, &quot;masari_priority_score&quot;: 10.666666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.262293230000004, 29.778752680000004], [31.26823674, 29.779178560000002], [31.271645230000004, 29.77488799], [31.269110510000004, 29.77017171], [31.263167529999997, 29.769745759999992], [31.259758750000003, 29.774036169999995], [31.262293230000004, 29.778752680000004]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;6&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e621525fffff&quot;, &quot;Population_2018&quot;: 12151, &quot;Underserved_Score&quot;: 0.4268852459016393, &quot;masari_priority_score&quot;: 10.0}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.37796713, 30.163199059999997], [31.383930390000003, 30.16361505], [31.387345169999996, 30.159321470000005], [31.384796990000005, 30.154612059999998], [31.378834260000005, 30.154196000000002], [31.375419180000005, 30.15848941999999], [31.37796713, 30.163199059999997]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;54&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628635fffff&quot;, &quot;Population_2018&quot;: 11925, &quot;Underserved_Score&quot;: 0.4249180327868852, &quot;masari_priority_score&quot;: 9.333333333333332}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.1542024, 30.056698010000005], [31.16016379, 30.057125559999996], [31.16358724, 30.05283615999999], [31.161049600000002, 30.048119380000003], [31.155088750000004, 30.047691769999997], [31.151665, 30.051980999999998], [31.1542024, 30.056698010000005]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;104&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e628ad7fffff&quot;, &quot;Population_2018&quot;: 11838, &quot;Underserved_Score&quot;: 0.4229508196721311, &quot;masari_priority_score&quot;: 8.666666666666666}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;geometry&quot;: {&quot;coordinates&quot;: [[[[31.4307707, 30.1759353], [31.43673368, 30.17634871], [31.44014599, 30.172054190000004], [31.43759563, 30.16734641], [31.43163319, 30.166932929999998], [31.428220579999998, 30.171227300000005], [31.4307707, 30.1759353]]]], &quot;type&quot;: &quot;MultiPolygon&quot;}, &quot;id&quot;: &quot;61&quot;, &quot;properties&quot;: {&quot;Boarding_Total_Hex&quot;: 0.0, &quot;H3_Hex_ID&quot;: &quot;883e6286c7fffff&quot;, &quot;Population_2018&quot;: 11813, &quot;Underserved_Score&quot;: 0.4216393442622951, &quot;masari_priority_score&quot;: 8.0}, &quot;type&quot;: &quot;Feature&quot;}], &quot;type&quot;: &quot;FeatureCollection&quot;});
+
+        
+    
+    geo_json_9e7f75162db2f68d03f5666c711142e1.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create(&#x27;div&#x27;);
+    
+    let handleObject = feature =&gt; {
+        if (feature === null) {
+            return &#x27;&#x27;;
+        } else if (typeof(feature)==&#x27;object&#x27;) {
+            return JSON.stringify(feature);
+        } else {
+            return feature;
+        }
+    }
+    let fields = [&quot;H3_Hex_ID&quot;, &quot;Population_2018&quot;, &quot;Underserved_Score&quot;, &quot;Boarding_Total_Hex&quot;, &quot;masari_priority_score&quot;];
+    let aliases = [&quot;H3 hex&quot;, &quot;Population 2018&quot;, &quot;Underserved score&quot;, &quot;Boarding total&quot;, &quot;Masari priority&quot;];
+    let table = &#x27;&lt;table&gt;&#x27; +
+        String(
+        fields.map(
+        (v,i)=&gt;
+        `&lt;tr&gt;
+            &lt;th&gt;${aliases[i].toLocaleString()}&lt;/th&gt;
+            
+            &lt;td&gt;${handleObject(layer.feature.properties[v]).toLocaleString()}&lt;/td&gt;
+        &lt;/tr&gt;`).join(&#x27;&#x27;))
+    +&#x27;&lt;/table&gt;&#x27;;
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  &quot;sticky&quot;: true,
+  &quot;className&quot;: &quot;foliumtooltip&quot;,
+});
+                     
+    
+            geo_json_9e7f75162db2f68d03f5666c711142e1.addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+            var circle_marker_39f1942eddd7ccf3cbcae2ebc61d5454 = L.circleMarker(
+                [29.990646716698805, 31.1816966364654],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.985, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_5b55e7b766c2e4999a30f3e2da28fde6 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_0544882f67a3c7303bef1a76fdb01514 = $(`&lt;div id=&quot;html_0544882f67a3c7303bef1a76fdb01514&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628f25fffff&lt;/b&gt;&lt;br&gt;Population: 81,621&lt;br&gt;Underserved score: 0.668&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 99.7&lt;/div&gt;`)[0];
+                popup_5b55e7b766c2e4999a30f3e2da28fde6.setContent(html_0544882f67a3c7303bef1a76fdb01514);
+            
+        
+
+        circle_marker_39f1942eddd7ccf3cbcae2ebc61d5454.bindPopup(popup_5b55e7b766c2e4999a30f3e2da28fde6)
+        ;
+
+        
+    
+    
+            circle_marker_39f1942eddd7ccf3cbcae2ebc61d5454.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628f25fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_a3b7293879396a38bc36bebc8817aa5f = L.circleMarker(
+                [29.98160838453384, 31.24555838131058],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.951666666666666, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_4ea42a4cb6b04d956b718cef9928965a = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_c031174a97d5c840ca1f622fd0001d3a = $(`&lt;div id=&quot;html_c031174a97d5c840ca1f622fd0001d3a&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628c67fffff&lt;/b&gt;&lt;br&gt;Population: 77,149&lt;br&gt;Underserved score: 0.665&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 99.0&lt;/div&gt;`)[0];
+                popup_4ea42a4cb6b04d956b718cef9928965a.setContent(html_c031174a97d5c840ca1f622fd0001d3a);
+            
+        
+
+        circle_marker_a3b7293879396a38bc36bebc8817aa5f.bindPopup(popup_4ea42a4cb6b04d956b718cef9928965a)
+        ;
+
+        
+    
+    
+            circle_marker_a3b7293879396a38bc36bebc8817aa5f.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628c67fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_e08df40840474c55dc4fc9673f92880f = L.circleMarker(
+                [30.026671896683016, 31.178161826460848],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.918333333333333, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_baba5b9d672e521b0971c09a89f7c9b2 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_6add55e02cc01e040f1bccd09b49d034 = $(`&lt;div id=&quot;html_6add55e02cc01e040f1bccd09b49d034&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628f69fffff&lt;/b&gt;&lt;br&gt;Population: 76,908&lt;br&gt;Underserved score: 0.664&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 98.4&lt;/div&gt;`)[0];
+                popup_baba5b9d672e521b0971c09a89f7c9b2.setContent(html_6add55e02cc01e040f1bccd09b49d034);
+            
+        
+
+        circle_marker_e08df40840474c55dc4fc9673f92880f.bindPopup(popup_baba5b9d672e521b0971c09a89f7c9b2)
+        ;
+
+        
+    
+    
+            circle_marker_e08df40840474c55dc4fc9673f92880f.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628f69fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_8f07d692715fd5edf683c6b31a957031 = L.circleMarker(
+                [29.9738746637948, 31.264300190374843],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.885, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_6f32a760fdef2229fb25f996c3efae58 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_c9a4706f1dd50dc87882034ad9e51241 = $(`&lt;div id=&quot;html_c9a4706f1dd50dc87882034ad9e51241&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628c2bfffff&lt;/b&gt;&lt;br&gt;Population: 76,440&lt;br&gt;Underserved score: 0.662&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 97.7&lt;/div&gt;`)[0];
+                popup_6f32a760fdef2229fb25f996c3efae58.setContent(html_c9a4706f1dd50dc87882034ad9e51241);
+            
+        
+
+        circle_marker_8f07d692715fd5edf683c6b31a957031.bindPopup(popup_6f32a760fdef2229fb25f996c3efae58)
+        ;
+
+        
+    
+    
+            circle_marker_8f07d692715fd5edf683c6b31a957031.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628c2bfffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_14f9a83864804fc338b022b22977afe9 = L.circleMarker(
+                [30.03567805242816, 31.177277732418325],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.851666666666667, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_fcb42aed68c3d3e2925d1624f5267486 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_d12a03f62ca38dd6774f9e63aea0505e = $(`&lt;div id=&quot;html_d12a03f62ca38dd6774f9e63aea0505e&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628a93fffff&lt;/b&gt;&lt;br&gt;Population: 74,517&lt;br&gt;Underserved score: 0.661&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 97.0&lt;/div&gt;`)[0];
+                popup_fcb42aed68c3d3e2925d1624f5267486.setContent(html_d12a03f62ca38dd6774f9e63aea0505e);
+            
+        
+
+        circle_marker_14f9a83864804fc338b022b22977afe9.bindPopup(popup_fcb42aed68c3d3e2925d1624f5267486)
+        ;
+
+        
+    
+    
+            circle_marker_14f9a83864804fc338b022b22977afe9.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628a93fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_63f72fc6d5184dce4d8f27500d44696c = L.circleMarker(
+                [30.101215126120216, 31.269909201360726],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.773333333333333, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_7b866ca9ca4c6fecc2b5b5cc54fed05c = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_5cdd7c982705cbc2cf29be3c0fb9c498 = $(`&lt;div id=&quot;html_5cdd7c982705cbc2cf29be3c0fb9c498&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e6280b9fffff&lt;/b&gt;&lt;br&gt;Population: 71,564&lt;br&gt;Underserved score: 0.657&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 95.5&lt;/div&gt;`)[0];
+                popup_7b866ca9ca4c6fecc2b5b5cc54fed05c.setContent(html_5cdd7c982705cbc2cf29be3c0fb9c498);
+            
+        
+
+        circle_marker_63f72fc6d5184dce4d8f27500d44696c.bindPopup(popup_7b866ca9ca4c6fecc2b5b5cc54fed05c)
+        ;
+
+        
+    
+    
+            circle_marker_63f72fc6d5184dce4d8f27500d44696c.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e6280b9fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_a2f147153f0a99b51ba7ba8da3a6d08c = L.circleMarker(
+                [30.043316680097096, 31.284539986573837],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.725, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_4cd0529aabfdf4ce662ce3008e0b5158 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_d0c40e0c1c8fc46f693c6a7cf20a96ba = $(`&lt;div id=&quot;html_d0c40e0c1c8fc46f693c6a7cf20a96ba&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628e15fffff&lt;/b&gt;&lt;br&gt;Population: 69,546&lt;br&gt;Underserved score: 0.654&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 94.5&lt;/div&gt;`)[0];
+                popup_4cd0529aabfdf4ce662ce3008e0b5158.setContent(html_d0c40e0c1c8fc46f693c6a7cf20a96ba);
+            
+        
+
+        circle_marker_a2f147153f0a99b51ba7ba8da3a6d08c.bindPopup(popup_4cd0529aabfdf4ce662ce3008e0b5158)
+        ;
+
+        
+    
+    
+            circle_marker_a2f147153f0a99b51ba7ba8da3a6d08c.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628e15fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_4b5ca42d0474bee3b34b0ac3212bb157 = L.circleMarker(
+                [30.01380280187061, 31.188425277216144],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.691666666666666, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_65049c39c1f3ff660935924e74c414dd = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_b3d3938e0b211289cba03c56ee9ddfda = $(`&lt;div id=&quot;html_b3d3938e0b211289cba03c56ee9ddfda&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628f63fffff&lt;/b&gt;&lt;br&gt;Population: 67,737&lt;br&gt;Underserved score: 0.653&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 93.8&lt;/div&gt;`)[0];
+                popup_65049c39c1f3ff660935924e74c414dd.setContent(html_b3d3938e0b211289cba03c56ee9ddfda);
+            
+        
+
+        circle_marker_4b5ca42d0474bee3b34b0ac3212bb157.bindPopup(popup_65049c39c1f3ff660935924e74c414dd)
+        ;
+
+        
+    
+    
+            circle_marker_4b5ca42d0474bee3b34b0ac3212bb157.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628f63fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_d0f9408551ce514a2dc70c15a521971b = L.circleMarker(
+                [30.022808942835606, 31.187542216556377],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.658333333333335, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_7fc575c30646675b2ebef470b33d3406 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_79e6ee62312343e6c181ae638d78d9fb = $(`&lt;div id=&quot;html_79e6ee62312343e6c181ae638d78d9fb&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628f6bfffff&lt;/b&gt;&lt;br&gt;Population: 67,664&lt;br&gt;Underserved score: 0.652&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 93.2&lt;/div&gt;`)[0];
+                popup_7fc575c30646675b2ebef470b33d3406.setContent(html_79e6ee62312343e6c181ae638d78d9fb);
+            
+        
+
+        circle_marker_d0f9408551ce514a2dc70c15a521971b.bindPopup(popup_7fc575c30646675b2ebef470b33d3406)
+        ;
+
+        
+    
+    
+            circle_marker_d0f9408551ce514a2dc70c15a521971b.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628f6bfffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_9e225179fd05683c5ceb360b72367447 = L.circleMarker(
+                [29.982880278790955, 31.26342428037363],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.625, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_b814dfd6af1693ca08feae0c2fe4b1a6 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_4466c19162850d83a985ab4b5e6a9bf6 = $(`&lt;div id=&quot;html_4466c19162850d83a985ab4b5e6a9bf6&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628c05fffff&lt;/b&gt;&lt;br&gt;Population: 67,202&lt;br&gt;Underserved score: 0.652&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 92.5&lt;/div&gt;`)[0];
+                popup_b814dfd6af1693ca08feae0c2fe4b1a6.setContent(html_4466c19162850d83a985ab4b5e6a9bf6);
+            
+        
+
+        circle_marker_9e225179fd05683c5ceb360b72367447.bindPopup(popup_b814dfd6af1693ca08feae0c2fe4b1a6)
+        ;
+
+        
+    
+    
+            circle_marker_9e225179fd05683c5ceb360b72367447.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628c05fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_eab3c36fe062a04df72ed6cf2bd8715b = L.circleMarker(
+                [30.058832953727023, 31.184008415272288],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.591666666666667, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_1aee788e99ca9019f1e74796473edc7f = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_7bdcc7ed6ccddfe9371e9f49c4c5ffc9 = $(`&lt;div id=&quot;html_7bdcc7ed6ccddfe9371e9f49c4c5ffc9&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e6281a1fffff&lt;/b&gt;&lt;br&gt;Population: 67,119&lt;br&gt;Underserved score: 0.651&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 91.8&lt;/div&gt;`)[0];
+                popup_1aee788e99ca9019f1e74796473edc7f.setContent(html_7bdcc7ed6ccddfe9371e9f49c4c5ffc9);
+            
+        
+
+        circle_marker_eab3c36fe062a04df72ed6cf2bd8715b.bindPopup(popup_1aee788e99ca9019f1e74796473edc7f)
+        ;
+
+        
+    
+    
+            circle_marker_eab3c36fe062a04df72ed6cf2bd8715b.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e6281a1fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_930e10fe741b9c0504afcfc11b635902 = L.circleMarker(
+                [29.968736051737835, 31.255806436558085],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.543333333333333, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_0c17e063fa4aa5d65433cfcd00a62280 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_3b6548c6366a6d625d10ce5715f4ad44 = $(`&lt;div id=&quot;html_3b6548c6366a6d625d10ce5715f4ad44&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628c21fffff&lt;/b&gt;&lt;br&gt;Population: 63,950&lt;br&gt;Underserved score: 0.647&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 90.9&lt;/div&gt;`)[0];
+                popup_0c17e063fa4aa5d65433cfcd00a62280.setContent(html_3b6548c6366a6d625d10ce5715f4ad44);
+            
+        
+
+        circle_marker_930e10fe741b9c0504afcfc11b635902.bindPopup(popup_0c17e063fa4aa5d65433cfcd00a62280)
+        ;
+
+        
+    
+    
+            circle_marker_930e10fe741b9c0504afcfc11b635902.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628c21fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_71da02230bc20b4c0931df65aa0b7b44 = L.circleMarker(
+                [29.995790354503924, 31.19019093123983],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.51, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_8174f34b30211236408be706934151cb = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_80e4a8c33d56c6f1f56a86452a4c8562 = $(`&lt;div id=&quot;html_80e4a8c33d56c6f1f56a86452a4c8562&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628f21fffff&lt;/b&gt;&lt;br&gt;Population: 62,824&lt;br&gt;Underserved score: 0.645&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 90.2&lt;/div&gt;`)[0];
+                popup_8174f34b30211236408be706934151cb.setContent(html_80e4a8c33d56c6f1f56a86452a4c8562);
+            
+        
+
+        circle_marker_71da02230bc20b4c0931df65aa0b7b44.bindPopup(popup_8174f34b30211236408be706934151cb)
+        ;
+
+        
+    
+    
+            circle_marker_71da02230bc20b4c0931df65aa0b7b44.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628f21fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_3044665ee033d1a34fde6f07824803dc = L.circleMarker(
+                [30.049827031676656, 31.184892101469266],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.461666666666666, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_ed1cb0a203469f627a3b725057e8725d = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_f162abdc269e72787fb412279ae106a8 = $(`&lt;div id=&quot;html_f162abdc269e72787fb412279ae106a8&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e6281a7fffff&lt;/b&gt;&lt;br&gt;Population: 58,615&lt;br&gt;Underserved score: 0.639&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 89.2&lt;/div&gt;`)[0];
+                popup_ed1cb0a203469f627a3b725057e8725d.setContent(html_f162abdc269e72787fb412279ae106a8);
+            
+        
+
+        circle_marker_3044665ee033d1a34fde6f07824803dc.bindPopup(popup_ed1cb0a203469f627a3b725057e8725d)
+        ;
+
+        
+    
+    
+            circle_marker_3044665ee033d1a34fde6f07824803dc.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e6281a7fffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var circle_marker_b83e6636c160c65cfeb524326d39b7f2 = L.circleMarker(
+                [30.040821056680603, 31.185775626470416],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 8.428333333333333, &quot;stroke&quot;: true, &quot;weight&quot;: 3}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+        
+    
+        var popup_5578aa88c25d17da92078702bddf797c = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_7b57a721a321b947d8df32d5679af40c = $(`&lt;div id=&quot;html_7b57a721a321b947d8df32d5679af40c&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;&lt;b&gt;883e628f4dfffff&lt;/b&gt;&lt;br&gt;Population: 57,707&lt;br&gt;Underserved score: 0.636&lt;br&gt;Boarding total: 0&lt;br&gt;Priority score: 88.6&lt;/div&gt;`)[0];
+                popup_5578aa88c25d17da92078702bddf797c.setContent(html_7b57a721a321b947d8df32d5679af40c);
+            
+        
+
+        circle_marker_b83e6636c160c65cfeb524326d39b7f2.bindPopup(popup_5578aa88c25d17da92078702bddf797c)
+        ;
+
+        
+    
+    
+            circle_marker_b83e6636c160c65cfeb524326d39b7f2.bindTooltip(
+                `&lt;div&gt;
+                     Top target hex: 883e628f4dfffff
+                 &lt;/div&gt;`,
+                {
+  &quot;sticky&quot;: true,
+}
+            );
+        
+    
+            var layer_control_69122ac8db18bc4edf2caacb7c6c7e2d_layers = {
+                base_layers : {
+                    &quot;cartodbdarkmatter&quot; : tile_layer_bd9785d110bd5909af2b1f6dd095c88b,
+                },
+                overlays :  {
+                    &quot;Dense + underserved target hexes&quot; : geo_json_9e7f75162db2f68d03f5666c711142e1,
+                },
+            };
+            let layer_control_69122ac8db18bc4edf2caacb7c6c7e2d = L.control.layers(
+                layer_control_69122ac8db18bc4edf2caacb7c6c7e2d_layers.base_layers,
+                layer_control_69122ac8db18bc4edf2caacb7c6c7e2d_layers.overlays,
+                {
+  &quot;position&quot;: &quot;topright&quot;,
+  &quot;collapsed&quot;: true,
+  &quot;autoZIndex&quot;: true,
+}
+            ).addTo(map_e7218b1a40f67a1e4d0b1ac9dc7d371b);
+
+        
+&lt;/script&gt;
+&lt;/html&gt;" style="position:absolute;width:100%;height:100%;left:0;top:0;border:none !important;" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe></div></div></div></body></html>

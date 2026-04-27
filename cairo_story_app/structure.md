@@ -12,9 +12,9 @@
 | 5 | II | 84% of Phase-1 ghost terminals are beyond 2 km | المحطات المنسيّة · ٨٤٪ | Ghost overlay + metro | — | dim | 84% |
 | 6 | II | Cairo is a city of two densities | مدينتان مختلفتان | District choropleth | — | dim | 21× |
 | 7 | I | At 6:15 AM she stands at the mawfaq | الموقف · ٦:١٥ | Close zoom mawfaq · pitch 55° | — | fixed · bright · image | 60+ / hr |
-| 8 | II | Dense districts get 12× fewer stations per capita | عدم التوافق · ح١ | District + station overlay | **h1_box** | dim | ε² = 0.16 |
-| 9 | II | The LRT median catchment is zero residents | قطار خفيف في الصحراء · ح٢ | East pan · LRT highlight | **h2_bar** | dim | δ = −0.99 |
-| 10 | II | The BRT is the one thing they got right | النقل السريع · ح٣ | Ring Road + informal | **h3_bar** | dim | δ = +0.83 |
+| 8 | II | Dense districts get ~12× fewer stations per capita | عدم التوافق · ح١ | District + station overlay | **h1_box** | dim | ε² = 0.83 |
+| 9 | II | The LRT median catchment is 916 residents | قطار خفيف في الصحراء · ح٢ | East pan · LRT highlight | **h2_bar** | dim | δ = −0.99 |
+| 10 | II | The BRT is the one thing they got right | النقل السريع · ح٣ | Ring Road + informal | **h3_bar** | dim | δ = +0.71 |
 | 11 | II | No cell in this matrix is above 25% | الحُكم · ١٨ب | Reset view | **q18b_matrix** | dim | 25% |
 | 12 | III | Masari · one route planner for both systems | مَسَارِي · تطبيق واحد | **Animated 10 s** microbus → metro → return | — | **animated along polyline** | 18M |
 | 13 | III | 08:55 — she arrives on time | وصلت في الموعد | Maadi office · pitch 55° | — | fixed Maadi · brightest · image | 08:55 |
@@ -50,16 +50,16 @@ Each page embeds its existing Plotly HTML exports from `/Exports/` (40 HTML file
 |---|---|---|
 | Q14 · ghosts vs new metro | Python distance-bucket bar | 84% beyond 2 km |
 | Q18b · gap-closure matrix | Python heatmap | no cell > 25% |
-| Q22 · Adly Mansour | Embed `adly_mansour_zoom.html` | 4 modes · 83rd pctile |
+| Q23 · Adly Mansour | Embed `adly_mansour_zoom.html` | 4 modes · 21st pctile |
 | Q24 · K-Means | Python cluster-size bar + CAGR bubble | ARI = 1.00 |
 
 ### Hypotheses (3 + 2 hero maps)
 
 | Page | Charts | Key KPI |
 |---|---|---|
-| H1 · coverage-need mismatch | Python box + Moran's I bar | H = 12.5 · ε² = 0.16 |
-| H2 · LRT catchment deficit | Python comparison bar | δ = −0.993 |
-| H3 · BRT corridor match | Python comparison bar | δ = +0.826 |
+| H1 · coverage-need mismatch | Python box + Moran's I bar | H = 55.7 · ε² = 0.83 |
+| H2 · LRT catchment deficit | Python comparison bar | δ = −0.991 |
+| H3 · BRT corridor match | Python comparison bar | δ = +0.710 |
 | HERO · Two Cairos | Embed `two_cairos_map.html` | spatial overlay |
 | HERO · Coverage-Need | Embed `headline_coverage_need_map.html` | final synthesis |
 

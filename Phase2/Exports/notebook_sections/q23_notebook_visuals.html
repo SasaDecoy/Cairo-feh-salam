@@ -1,0 +1,327 @@
+<!doctype html><html><head><meta charset="utf-8" />
+<title>Q23 · Notebook Visualizations</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+:root{--bg:#0D1117;--panel:#161B22;--txt:#C9D1D9;--muted:#8B949E;--blue:#58A6FF;--gold:#E9C46A;--coral:#E86F51;}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+header{padding:18px 22px;border-bottom:1px solid rgba(88,166,255,.2);background:rgba(13,17,23,.96);}
+h1{font-size:20px;margin:0 0 6px;color:var(--gold);}p{margin:0;color:var(--muted);line-height:1.45;font-size:13px}.wrap{padding:18px;}.card{background:rgba(22,27,34,.76);border:1px solid rgba(88,166,255,.18);border-radius:12px;padding:14px;margin:0 0 22px;}.meta{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}.title{font-size:16px;color:var(--gold);font-weight:700;margin-bottom:10px}.plot{width:100%;min-height:460px}.htmlviz iframe,.htmlviz>div{max-width:100%;}</style>
+</head><body><header><h1>Q23 · notebook visualizations</h1><p>Exact saved visual outputs from <code>Phase2_Analysis_Hypothesis.ipynb</code>. Count: <strong>3</strong>.</p></header><div class="wrap">
+<section class="card"><div class="meta">Q23 · cell 127</div><div class="title">01. Q23 · map · cell 127</div>
+<div class="htmlviz"><div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File -> Trust Notebook</span><iframe srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    
+    &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot; /&gt;
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://code.jquery.com/jquery-3.7.1.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js&quot;&gt;&lt;/script&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css&quot;/&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css&quot;/&gt;
+    
+            &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
+            &lt;style&gt;
+                #map_b607b0a60a46cf6ed4377d7ee733d662 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            &lt;/style&gt;
+
+            &lt;style&gt;html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            &lt;/style&gt;
+
+            &lt;style&gt;#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            &lt;/style&gt;
+
+            &lt;script&gt;
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            &lt;/script&gt;
+
+        
+&lt;/head&gt;
+&lt;body&gt;
+    
+    
+&lt;div style=&quot;position: fixed; bottom: 20px; left: 20px; z-index: 9999;
+  background: rgba(13,17,23,0.92); color: #C9D1D9; padding: 12px 16px;
+  border-radius: 8px; border: 1px solid rgba(88,166,255,0.3);
+  font-family: &#x27;Share Tech Mono&#x27;, monospace; font-size: 11px; line-height: 1.8;&quot;&gt;
+  &lt;div style=&quot;color:#E9C46A; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.2em;&quot;&gt;ADLY MANSOUR · 4 MODES (2.5 km buffer)&lt;/div&gt;
+  &lt;div&gt;&lt;span style=&quot;display:inline-block;width:10px;height:10px;background:#58A6FF;border-radius:50%;margin-right:6px;&quot;&gt;&lt;/span&gt;Metro Line 3 terminus (2019)&lt;/div&gt;
+  &lt;div&gt;&lt;span style=&quot;display:inline-block;width:10px;height:10px;background:#F4A261;border-radius:50%;margin-right:6px;&quot;&gt;&lt;/span&gt;Cairo LRT (2022)&lt;/div&gt;
+  &lt;div&gt;&lt;span style=&quot;display:inline-block;width:10px;height:10px;background:#7B2D8E;border-radius:50%;margin-right:6px;&quot;&gt;&lt;/span&gt;Cairo BRT (2025)&lt;/div&gt;
+  &lt;div&gt;&lt;span style=&quot;display:inline-block;width:10px;height:10px;background:#E86F51;border-radius:50%;margin-right:6px;&quot;&gt;&lt;/span&gt;Phase-1 informal terminals (System B)&lt;/div&gt;
+  &lt;div&gt;&lt;span style=&quot;display:inline-block;width:14px;height:2px;background:transparent;border-top:1px dashed #E9C46A;margin-right:6px;vertical-align:middle;&quot;&gt;&lt;/span&gt;2.5 km convergence buffer&lt;/div&gt;
+&lt;/div&gt;
+    
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_b607b0a60a46cf6ed4377d7ee733d662&quot; &gt;&lt;/div&gt;
+        
+&lt;/body&gt;
+&lt;script&gt;
+    
+    
+            var map_b607b0a60a46cf6ed4377d7ee733d662 = L.map(
+                &quot;map_b607b0a60a46cf6ed4377d7ee733d662&quot;,
+                {
+                    center: [30.147, 31.421],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  &quot;zoom&quot;: 13,
+  &quot;zoomControl&quot;: true,
+  &quot;preferCanvas&quot;: false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_9664e66e60016e667f7d4d42ee627e61 = L.tileLayer(
+                &quot;https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 20,
+  &quot;maxNativeZoom&quot;: 20,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\&quot;https://carto.com/attributions\&quot;\u003eCARTO\u003c/a\u003e&quot;,
+  &quot;subdomains&quot;: &quot;abcd&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_9664e66e60016e667f7d4d42ee627e61.addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+            var circle_marker_872c00c87b83bd4588d4190f8fe64a27 = L.circleMarker(
+                [30.146944444444443, 31.421388888888895],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 7, &quot;stroke&quot;: true, &quot;weight&quot;: 2}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_610fcbe26a5608e160d1438ff17fe460 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_4caaeb3854e3e37338cde59c0170bfd8 = $(`&lt;div id=&quot;html_4caaeb3854e3e37338cde59c0170bfd8&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;Adly Mansour · S3_metro&lt;/div&gt;`)[0];
+                popup_610fcbe26a5608e160d1438ff17fe460.setContent(html_4caaeb3854e3e37338cde59c0170bfd8);
+            
+        
+
+        circle_marker_872c00c87b83bd4588d4190f8fe64a27.bindPopup(popup_610fcbe26a5608e160d1438ff17fe460)
+        ;
+
+        
+    
+    
+            var circle_marker_a3bced3088af3ce20451b263e79b0c5d = L.circleMarker(
+                [30.143888888888892, 31.40472222222222],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#58A6FF&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#58A6FF&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 7, &quot;stroke&quot;: true, &quot;weight&quot;: 2}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_4fe5424a51768f52e64fff66a3694b4d = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_35ef32956ab117aabca0782735899119 = $(`&lt;div id=&quot;html_35ef32956ab117aabca0782735899119&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;El Haykestep · S3_metro&lt;/div&gt;`)[0];
+                popup_4fe5424a51768f52e64fff66a3694b4d.setContent(html_35ef32956ab117aabca0782735899119);
+            
+        
+
+        circle_marker_a3bced3088af3ce20451b263e79b0c5d.bindPopup(popup_4fe5424a51768f52e64fff66a3694b4d)
+        ;
+
+        
+    
+    
+            var circle_marker_50b3494a11d4c53f8a44d8e8ce8fb3b3 = L.circleMarker(
+                [30.147031500000008, 31.4215092],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#F4A261&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#F4A261&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 7, &quot;stroke&quot;: true, &quot;weight&quot;: 2}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_a096ac389aa55d862727fd6ab9f9abfa = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_7c0af0e67c52fb4edca673e9f77fa8cf = $(`&lt;div id=&quot;html_7c0af0e67c52fb4edca673e9f77fa8cf&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;Adly Mansour · S4_lrt&lt;/div&gt;`)[0];
+                popup_a096ac389aa55d862727fd6ab9f9abfa.setContent(html_7c0af0e67c52fb4edca673e9f77fa8cf);
+            
+        
+
+        circle_marker_50b3494a11d4c53f8a44d8e8ce8fb3b3.bindPopup(popup_a096ac389aa55d862727fd6ab9f9abfa)
+        ;
+
+        
+    
+    
+            var circle_marker_e9da75e3ed2a8a232c1154d7958cd303 = L.circleMarker(
+                [30.148094899999997, 31.42001],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#7B2D8E&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#7B2D8E&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 7, &quot;stroke&quot;: true, &quot;weight&quot;: 2}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_53279bc6a77ae15820cc76972469abfe = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_d5ed59cea4526a97f8f68031ed279505 = $(`&lt;div id=&quot;html_d5ed59cea4526a97f8f68031ed279505&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;mhta &#x27;dly mnswr BRT · S5_brt&lt;/div&gt;`)[0];
+                popup_53279bc6a77ae15820cc76972469abfe.setContent(html_d5ed59cea4526a97f8f68031ed279505);
+            
+        
+
+        circle_marker_e9da75e3ed2a8a232c1154d7958cd303.bindPopup(popup_53279bc6a77ae15820cc76972469abfe)
+        ;
+
+        
+    
+    
+            var circle_marker_7cd59b74cffa3054fd5dac0af45b4e0c = L.circleMarker(
+                [30.1488806, 31.4187215],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#7B2D8E&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#7B2D8E&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 7, &quot;stroke&quot;: true, &quot;weight&quot;: 2}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_cb0711fc890389f6383509ecd5722451 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_b35915e0c597bf5dee5df78a5828a9f5 = $(`&lt;div id=&quot;html_b35915e0c597bf5dee5df78a5828a9f5&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;mhta alatwbys altrddy alslam · S5_brt&lt;/div&gt;`)[0];
+                popup_cb0711fc890389f6383509ecd5722451.setContent(html_b35915e0c597bf5dee5df78a5828a9f5);
+            
+        
+
+        circle_marker_7cd59b74cffa3054fd5dac0af45b4e0c.bindPopup(popup_cb0711fc890389f6383509ecd5722451)
+        ;
+
+        
+    
+    
+            var circle_marker_353c932ab070ad5e697e3b9cd6eaea7a = L.circleMarker(
+                [30.15831650000001, 31.405057000000003],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#7B2D8E&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#7B2D8E&quot;, &quot;fillOpacity&quot;: 0.9, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 7, &quot;stroke&quot;: true, &quot;weight&quot;: 2}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_44e83ff7e5e16887ab12499a495f578f = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_1daa456314f0a41cc00e961aadab6c20 = $(`&lt;div id=&quot;html_1daa456314f0a41cc00e961aadab6c20&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;mhta alatwbys altrddy alfryq abrahym &#x27;raby · S5_brt&lt;/div&gt;`)[0];
+                popup_44e83ff7e5e16887ab12499a495f578f.setContent(html_1daa456314f0a41cc00e961aadab6c20);
+            
+        
+
+        circle_marker_353c932ab070ad5e697e3b9cd6eaea7a.bindPopup(popup_44e83ff7e5e16887ab12499a495f578f)
+        ;
+
+        
+    
+    
+            var circle_marker_4b2e34e3c14f94c3f4f19ec8eb4ebbc0 = L.circleMarker(
+                [30.15340342779876, 31.408848620502667],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#E86F51&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.8, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 6, &quot;stroke&quot;: true, &quot;weight&quot;: 1.5}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_7e50316c1921191ffd2be6f9f4a9a996 = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_fe49789f6cbe058f6dec29be5247cff0 = $(`&lt;div id=&quot;html_fe49789f6cbe058f6dec29be5247cff0&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;Al-Salam (10th of Ramadan) (informal terminal)&lt;/div&gt;`)[0];
+                popup_7e50316c1921191ffd2be6f9f4a9a996.setContent(html_fe49789f6cbe058f6dec29be5247cff0);
+            
+        
+
+        circle_marker_4b2e34e3c14f94c3f4f19ec8eb4ebbc0.bindPopup(popup_7e50316c1921191ffd2be6f9f4a9a996)
+        ;
+
+        
+    
+    
+            var circle_marker_de3490004d381472f0fe70a7aefda67e = L.circleMarker(
+                [30.142479763552963, 31.400026553909164],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#E86F51&quot;, &quot;dashArray&quot;: null, &quot;dashOffset&quot;: null, &quot;fill&quot;: true, &quot;fillColor&quot;: &quot;#E86F51&quot;, &quot;fillOpacity&quot;: 0.8, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 6, &quot;stroke&quot;: true, &quot;weight&quot;: 1.5}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+        var popup_e794941cb18a5a405c7b2c57c8c6381b = L.popup({
+  &quot;maxWidth&quot;: &quot;100%&quot;,
+});
+
+        
+            
+                var html_91682b7f89e11bfd4b3a36b39cc262b9 = $(`&lt;div id=&quot;html_91682b7f89e11bfd4b3a36b39cc262b9&quot; style=&quot;width: 100.0%; height: 100.0%;&quot;&gt;Awwel Gamal - Gesr EL Suez (informal terminal)&lt;/div&gt;`)[0];
+                popup_e794941cb18a5a405c7b2c57c8c6381b.setContent(html_91682b7f89e11bfd4b3a36b39cc262b9);
+            
+        
+
+        circle_marker_de3490004d381472f0fe70a7aefda67e.bindPopup(popup_e794941cb18a5a405c7b2c57c8c6381b)
+        ;
+
+        
+    
+    
+            var circle_17e50fac5930766f7852abbcfc39e066 = L.circle(
+                [30.147, 31.421],
+                {&quot;bubblingMouseEvents&quot;: true, &quot;color&quot;: &quot;#E9C46A&quot;, &quot;dashArray&quot;: &quot;6,6&quot;, &quot;dashOffset&quot;: null, &quot;fill&quot;: false, &quot;fillColor&quot;: &quot;#E9C46A&quot;, &quot;fillOpacity&quot;: 0.2, &quot;fillRule&quot;: &quot;evenodd&quot;, &quot;lineCap&quot;: &quot;round&quot;, &quot;lineJoin&quot;: &quot;round&quot;, &quot;opacity&quot;: 1.0, &quot;radius&quot;: 2500, &quot;stroke&quot;: true, &quot;weight&quot;: 1.5}
+            ).addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+    
+            tile_layer_9664e66e60016e667f7d4d42ee627e61.addTo(map_b607b0a60a46cf6ed4377d7ee733d662);
+        
+&lt;/script&gt;
+&lt;/html&gt;" style="position:absolute;width:100%;height:100%;left:0;top:0;border:none !important;" allowfullscreen webkitallowfullscreen mozallowfullscreen></iframe></div></div></div>
+</section>
+<section class="card"><div class="meta">Q23 · cell 129</div><div class="title">02. Q23 · Adly Mansour rank vs random Cairo 2.5-km clusters (p21)</div>
+<div id="plot-Q23-2" class="plot"></div>
+</section>
+<section class="card"><div class="meta">Q23 · cell 130</div><div class="title">03. Q23 add-on ? What makes Adly Mansour multimodal?</div>
+<div id="plot-Q23-3" class="plot"></div>
+</section>
+</div><script>
+(function(){const fig={"config": {"plotlyServerURL": "https://plot.ly"}, "data": [{"marker": {"color": "#58A6FF"}, "name": "Random 2.5-km cluster sample (n=150)", "nbinsx": 20, "opacity": 0.8, "type": "histogram", "x": [6, 51, 17, 23, 3, 9, 10, 18, 41, 6, 25, 35, 24, 5, 3, 25, 10, 46, 22, 2, 33, 43, 46, 21, 24, 6, 49, 31, 36, 7, 22, 46, 25, 17, 17, 4, 41, 11, 39, 2, 49, 38, 41, 40, 13, 3, 22, 23, 46, 24, 4, 32, 17, 49, 6, 24, 30, 6, 22, 10, 11, 17, 9, 25, 14, 45, 12, 21, 46, 39, 19, 17, 10, 18, 17, 11, 49, 27, 2, 32, 48, 1, 16, 17, 8, 49, 42, 4, 17, 3, 25, 18, 20, 2, 33, 35, 46, 41, 30, 43, 3, 29, 39, 5, 8, 4, 7, 34, 6, 35, 47, 35, 2, 22, 24, 13, 26, 10, 1, 26, 34, 3, 35, 51, 24, 38, 10, 7, 26, 8, 16, 53, 2, 27, 16, 28, 38, 24, 14, 18, 49, 24, 36, 49, 6, 12, 16, 8, 27, 5]}], "layout": {"annotations": [{"showarrow": false, "text": " Adly Mansour = 8", "x": 8, "xanchor": "center", "xref": "x", "y": 1, "yanchor": "bottom", "yref": "y domain"}], "font": {"color": "#C9D1D9"}, "height": 420, "paper_bgcolor": "#0D1117", "plot_bgcolor": "#0D1117", "shapes": [{"line": {"color": "#E86F51", "width": 3}, "type": "line", "x0": 8, "x1": 8, "xref": "x", "y0": 0, "y1": 1, "yref": "y domain"}], "showlegend": false, "template": {"data": {"bar": [{"error_x": {"color": "#f2f5fa"}, "error_y": {"color": "#f2f5fa"}, "marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "barpolar": [{"marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "carpet": [{"aaxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "baxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "contour"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "heatmap"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "histogram2d"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "histogram2dcontour"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter": [{"marker": {"line": {"color": "#283442"}}, "type": "scatter"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"line": {"color": "#283442"}}, "type": "scattergl"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#506784"}, "line": {"color": "rgb(17,17,17)"}}, "header": {"fill": {"color": "#2a3f5f"}, "line": {"color": "rgb(17,17,17)"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#f2f5fa", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "sequentialminus": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#f2f5fa"}, "geo": {"bgcolor": "rgb(17,17,17)", "lakecolor": "rgb(17,17,17)", "landcolor": "rgb(17,17,17)", "showlakes": true, "showland": true, "subunitcolor": "#506784"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "dark"}, "paper_bgcolor": "rgb(17,17,17)", "plot_bgcolor": "rgb(17,17,17)", "polar": {"angularaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "radialaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "yaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "zaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}}, "shapedefaults": {"line": {"color": "#f2f5fa"}}, "sliderdefaults": {"bgcolor": "#C8D4E3", "bordercolor": "rgb(17,17,17)", "borderwidth": 1, "tickwidth": 0}, "ternary": {"aaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "baxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "caxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "title": {"x": 0.05}, "updatemenudefaults": {"bgcolor": "#506784", "borderwidth": 0}, "xaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}}}, "title": {"font": {"color": "#E9C46A"}, "text": "Q23 · Adly Mansour rank vs random Cairo 2.5-km clusters (p21)"}, "width": 950, "xaxis": {"color": "#C9D1D9", "title": {"text": "Stations + informal terminals within 2.5 km of a random point"}}, "yaxis": {"color": "#C9D1D9", "title": {"text": "Frequency among 150 random draws"}}}}; Plotly.newPlot('plot-Q23-2', fig.data||[], fig.layout||{}, Object.assign({responsive:true,displaylogo:false}, fig.config||{}));})();
+(function(){const fig={"config": {"plotlyServerURL": "https://plot.ly"}, "data": [{"domain": {"x": [0, 0.45], "y": [0, 1]}, "hole": 0.45, "labels": ["Metro Line 3 (2019)", "Cairo LRT (2022)", "Cairo BRT (2025)", "Informal terminals (microbus / minibus / bus)"], "marker": {"colors": ["#58A6FF", "#F4A261", "#7B2D8E", "#E86F51"]}, "type": "pie", "values": {"bdata": "AgEDAg==", "dtype": "i1"}}, {"marker": {"color": ["#58A6FF", "#F4A261", "#7B2D8E", "#E86F51"]}, "type": "bar", "x": ["Metro Line 3 (2019)", "Cairo LRT (2022)", "Cairo BRT (2025)", "Informal terminals (microbus / minibus / bus)"], "xaxis": "x", "y": {"bdata": "AgEDAg==", "dtype": "i1"}, "yaxis": "y"}], "layout": {"annotations": [{"font": {"size": 16}, "showarrow": false, "text": "Composition", "x": 0.225, "xanchor": "center", "xref": "paper", "y": 1, "yanchor": "bottom", "yref": "paper"}, {"font": {"size": 16}, "showarrow": false, "text": "Mode counts", "x": 0.775, "xanchor": "center", "xref": "paper", "y": 1, "yanchor": "bottom", "yref": "paper"}], "font": {"color": "#C9D1D9"}, "height": 500, "paper_bgcolor": "#0D1117", "plot_bgcolor": "#0D1117", "showlegend": false, "template": {"data": {"bar": [{"error_x": {"color": "#f2f5fa"}, "error_y": {"color": "#f2f5fa"}, "marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "bar"}], "barpolar": [{"marker": {"line": {"color": "rgb(17,17,17)", "width": 0.5}, "pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "barpolar"}], "carpet": [{"aaxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "baxis": {"endlinecolor": "#A2B1C6", "gridcolor": "#506784", "linecolor": "#506784", "minorgridcolor": "#506784", "startlinecolor": "#A2B1C6"}, "type": "carpet"}], "choropleth": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "choropleth"}], "contour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "contour"}], "contourcarpet": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "contourcarpet"}], "heatmap": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "heatmap"}], "histogram": [{"marker": {"pattern": {"fillmode": "overlay", "size": 10, "solidity": 0.2}}, "type": "histogram"}], "histogram2d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "histogram2d"}], "histogram2dcontour": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "histogram2dcontour"}], "mesh3d": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "type": "mesh3d"}], "parcoords": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "parcoords"}], "pie": [{"automargin": true, "type": "pie"}], "scatter": [{"marker": {"line": {"color": "#283442"}}, "type": "scatter"}], "scatter3d": [{"line": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatter3d"}], "scattercarpet": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattercarpet"}], "scattergeo": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattergeo"}], "scattergl": [{"marker": {"line": {"color": "#283442"}}, "type": "scattergl"}], "scattermap": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermap"}], "scattermapbox": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scattermapbox"}], "scatterpolar": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolar"}], "scatterpolargl": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterpolargl"}], "scatterternary": [{"marker": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "type": "scatterternary"}], "surface": [{"colorbar": {"outlinewidth": 0, "ticks": ""}, "colorscale": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "type": "surface"}], "table": [{"cells": {"fill": {"color": "#506784"}, "line": {"color": "rgb(17,17,17)"}}, "header": {"fill": {"color": "#2a3f5f"}, "line": {"color": "rgb(17,17,17)"}}, "type": "table"}]}, "layout": {"annotationdefaults": {"arrowcolor": "#f2f5fa", "arrowhead": 0, "arrowwidth": 1}, "autotypenumbers": "strict", "coloraxis": {"colorbar": {"outlinewidth": 0, "ticks": ""}}, "colorscale": {"diverging": [[0, "#8e0152"], [0.1, "#c51b7d"], [0.2, "#de77ae"], [0.3, "#f1b6da"], [0.4, "#fde0ef"], [0.5, "#f7f7f7"], [0.6, "#e6f5d0"], [0.7, "#b8e186"], [0.8, "#7fbc41"], [0.9, "#4d9221"], [1, "#276419"]], "sequential": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]], "sequentialminus": [[0, "#0d0887"], [0.1111111111111111, "#46039f"], [0.2222222222222222, "#7201a8"], [0.3333333333333333, "#9c179e"], [0.4444444444444444, "#bd3786"], [0.5555555555555556, "#d8576b"], [0.6666666666666666, "#ed7953"], [0.7777777777777778, "#fb9f3a"], [0.8888888888888888, "#fdca26"], [1, "#f0f921"]]}, "colorway": ["#636efa", "#EF553B", "#00cc96", "#ab63fa", "#FFA15A", "#19d3f3", "#FF6692", "#B6E880", "#FF97FF", "#FECB52"], "font": {"color": "#f2f5fa"}, "geo": {"bgcolor": "rgb(17,17,17)", "lakecolor": "rgb(17,17,17)", "landcolor": "rgb(17,17,17)", "showlakes": true, "showland": true, "subunitcolor": "#506784"}, "hoverlabel": {"align": "left"}, "hovermode": "closest", "mapbox": {"style": "dark"}, "paper_bgcolor": "rgb(17,17,17)", "plot_bgcolor": "rgb(17,17,17)", "polar": {"angularaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "radialaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "scene": {"xaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "yaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}, "zaxis": {"backgroundcolor": "rgb(17,17,17)", "gridcolor": "#506784", "gridwidth": 2, "linecolor": "#506784", "showbackground": true, "ticks": "", "zerolinecolor": "#C8D4E3"}}, "shapedefaults": {"line": {"color": "#f2f5fa"}}, "sliderdefaults": {"bgcolor": "#C8D4E3", "bordercolor": "rgb(17,17,17)", "borderwidth": 1, "tickwidth": 0}, "ternary": {"aaxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "baxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}, "bgcolor": "rgb(17,17,17)", "caxis": {"gridcolor": "#506784", "linecolor": "#506784", "ticks": ""}}, "title": {"x": 0.05}, "updatemenudefaults": {"bgcolor": "#506784", "borderwidth": 0}, "xaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}, "yaxis": {"automargin": true, "gridcolor": "#283442", "linecolor": "#506784", "ticks": "", "title": {"standoff": 15}, "zerolinecolor": "#283442", "zerolinewidth": 2}}}, "title": {"font": {"color": "#E9C46A"}, "text": "Q23 add-on ? What makes Adly Mansour multimodal?"}, "width": 1100, "xaxis": {"anchor": "y", "domain": [0.55, 1], "tickangle": -25}, "yaxis": {"anchor": "x", "domain": [0, 1], "title": {"text": "stations / terminals"}}}}; Plotly.newPlot('plot-Q23-3', fig.data||[], fig.layout||{}, Object.assign({responsive:true,displaylogo:false}, fig.config||{}));})();
+</script></body></html>
